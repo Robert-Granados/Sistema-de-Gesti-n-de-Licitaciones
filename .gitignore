@@ -1,0 +1,29 @@
+# Build results
+**/bin/
+**/obj/
+artifacts/
+TestResults/
+coverage/
+
+# Local .NET SDK and tooling
+.dotnet/
+.store/
+.vs/
+.vscode/*.user
+*.user
+*.suo
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+**/appsettings.*.local.json
+**/appsettings.Development.json
+**/secrets.json
+**/secrets/
+*.pfx
+*.snk
+
+# Operating system and IDE files
+.DS_Store
+Thumbs.db

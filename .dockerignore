@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+.dotnet/
+.git/
+.env
+.env.*
+!.env.example
+TestResults/
+coverage/
+docs/
+k8s/
+database_schema.sql
+README.md
+
