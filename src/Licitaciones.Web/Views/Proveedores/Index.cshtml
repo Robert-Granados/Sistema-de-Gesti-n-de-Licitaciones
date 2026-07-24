@@ -1,0 +1,171 @@
+@model Licitaciones.Web.Models.Proveedores.ListarProveedoresViewModel
+
+@{
+    ViewData["Title"] = "Proveedores";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Proveedores</h1>
+        <p class="text-muted mb-0">Consulte los proveedores activos registrados.</p>
+    </div>
+    <a asp-action="Crear" class="btn btn-primary">Registrar proveedor</a>
+</div>
+
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+    <div class="col-md-5">
+        <label for="search" class="form-label">Buscar por nombre</label>
+        <input id="search"
+               name="search"
+               value="@Model.Search"
+               class="form-control"
+               placeholder="Nombre del proveedor" />
+    </div>
+    <div class="col-md-3">
+        <label for="sortBy" class="form-label">Orden</label>
+        <select id="sortBy" name="sortBy" class="form-select">
+            <option value="nombre" selected="@(Model.SortBy == "nombre")">Nombre A–Z</option>
+            <option value="nombre_desc" selected="@(Model.SortBy == "nombre_desc")">Nombre Z–A</option>
+            <option value="id" selected="@(Model.SortBy == "id")">ID ascendente</option>
+            <option value="id_desc" selected="@(Model.SortBy == "id_desc")">ID descendente</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="pageSize" class="form-label">Por página</label>
+        <select id="pageSize" name="pageSize" class="form-select">
+            <option value="5" selected="@(Model.PageSize == 5)">5</option>
+            <option value="10" selected="@(Model.PageSize == 10)">10</option>
+            <option value="25" selected="@(Model.PageSize == 25)">25</option>
+            <option value="50" selected="@(Model.PageSize == 50)">50</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button type="submit" class="btn btn-outline-primary w-100">Aplicar</button>
+    </div>
+</form>
+
+@if (Model.Resultado.Elementos.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        No se encontraron proveedores con los criterios indicados.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Nombre</th>
+                    <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var proveedor in Model.Resultado.Elementos)
+                {
+                    <tr>
+                        <td><code>@proveedor.Id</code></td>
+                        <td>@proveedor.Nombre</td>
+                        <td class="text-end">
+                            <a asp-action="Detalle"
+                               asp-route-id="@proveedor.Id"
+                               class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                            <a asp-action="Editar"
+                               asp-route-id="@proveedor.Id"
+                               class="btn btn-sm btn-outline-secondary">Editar</a>
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#eliminarProveedorModal"
+                                    data-proveedor-id="@proveedor.Id"
+                                    data-proveedor-nombre="@proveedor.Nombre">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <p class="mb-0">
+        Total: <strong>@Model.Resultado.TotalRegistros</strong> ·
+        Página <strong>@Model.Resultado.PaginaActual</strong> de
+        <strong>@Model.Resultado.TotalPaginas</strong>
+    </p>
+
+    <nav aria-label="Paginación de proveedores">
+        <ul class="pagination mb-0">
+            <li class="page-item @(!Model.Resultado.TienePaginaAnterior ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Resultado.PaginaActual - 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-search="@Model.Search"
+                   asp-route-sortBy="@Model.SortBy">Anterior</a>
+            </li>
+            <li class="page-item @(!Model.Resultado.TienePaginaSiguiente ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Resultado.PaginaActual + 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-search="@Model.Search"
+                   asp-route-sortBy="@Model.SortBy">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="modal fade"
+     id="eliminarProveedorModal"
+     tabindex="-1"
+     aria-labelledby="eliminarProveedorModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="eliminarProveedorModalLabel">
+                    Confirmar eliminación
+                </h2>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Confirma que desea eliminar al proveedor
+                <strong id="proveedorAEliminar"></strong>?
+                Su historial de ofertas se conservará.
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminarProveedor" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">
+                        Sí, eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('eliminarProveedorModal')
+            .addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const id = button.getAttribute('data-proveedor-id');
+                const nombre = button.getAttribute('data-proveedor-nombre');
+
+                document.getElementById('proveedorAEliminar').textContent = nombre;
+                document.getElementById('formEliminarProveedor').action =
+                    '@Url.Action("Eliminar", "Proveedores")/' + encodeURIComponent(id);
+            });
+    </script>
+}

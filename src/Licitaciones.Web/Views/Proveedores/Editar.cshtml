@@ -1,0 +1,42 @@
+@model Licitaciones.Web.Models.Proveedores.EditarProveedorViewModel
+
+@{
+    ViewData["Title"] = "Editar proveedor";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <h1>Editar proveedor</h1>
+        <p class="text-muted">
+            Actualice el nombre conservando la unicidad del proveedor.
+        </p>
+
+        <form asp-action="Editar" asp-route-id="@Model.Id" method="post">
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="RowVersion" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Nombre" class="form-label"></label>
+                <input asp-for="Nombre"
+                       class="form-control"
+                       autocomplete="organization"
+                       pattern="[\p{L}\p{N}\s.,\(\)]+" />
+                <span asp-validation-for="Nombre" class="text-danger"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-action="Detalle"
+                   asp-route-id="@Model.Id"
+                   class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
