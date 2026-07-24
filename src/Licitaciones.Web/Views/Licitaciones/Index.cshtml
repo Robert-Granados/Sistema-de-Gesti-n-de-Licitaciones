@@ -109,10 +109,15 @@ else
                         <td>@licitacion.FechaCierre.ToOffset(TimeSpan.FromHours(-6)).ToString("dd/MM/yyyy HH:mm")</td>
                         <td>@licitacion.PresupuestoEstimadoCrc.ToString("N2")</td>
                         <td class="text-end">
-                            <a asp-controller="Licitaciones"
-                               asp-action="Crear"
-                               class="btn btn-sm btn-outline-secondary disabled"
-                               aria-disabled="true">Detalles</a>
+                            <a asp-action="Detalle"
+                               asp-route-id="@licitacion.Id"
+                               class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                            @if (licitacion.Estado != Licitaciones.Domain.Enums.EstadoLicitacion.Cerrada)
+                            {
+                                <a asp-action="Editar"
+                                   asp-route-id="@licitacion.Id"
+                                   class="btn btn-sm btn-outline-secondary">Editar</a>
+                            }
                         </td>
                     </tr>
                 }

@@ -76,6 +76,33 @@ public sealed class Licitacion
         Estado = EstadoLicitacion.Cerrada;
     }
 
+    public void CambiarTitulo(string titulo)
+    {
+        Titulo = ValidarTextoObligatorio(titulo, nameof(titulo));
+    }
+
+    public void ActualizarFechaCierre(DateTimeOffset fechaCierre)
+    {
+        if (fechaCierre == default)
+        {
+            throw new ArgumentException("La fecha de cierre es obligatoria.", nameof(fechaCierre));
+        }
+
+        FechaCierre = fechaCierre;
+    }
+
+    public void ActualizarPresupuesto(decimal presupuestoEstimadoCrc)
+    {
+        if (presupuestoEstimadoCrc <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(presupuestoEstimadoCrc),
+                "El presupuesto estimado debe ser mayor que cero.");
+        }
+
+        PresupuestoEstimadoCrc = presupuestoEstimadoCrc;
+    }
+
     private static string ValidarTextoObligatorio(string? valor, string nombreParametro)
     {
         if (string.IsNullOrWhiteSpace(valor))

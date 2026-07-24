@@ -35,6 +35,8 @@ public static class DependencyInjection
         services.AddSingleton<IClock, SystemClock>();
         services.AddScoped<ILicitacionRepository, LicitacionRepository>();
         services.AddScoped<ILicitacionReadRepository, LicitacionReadRepository>();
+        services.AddScoped<ILicitacionDetalleRepository, LicitacionDetalleRepository>();
+        services.AddScoped<ILicitacionEditRepository, LicitacionEditRepository>();
 
         return services;
     }
