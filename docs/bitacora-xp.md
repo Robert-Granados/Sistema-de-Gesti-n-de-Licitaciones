@@ -99,22 +99,26 @@ El procedimiento de demostración y aceptación está en
 
 Registrar durante o inmediatamente después de la demo:
 
-- **Fecha de revisión:**
-- **Nombre o rol del cliente:**
-- **Funcionalidad aceptada:**
-- **Observaciones:**
-- **Cambios solicitados:**
-- **Prioridad de los cambios:**
-- **Decisión:** Aceptada / Aceptada con ajustes / No aceptada
+- **Fecha de revisión: 23/07/2026**
+- **Nombre o rol del cliente: Robert Granados**
+- **Funcionalidad aceptada: Editar proveedor, Eliminar proveedor, Consultar detalle, Registrar proveedor, Listar proveedores, Buscar proveedores**
+- **Observaciones: La funcionalidad es adecuada y cumple con las expectativas para la iteración 1, pero se requiere mejorar la experiencia del usuario, tmabién es necesario un que la pruebas se puedan realizar con más datos en los diferentes apartados**
+- **Cambios solicitados: Mejorar la experiencia del usuario (UX/UI)**
+- **Prioridad de los cambios: Media**
+- **Decisión:** Aceptada con ajustes
 
 ### Retrospectiva del equipo
 
 Completar después de recibir la retroalimentación:
 
-- **Qué funcionó bien:**
-- **Qué debe mejorar:**
-- **Acción concreta para la Iteración 2:**
-- **Responsable y fecha de seguimiento:**
+- **Qué funcionó bien:** Funcionalidad implementada correctamente, pruebas unitarias y de integración exitosas. 
+- **Qué debe mejorar:** Mejorar la experiencia del usuario (UX/UI) y permitir pruebas con más datos en los diferentes apartados.
+- **Acción concreta para la Iteración 2:** 
+  - Mejorar la experiencia del usuario (UX/UI) en la aplicación.
+  - Implementar la capacidad de realizar pruebas con más datos en los diferentes apartados.
+- **Responsable y fecha de seguimiento:** 
+  - Responsable: Robert Granados
+  - Fecha de seguimiento: 30/07/2026
 
 ### Condición de cierre
 
