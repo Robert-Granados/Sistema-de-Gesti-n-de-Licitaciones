@@ -1,0 +1,128 @@
+@model Licitaciones.Application.Proveedores.Detalle.ProveedorDetalleDto
+
+@{
+    ViewData["Title"] = "Detalle del proveedor";
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1>@Model.Nombre</h1>
+        <p class="text-muted mb-0">
+            ID: <code>@Model.Id</code>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Editar"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary">Editar</a>
+        <button type="button"
+                class="btn btn-outline-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#eliminarProveedorModal">
+            Eliminar
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Volver a proveedores</a>
+    </div>
+</div>
+
+<div class="modal fade"
+     id="eliminarProveedorModal"
+     tabindex="-1"
+     aria-labelledby="eliminarProveedorModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title fs-5" id="eliminarProveedorModalLabel">
+                    Confirmar eliminación
+                </h2>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                ¿Confirma que desea eliminar al proveedor
+                <strong>@Model.Nombre</strong>?
+                Su historial de ofertas se conservará.
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">Cancelar</button>
+                <form asp-action="Eliminar"
+                      asp-route-id="@Model.Id"
+                      method="post">
+                    <button type="submit" class="btn btn-danger">
+                        Sí, eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<h2 class="h4">Historial de ofertas</h2>
+
+@if (Model.Ofertas.Elementos.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        Este proveedor todavía no tiene ofertas registradas.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Licitación</th>
+                    <th scope="col">Monto CRC</th>
+                    <th scope="col">Fecha de registro</th>
+                    <th scope="col">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var oferta in Model.Ofertas.Elementos)
+                {
+                    <tr>
+                        <td>
+                            <strong>@oferta.CodigoLicitacion</strong><br />
+                            <span class="text-muted">@oferta.TituloLicitacion</span>
+                        </td>
+                        <td>@oferta.MontoOfertadoCrc.ToString("N2")</td>
+                        <td>@oferta.FechaRegistro.ToString("yyyy-MM-dd HH:mm 'UTC'")</td>
+                        <td>@oferta.Estado</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <p class="mb-0">
+        Total de ofertas: <strong>@Model.Ofertas.TotalRegistros</strong> ·
+        Página <strong>@Model.Ofertas.PaginaActual</strong> de
+        <strong>@Model.Ofertas.TotalPaginas</strong>
+    </p>
+
+    <nav aria-label="Paginación de ofertas">
+        <ul class="pagination mb-0">
+            <li class="page-item @(!Model.Ofertas.TienePaginaAnterior ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Detalle"
+                   asp-route-id="@Model.Id"
+                   asp-route-page="@(Model.Ofertas.PaginaActual - 1)"
+                   asp-route-pageSize="@Model.Ofertas.TamanoPagina">Anterior</a>
+            </li>
+            <li class="page-item @(!Model.Ofertas.TienePaginaSiguiente ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Detalle"
+                   asp-route-id="@Model.Id"
+                   asp-route-page="@(Model.Ofertas.PaginaActual + 1)"
+                   asp-route-pageSize="@Model.Ofertas.TamanoPagina">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>

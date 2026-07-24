@@ -1,0 +1,8 @@
+namespace Licitaciones.Application.Proveedores.Listar;
+
+public sealed record ListarProveedoresQuery(
+    int Page = 1,
+    int PageSize = 10,
+    string? Search = null,
+    string? SortBy = null);
+
