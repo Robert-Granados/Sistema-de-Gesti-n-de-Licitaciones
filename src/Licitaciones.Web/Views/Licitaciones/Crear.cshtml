@@ -1,0 +1,76 @@
+@model Licitaciones.Web.Models.Licitaciones.CrearLicitacionViewModel
+
+@{
+    ViewData["Title"] = "Crear licitación";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <h1>Crear licitación</h1>
+        <p class="text-muted">
+            Registre una nueva licitación para iniciar el proceso de recepción de ofertas.
+        </p>
+
+        @if (TempData["MensajeExito"] is string mensaje)
+        {
+            <div class="alert alert-success" role="alert">@mensaje</div>
+        }
+
+        <form asp-controller="Licitaciones" asp-action="Crear" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="Codigo" class="form-label"></label>
+                <input asp-for="Codigo"
+                       class="form-control"
+                       maxlength="50"
+                       placeholder="Ejemplo: LIC-2026-001"
+                       aria-describedby="codigo-ayuda" />
+                <div id="codigo-ayuda" class="form-text">
+                    Código único de la licitación (máximo 50 caracteres).
+                </div>
+                <span asp-validation-for="Codigo" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Titulo" class="form-label"></label>
+                <input asp-for="Titulo"
+                       class="form-control"
+                       maxlength="300"
+                       placeholder="Descripción breve de la licitación" />
+                <span asp-validation-for="Titulo" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaCierre" class="form-label"></label>
+                <input asp-for="FechaCierre"
+                       type="datetime-local"
+                       class="form-control" />
+                <div class="form-text">
+                    Seleccione la fecha y hora de cierre (debe ser futura).
+                </div>
+                <span asp-validation-for="FechaCierre" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PresupuestoEstimadoCrc" class="form-label"></label>
+                <input asp-for="PresupuestoEstimadoCrc"
+                       type="number"
+                       step="0.01"
+                       min="0.01"
+                       class="form-control"
+                       placeholder="0.00" />
+                <div class="form-text">
+                    Presupuesto estimado en colones costarricenses (debe ser mayor a cero).
+                </div>
+                <span asp-validation-for="PresupuestoEstimadoCrc" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Crear licitación</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

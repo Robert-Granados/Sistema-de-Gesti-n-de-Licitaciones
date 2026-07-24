@@ -1,5 +1,8 @@
 using Licitaciones.Domain.Enums;
+using Licitaciones.Application.Common.Clock;
+using Licitaciones.Application.Licitaciones.Ports;
 using Licitaciones.Application.Proveedores.Ports;
+using Licitaciones.Infrastructure.Common;
 using Licitaciones.Infrastructure.Persistence;
 using Licitaciones.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +32,9 @@ public static class DependencyInjection
         services.AddScoped<IProveedorDetalleRepository, ProveedorDetalleRepository>();
         services.AddScoped<IProveedorEditRepository, ProveedorEditRepository>();
         services.AddScoped<IProveedorDeleteRepository, ProveedorDeleteRepository>();
+        services.AddSingleton<IClock, SystemClock>();
+        services.AddScoped<ILicitacionRepository, LicitacionRepository>();
+        services.AddScoped<ILicitacionReadRepository, LicitacionReadRepository>();
 
         return services;
     }
