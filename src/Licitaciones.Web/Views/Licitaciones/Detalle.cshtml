@@ -5,6 +5,9 @@
 @{
     ViewData["Title"] = $"Detalle — {Model.Codigo}";
     var crCulture = new CultureInfo("es-CR");
+    var ahora = DateTimeOffset.UtcNow;
+    var estaCerradaFuncionalmente = Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
+        && Model.FechaCierre <= ahora;
 }
 
 <div class="d-flex justify-content-between align-items-start mb-4">
@@ -13,19 +16,51 @@
         <p class="text-muted mb-0">@Model.Titulo</p>
     </div>
     <div class="d-flex gap-2">
-        @if (Model.Estado != Licitaciones.Domain.Enums.EstadoLicitacion.Cerrada)
+        @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador
+            || Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
         {
             <a asp-action="Editar"
                asp-route-id="@Model.Id"
                class="btn btn-primary">Editar</a>
         }
+
+        @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador
+            && Model.PresupuestoEstimadoCrc > 0
+            && Model.FechaCierre > ahora)
+        {
+            <form asp-action="Publicar" asp-route-id="@Model.Id" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit"
+                        class="btn btn-success"
+                        onclick="return confirm('¿Está seguro de publicar esta licitación?')">
+                    Publicar
+                </button>
+            </form>
+        }
+
+        @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
+            || Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador)
+        {
+            <button type="button"
+                    class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#cerrarModal">
+                Cerrar
+            </button>
+        }
+
         <a asp-action="Index" class="btn btn-outline-secondary">Volver a licitaciones</a>
     </div>
 </div>
 
-@if (TempData["MensajeExito"] is string mensaje)
+@if (TempData["MensajeExito"] is string mensajeExito)
 {
-    <div class="alert alert-success" role="alert">@mensaje</div>
+    <div class="alert alert-success" role="alert">@mensajeExito</div>
+}
+
+@if (TempData["MensajeError"] is string mensajeError)
+{
+    <div class="alert alert-danger" role="alert">@mensajeError</div>
 }
 
 <div class="row g-4 mb-4">
@@ -33,7 +68,11 @@
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title text-muted">Estado</h6>
-                @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
+                @if (estaCerradaFuncionalmente)
+                {
+                    <span class="badge bg-warning text-dark">Cerrada (vencida)</span>
+                }
+                else if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
                 {
                     <span class="badge bg-success">Publicada</span>
                 }
@@ -185,3 +224,44 @@ else
         </table>
     </div>
 }
+
+<!-- Modal de cierre -->
+<div class="modal fade" id="cerrarModal" tabindex="-1" aria-labelledby="cerrarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Cerrar" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cerrarModalLabel">Cerrar licitación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Está a punto de cerrar la licitación <strong>@Model.Codigo</strong>.
+                        @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador)
+                        {
+                            <span class="text-warning">Esta acción cancelará la licitación.</span>
+                        }
+                        else
+                        {
+                            <span>Una vez cerrada, no se podrán registrar nuevas ofertas.</span>
+                        }
+                    </p>
+                    <div class="mb-3">
+                        <label for="motivo" class="form-label">Motivo de cierre *</label>
+                        <textarea name="motivo"
+                                  id="motivo"
+                                  class="form-control"
+                                  rows="3"
+                                  required
+                                  placeholder="Indique el motivo del cierre..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Cerrar licitación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

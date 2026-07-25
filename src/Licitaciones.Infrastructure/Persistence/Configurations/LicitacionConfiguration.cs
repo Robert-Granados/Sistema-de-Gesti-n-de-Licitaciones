@@ -45,6 +45,13 @@ internal sealed class LicitacionConfiguration : IEntityTypeConfiguration<Licitac
         builder.Property(x => x.PresupuestoEstimadoCrc)
             .HasColumnName("presupuesto_estimado_crc")
             .HasColumnType("numeric(18,2)");
+        builder.Property(x => x.PublicadaEn)
+            .HasColumnName("publicada_en");
+        builder.Property(x => x.CerradaEn)
+            .HasColumnName("cerrada_en");
+        builder.Property(x => x.MotivoCierre)
+            .HasColumnName("motivo_cierre")
+            .HasMaxLength(500);
 
         builder.ConfigureAuditProperties(includeDeletedAt: true);
 

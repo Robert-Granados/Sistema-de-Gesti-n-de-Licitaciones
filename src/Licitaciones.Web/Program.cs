@@ -4,10 +4,12 @@ using Licitaciones.Application.Proveedores.Listar;
 using Licitaciones.Application.Proveedores.Detalle;
 using Licitaciones.Application.Proveedores.Editar;
 using Licitaciones.Application.Proveedores.Eliminar;
+using Licitaciones.Application.Licitaciones.Cerrar;
 using Licitaciones.Application.Licitaciones.Crear;
-using Licitaciones.Application.Licitaciones.Listar;
 using Licitaciones.Application.Licitaciones.Detalle;
 using Licitaciones.Application.Licitaciones.Editar;
+using Licitaciones.Application.Licitaciones.Listar;
+using Licitaciones.Application.Licitaciones.Publicar;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,8 @@ builder.Services.AddScoped<CrearLicitacionHandler>();
 builder.Services.AddScoped<ListarLicitacionesHandler>();
 builder.Services.AddScoped<ObtenerLicitacionPorIdHandler>();
 builder.Services.AddScoped<EditarLicitacionHandler>();
+builder.Services.AddScoped<PublicarLicitacionHandler>();
+builder.Services.AddScoped<CerrarLicitacionHandler>();
 
 var app = builder.Build();
 

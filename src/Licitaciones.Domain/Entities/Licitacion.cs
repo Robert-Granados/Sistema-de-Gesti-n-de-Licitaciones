@@ -1,4 +1,5 @@
 using Licitaciones.Domain.Enums;
+using Licitaciones.Domain.Exceptions;
 
 namespace Licitaciones.Domain.Entities;
 
@@ -49,35 +50,51 @@ public sealed class Licitacion
 
     public decimal PresupuestoEstimadoCrc { get; private set; }
 
+    public DateTimeOffset? PublicadaEn { get; private set; }
+
+    public DateTimeOffset? CerradaEn { get; private set; }
+
+    public string? MotivoCierre { get; private set; }
+
     public void Publicar(DateTimeOffset ahora)
     {
         if (Estado != EstadoLicitacion.Borrador)
         {
-            throw new InvalidOperationException(
-                "Solo una licitación en borrador puede publicarse.");
+            throw new TransicionEstadoInvalidaException(
+                $"No se puede publicar una licitación en estado {Estado}. Solo se permite desde Borrador.");
         }
 
         if (FechaCierre <= ahora)
         {
-            throw new InvalidOperationException(
+            throw new TransicionEstadoInvalidaException(
                 "La fecha de cierre debe ser futura para publicar la licitación.");
         }
 
         Estado = EstadoLicitacion.Publicada;
+        PublicadaEn = ahora;
     }
 
-    public void Cerrar()
+    public void Cerrar(string motivo, DateTimeOffset ahora)
     {
-        if (Estado == EstadoLicitacion.Cerrada)
+        if (Estado != EstadoLicitacion.Borrador && Estado != EstadoLicitacion.Publicada)
         {
-            throw new InvalidOperationException("La licitación ya está cerrada.");
+            throw new TransicionEstadoInvalidaException(
+                $"No se puede cerrar una licitación en estado {Estado}.");
         }
 
+        MotivoCierre = ValidarTextoObligatorio(motivo, nameof(motivo));
         Estado = EstadoLicitacion.Cerrada;
+        CerradaEn = ahora;
     }
 
     public void CambiarTitulo(string titulo)
     {
+        if (Estado != EstadoLicitacion.Borrador && Estado != EstadoLicitacion.Publicada)
+        {
+            throw new TransicionEstadoInvalidaException(
+                $"No se puede editar una licitación en estado {Estado}.");
+        }
+
         Titulo = ValidarTextoObligatorio(titulo, nameof(titulo));
     }
 

@@ -1,9 +1,12 @@
 using Licitaciones.Application.Common.Clock;
+using Licitaciones.Application.Licitaciones.Cerrar;
 using Licitaciones.Application.Licitaciones.Crear;
 using Licitaciones.Application.Licitaciones.Detalle;
 using Licitaciones.Application.Licitaciones.Editar;
 using Licitaciones.Application.Licitaciones.Exceptions;
 using Licitaciones.Application.Licitaciones.Listar;
+using Licitaciones.Application.Licitaciones.Publicar;
+using Licitaciones.Domain.Exceptions;
 using Licitaciones.Web.Models.Licitaciones;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +18,8 @@ public sealed class LicitacionesController(
     ListarLicitacionesHandler listarLicitacionesHandler,
     ObtenerLicitacionPorIdHandler obtenerLicitacionPorIdHandler,
     EditarLicitacionHandler editarLicitacionHandler,
+    PublicarLicitacionHandler publicarLicitacionHandler,
+    CerrarLicitacionHandler cerrarLicitacionHandler,
     IClock clock) : Controller
 {
     private const string AmericaCostaRica = "America/Costa_Rica";
@@ -230,5 +235,68 @@ public sealed class LicitacionesController(
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);
         }
+    }
+
+    [HttpPost("Publicar/{id:guid}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Publicar(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            await publicarLicitacionHandler.HandleAsync(
+                new PublicarLicitacionCommand(id),
+                cancellationToken);
+
+            TempData["MensajeExito"] = "La licitación se publicó correctamente.";
+        }
+        catch (LicitacionNoEncontradaException)
+        {
+            return NotFound();
+        }
+        catch (TransicionEstadoInvalidaException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+
+        return RedirectToAction(nameof(Detalle), new { id });
+    }
+
+    [HttpPost("Cerrar/{id:guid}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Cerrar(
+        Guid id,
+        string? motivo,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(motivo))
+        {
+            TempData["MensajeError"] = "El motivo de cierre es obligatorio.";
+            return RedirectToAction(nameof(Detalle), new { id });
+        }
+
+        try
+        {
+            await cerrarLicitacionHandler.HandleAsync(
+                new CerrarLicitacionCommand(id, motivo),
+                cancellationToken);
+
+            TempData["MensajeExito"] = "La licitación se cerró correctamente.";
+        }
+        catch (LicitacionNoEncontradaException)
+        {
+            return NotFound();
+        }
+        catch (LicitacionCerradaException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+        catch (TransicionEstadoInvalidaException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+
+        return RedirectToAction(nameof(Detalle), new { id });
     }
 }
