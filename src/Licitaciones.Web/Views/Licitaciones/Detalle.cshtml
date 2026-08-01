@@ -8,6 +8,10 @@
     var ahora = DateTimeOffset.UtcNow;
     var estaCerradaFuncionalmente = Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
         && Model.FechaCierre <= ahora;
+    var puedeEliminar = Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador
+        && Model.Ofertas.TotalRegistros == 0;
+    var puedeOfertar = Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
+        && Model.FechaCierre > ahora;
 }
 
 <div class="d-flex justify-content-between align-items-start mb-4">
@@ -46,6 +50,16 @@
                     data-bs-toggle="modal"
                     data-bs-target="#cerrarModal">
                 Cerrar
+            </button>
+        }
+
+        @if (puedeEliminar)
+        {
+            <button type="button"
+                    class="btn btn-outline-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#eliminarModal">
+                Eliminar
             </button>
         }
 
@@ -186,6 +200,51 @@ else
 
 <h2 class="h4 mb-3">Ofertas registradas</h2>
 
+@if (puedeOfertar)
+{
+    <div class="card mb-4 border-primary">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Registrar nueva oferta</h5>
+        </div>
+        <div class="card-body">
+            <form asp-action="RegistrarOferta" asp-route-licitacionId="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="ProveedorId" class="form-label">Proveedor</label>
+                        <select name="ProveedorId" id="ProveedorId" class="form-select" required>
+                            <option value="">Seleccione un proveedor...</option>
+                            @foreach (var proveedor in Model.ProveedoresDisponibles)
+                            {
+                                <option value="@proveedor.Id">@proveedor.Nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="MontoOfertadoCrc" class="form-label">Monto ofertado (CRC)</label>
+                        <input type="number"
+                               name="MontoOfertadoCrc"
+                               id="MontoOfertadoCrc"
+                               class="form-control"
+                               step="0.01"
+                               min="0.01"
+                               max="@Model.PresupuestoEstimadoCrc"
+                               required
+                               placeholder="0.00" />
+                        <div class="form-text">
+                            Máximo: @Model.PresupuestoEstimadoCrc.ToString("C", crCulture)
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="hidden" name="LicitacionId" value="@Model.Id" />
+                        <button type="submit" class="btn btn-primary">Registrar oferta</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+}
+
 @if (Model.Ofertas.Elementos.Count == 0)
 {
     <div class="alert alert-info" role="status">
@@ -260,6 +319,38 @@ else
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="submit" class="btn btn-danger">Cerrar licitación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de eliminación -->
+<div class="modal fade" id="eliminarModal" tabindex="-1" aria-labelledby="eliminarModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Eliminar" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eliminarModalLabel">Eliminar licitación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        Está a punto de eliminar la licitación <strong>@Model.Codigo</strong>.
+                        Esta acción no se puede deshacer.
+                    </p>
+                    @if (Model.Ofertas.TotalRegistros > 0)
+                    {
+                        <div class="alert alert-warning mb-0">
+                            Esta licitación tiene @Model.Ofertas.TotalRegistros oferta(s) asociada(s).
+                            Se aplicará borrado lógico para conservar el historial.
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
                 </div>
             </form>
         </div>

@@ -1,6 +1,7 @@
 using Licitaciones.Domain.Enums;
 using Licitaciones.Application.Common.Clock;
 using Licitaciones.Application.Licitaciones.Ports;
+using Licitaciones.Application.Ofertas.Ports;
 using Licitaciones.Application.Proveedores.Ports;
 using Licitaciones.Infrastructure.Common;
 using Licitaciones.Infrastructure.Persistence;
@@ -37,6 +38,10 @@ public static class DependencyInjection
         services.AddScoped<ILicitacionReadRepository, LicitacionReadRepository>();
         services.AddScoped<ILicitacionDetalleRepository, LicitacionDetalleRepository>();
         services.AddScoped<ILicitacionEditRepository, LicitacionEditRepository>();
+        services.AddScoped<ILicitacionDeleteRepository, LicitacionDeleteRepository>();
+        services.AddScoped<IOfertaValidacionRepository, OfertaRepository>();
+        services.AddScoped<IOfertaWriteRepository, OfertaRepository>();
+        services.AddScoped<IOfertaReadRepository, OfertaReadRepository>();
 
         return services;
     }

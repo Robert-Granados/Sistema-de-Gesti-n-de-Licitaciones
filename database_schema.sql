@@ -158,7 +158,7 @@ CREATE TABLE proveedores (
 
     CONSTRAINT pk_proveedores PRIMARY KEY (id),
     CONSTRAINT ck_proveedores_nombre_caracteres
-        CHECK (nombre ~ '^[\p{L}\p{N}\s.,()]+$'),
+        CHECK (nombre ~ '^[[:alnum:][:space:].,()]+$'),
     CONSTRAINT ck_proveedores_nombre_no_vacio
         CHECK (length(trim(nombre)) > 0)
 );

@@ -17,7 +17,8 @@ internal sealed class LicitacionReadRepository(AppDbContext dbContext)
     {
         IQueryable<Licitacion> licitaciones = dbContext.Licitaciones
             .AsNoTracking()
-            .Where(l => l.Estado != EstadoLicitacion.Cerrada);
+            .Where(l => l.Estado != EstadoLicitacion.Cerrada
+                && l.EliminadoEn == null);
 
         if (!string.IsNullOrWhiteSpace(consulta.Search))
         {

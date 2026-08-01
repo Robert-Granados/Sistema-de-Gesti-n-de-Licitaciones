@@ -3,9 +3,12 @@ using Licitaciones.Application.Licitaciones.Cerrar;
 using Licitaciones.Application.Licitaciones.Crear;
 using Licitaciones.Application.Licitaciones.Detalle;
 using Licitaciones.Application.Licitaciones.Editar;
+using Licitaciones.Application.Licitaciones.Eliminar;
 using Licitaciones.Application.Licitaciones.Exceptions;
 using Licitaciones.Application.Licitaciones.Listar;
 using Licitaciones.Application.Licitaciones.Publicar;
+using Licitaciones.Application.Ofertas.Exceptions;
+using Licitaciones.Application.Ofertas.Registrar;
 using Licitaciones.Domain.Exceptions;
 using Licitaciones.Web.Models.Licitaciones;
 using Microsoft.AspNetCore.Mvc;
@@ -20,6 +23,8 @@ public sealed class LicitacionesController(
     EditarLicitacionHandler editarLicitacionHandler,
     PublicarLicitacionHandler publicarLicitacionHandler,
     CerrarLicitacionHandler cerrarLicitacionHandler,
+    EliminarLicitacionHandler eliminarLicitacionHandler,
+    RegistrarOfertaHandler registrarOfertaHandler,
     IClock clock) : Controller
 {
     private const string AmericaCostaRica = "America/Costa_Rica";
@@ -298,5 +303,82 @@ public sealed class LicitacionesController(
         }
 
         return RedirectToAction(nameof(Detalle), new { id });
+    }
+
+    [HttpPost("Eliminar/{id:guid}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Eliminar(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var resultado = await eliminarLicitacionHandler.HandleAsync(
+                new EliminarLicitacionCommand(id),
+                cancellationToken);
+
+            TempData["MensajeExito"] = resultado.TeniaOfertas
+                ? "La licitación se eliminó lógicamente y se conservó su historial de ofertas."
+                : "La licitación se eliminó correctamente.";
+
+            return RedirectToAction(nameof(Index));
+        }
+        catch (LicitacionNoEncontradaException)
+        {
+            return NotFound();
+        }
+    }
+
+    [HttpPost("RegistrarOferta/{licitacionId:guid}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RegistrarOferta(
+        Guid licitacionId,
+        RegistrarOfertaViewModel model,
+        CancellationToken cancellationToken)
+    {
+        if (licitacionId != model.LicitacionId)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction(nameof(Detalle), new { id = licitacionId });
+        }
+
+        try
+        {
+            await registrarOfertaHandler.HandleAsync(
+                new RegistrarOfertaCommand(
+                    model.LicitacionId,
+                    model.ProveedorId,
+                    model.MontoOfertadoCrc),
+                cancellationToken);
+
+            TempData["MensajeExito"] = "La oferta se registró correctamente.";
+        }
+        catch (LicitacionNoDisponibleException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+        catch (ProveedorNoEncontradoException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+        catch (OfertaDuplicadaException exception)
+        {
+            return Conflict(new ProblemDetails
+            {
+                Status = StatusCodes.Status409Conflict,
+                Title = "Oferta duplicada",
+                Detail = exception.Message
+            });
+        }
+        catch (ArgumentOutOfRangeException exception)
+        {
+            TempData["MensajeError"] = exception.Message;
+        }
+
+        return RedirectToAction(nameof(Detalle), new { id = licitacionId });
     }
 }

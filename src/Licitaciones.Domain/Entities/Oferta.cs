@@ -45,6 +45,18 @@ public sealed class Oferta
         Proveedor = null!;
     }
 
+    public void ActualizarMonto(decimal montoOfertadoCrc)
+    {
+        if (montoOfertadoCrc <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(montoOfertadoCrc),
+                "El monto ofertado debe ser mayor que cero.");
+        }
+
+        MontoOfertadoCrc = montoOfertadoCrc;
+    }
+
     public Guid Id { get; private set; }
 
     public Guid LicitacionId { get; private set; }
