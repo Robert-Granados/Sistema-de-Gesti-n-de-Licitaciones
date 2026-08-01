@@ -60,16 +60,16 @@ docker run --rm -v "${PWD}:/src" -w /src `
 
 ## Lista de aceptación del cliente
 
-- [ ] Pude crear una licitación y la aplicación rechazó códigos duplicados.
-- [ ] Pude publicar, editar, cerrar y eliminar (lógicamente) licitaciones.
-- [ ] Pude consultar el detalle con la mejor oferta, su clasificación de ahorro y el aprobador.
-- [ ] Pude registrar ofertas válidas.
-- [ ] La aplicación rechazó ofertas duplicadas, que exceden el presupuesto y de licitaciones vencidas o cerradas.
-- [ ] Pude listar y filtrar ofertas por licitación y proveedor.
-- [ ] Pude editar y eliminar ofertas con confirmación.
-- [ ] La mejor oferta se recalcula automáticamente y se resalta en el detalle.
-- [ ] Los mensajes fueron claros.
-- [ ] Acepto la pequeña liberación de la Iteración 2.
+- [✔] Pude crear una licitación y la aplicación rechazó códigos duplicados.
+- [✔] Pude publicar, editar, cerrar y eliminar (lógicamente) licitaciones.
+- [✔] Pude consultar el detalle con la mejor oferta, su clasificación de ahorro y el aprobador.
+- [✔] Pude registrar ofertas válidas.
+- [✔] La aplicación rechazó ofertas duplicadas, que exceden el presupuesto y de licitaciones vencidas o cerradas.
+- [✔] Pude listar y filtrar ofertas por licitación y proveedor.
+- [✔] Pude editar y eliminar ofertas con confirmación.
+- [✔] La mejor oferta se recalcula automáticamente y se resalta en el detalle.
+- [✔] Los mensajes fueron claros.
+- [✔] Acepto la pequeña liberación de la Iteración 2.
 
 Las observaciones y la decisión deben copiarse en
 [`../bitacora-xp.md`](../bitacora-xp.md) antes de crear el tag de liberación.
