@@ -1,4 +1,5 @@
 using Licitaciones.Application.Ofertas.Listar;
+using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
 using Licitaciones.Domain.Entities;
 using Licitaciones.Infrastructure;
@@ -143,6 +144,53 @@ public sealed class ListarOfertasIntegrationTests : IAsyncLifetime
         await command.ExecuteNonQueryAsync();
     }
 
+    [Fact]
+    public async Task OpcionesDeFiltro_IncluyenCerradasYExcluyenEliminadas()
+    {
+        await using var services = CrearServicios();
+        await using var scope = services.CreateAsyncScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await AplicarEsquemaCanonicoAsync();
+
+        var ahora = DateTimeOffset.UtcNow;
+        var licitacionActiva = new Licitacion(
+            "LIC-ACT", "Licitación activa", ahora.AddDays(10), 1_000_000m);
+        licitacionActiva.Publicar(ahora);
+        var licitacionCerrada = new Licitacion(
+            "LIC-CER", "Licitación cerrada", ahora.AddDays(10), 1_000_000m);
+        licitacionCerrada.Publicar(ahora);
+        licitacionCerrada.Cerrar("Adjudicada", ahora);
+
+        var proveedorActivo = new Proveedor("Proveedor activo");
+        var proveedorEliminado = new Proveedor("Proveedor eliminado");
+        proveedorEliminado.Eliminar(ahora);
+
+        dbContext.AddRange(
+            licitacionActiva,
+            licitacionCerrada,
+            proveedorActivo,
+            proveedorEliminado);
+        dbContext.Entry(licitacionActiva)
+            .Property<string>("CodigoNormalizado")
+            .CurrentValue = licitacionActiva.Codigo.ToUpperInvariant();
+        dbContext.Entry(licitacionCerrada)
+            .Property<string>("CodigoNormalizado")
+            .CurrentValue = licitacionCerrada.Codigo.ToUpperInvariant();
+        await dbContext.SaveChangesAsync();
+
+        var handler = scope.ServiceProvider
+            .GetRequiredService<OpcionesFiltroOfertasHandler>();
+
+        var opciones = await handler.HandleAsync(new OpcionesFiltroOfertasQuery());
+
+        Assert.Equal(
+            new[] { "LIC-ACT", "LIC-CER" },
+            opciones.Licitaciones.Select(l => l.Codigo));
+        Assert.Equal(licitacionCerrada.Id, opciones.Licitaciones[1].Id);
+        var proveedor = Assert.Single(opciones.Proveedores);
+        Assert.Equal("Proveedor activo", proveedor.Nombre);
+    }
+
     private ServiceProvider CrearServicios()
     {
         var configuration = new ConfigurationBuilder()
@@ -155,6 +203,7 @@ public sealed class ListarOfertasIntegrationTests : IAsyncLifetime
         var services = new ServiceCollection();
         services.AddInfrastructure(configuration);
         services.AddScoped<ListarOfertasHandler>();
+        services.AddScoped<OpcionesFiltroOfertasHandler>();
 
         return services.BuildServiceProvider();
     }

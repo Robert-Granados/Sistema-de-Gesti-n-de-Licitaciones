@@ -1,5 +1,6 @@
 using Licitaciones.Application.Common.Models;
 using Licitaciones.Application.Ofertas.Listar;
+using Licitaciones.Application.Ofertas.OpcionesFiltro;
 
 namespace Licitaciones.Application.Ofertas.Ports;
 
@@ -7,6 +8,9 @@ public interface IOfertaReadRepository
 {
     Task<PaginaResultado<OfertaListadoDto>> ListarAsync(
         OfertasConsulta consulta,
+        CancellationToken cancellationToken = default);
+
+    Task<OpcionesFiltroOfertasDto> ObtenerOpcionesFiltroAsync(
         CancellationToken cancellationToken = default);
 }
 

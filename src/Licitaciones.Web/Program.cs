@@ -11,6 +11,8 @@ using Licitaciones.Application.Licitaciones.Editar;
 using Licitaciones.Application.Licitaciones.Eliminar;
 using Licitaciones.Application.Licitaciones.Listar;
 using Licitaciones.Application.Licitaciones.Publicar;
+using Licitaciones.Application.Ofertas.Listar;
+using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Registrar;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +34,8 @@ builder.Services.AddScoped<PublicarLicitacionHandler>();
 builder.Services.AddScoped<CerrarLicitacionHandler>();
 builder.Services.AddScoped<EliminarLicitacionHandler>();
 builder.Services.AddScoped<RegistrarOfertaHandler>();
+builder.Services.AddScoped<ListarOfertasHandler>();
+builder.Services.AddScoped<OpcionesFiltroOfertasHandler>();
 
 var app = builder.Build();
 

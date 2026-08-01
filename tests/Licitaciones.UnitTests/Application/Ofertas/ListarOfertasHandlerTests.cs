@@ -1,5 +1,6 @@
 using Licitaciones.Application.Common.Models;
 using Licitaciones.Application.Ofertas.Listar;
+using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
 
 namespace Licitaciones.UnitTests.Application.Ofertas;
@@ -90,5 +91,9 @@ public sealed class ListarOfertasHandlerTests
                 paginaActual: consulta.Page,
                 tamanoPagina: consulta.PageSize));
         }
+
+        public Task<OpcionesFiltroOfertasDto> ObtenerOpcionesFiltroAsync(
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(new OpcionesFiltroOfertasDto([], []));
     }
 }

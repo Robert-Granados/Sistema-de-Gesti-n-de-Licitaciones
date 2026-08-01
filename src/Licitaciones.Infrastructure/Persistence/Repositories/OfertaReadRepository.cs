@@ -1,5 +1,7 @@
 using Licitaciones.Application.Common.Models;
+using Licitaciones.Application.Licitaciones.Detalle;
 using Licitaciones.Application.Ofertas.Listar;
+using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
 using Licitaciones.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -64,5 +66,29 @@ internal sealed class OfertaReadRepository(AppDbContext dbContext)
             totalRegistros,
             consulta.Page,
             consulta.PageSize);
+    }
+
+    public async Task<OpcionesFiltroOfertasDto> ObtenerOpcionesFiltroAsync(
+        CancellationToken cancellationToken = default)
+    {
+        var licitaciones = await dbContext.Licitaciones
+            .AsNoTracking()
+            .Where(licitacion => licitacion.EliminadoEn == null)
+            .OrderBy(licitacion => licitacion.Codigo)
+            .Select(licitacion => new OpcionLicitacionDto(
+                licitacion.Id,
+                licitacion.Codigo))
+            .ToListAsync(cancellationToken);
+
+        var proveedores = await dbContext.Proveedores
+            .AsNoTracking()
+            .Where(proveedor => proveedor.EliminadoEn == null)
+            .OrderBy(proveedor => proveedor.Nombre)
+            .Select(proveedor => new ProveedorBasicoDto(
+                proveedor.Id,
+                proveedor.Nombre))
+            .ToListAsync(cancellationToken);
+
+        return new OpcionesFiltroOfertasDto(licitaciones, proveedores);
     }
 }
