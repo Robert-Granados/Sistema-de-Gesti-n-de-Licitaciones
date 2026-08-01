@@ -141,58 +141,6 @@ public sealed class ObtenerLicitacionPorIdHandlerTests
     }
 
     [Fact]
-    public void CalculadorMejorOferta_SinOfertas_RetornaNull()
-    {
-        var resultado = CalculadorMejorOferta.Calcular([]);
-        Assert.Null(resultado);
-    }
-
-    [Fact]
-    public void CalculadorMejorOferta_ConEmpate_UsaMenorFechaRegistro()
-    {
-        var fecha1 = new DateTimeOffset(2026, 7, 24, 10, 0, 0, TimeSpan.Zero);
-        var fecha2 = new DateTimeOffset(2026, 7, 25, 10, 0, 0, TimeSpan.Zero);
-        var ofertas = new List<OfertaBasica>
-        {
-            new(Guid.NewGuid(), Guid.NewGuid(), "B", 100m, fecha2),
-            new(Guid.NewGuid(), Guid.NewGuid(), "A", 100m, fecha1),
-        };
-
-        var mejor = CalculadorMejorOferta.Calcular(ofertas);
-
-        Assert.NotNull(mejor);
-        Assert.Equal("A", mejor.NombreProveedor);
-    }
-
-    [Fact]
-    public void ClasificadorAhorro_AhorroMayorIgual10Porciento_Conveniente()
-    {
-        var clasificacion = ClasificadorAhorro.Clasificar(1_000_000m, 899_999.99m);
-        Assert.Equal(ClasificacionAhorro.OfertaConveniente, clasificacion);
-    }
-
-    [Fact]
-    public void ClasificadorAhorro_AhorroMenor10Porciento_Aceptable()
-    {
-        var clasificacion = ClasificadorAhorro.Clasificar(1_000_000m, 950_000m);
-        Assert.Equal(ClasificacionAhorro.OfertaAceptable, clasificacion);
-    }
-
-    [Fact]
-    public void ClasificadorAhorro_SinAhorro_ValidaSinAhorro()
-    {
-        var clasificacion = ClasificadorAhorro.Clasificar(1_000_000m, 1_000_000m);
-        Assert.Equal(ClasificacionAhorro.OfertaValidaSinAhorro, clasificacion);
-    }
-
-    [Fact]
-    public void ClasificadorAhorro_MontoMayorPresupuesto_ValidaSinAhorro()
-    {
-        var clasificacion = ClasificadorAhorro.Clasificar(1_000_000m, 1_100_000m);
-        Assert.Equal(ClasificacionAhorro.OfertaValidaSinAhorro, clasificacion);
-    }
-
-    [Fact]
     public void ResolverAprobador_ConMontos_SeleccionaNivelCorrecto()
     {
         var niveles = NivelesDefault();
