@@ -13,7 +13,8 @@ public sealed record LicitacionDetalleCompleta(
     Licitacion Licitacion,
     IReadOnlyList<OfertaBasica> Ofertas,
     IReadOnlyList<NivelAprobacion> NivelesAprobacion,
-    TipoCambio? TipoCambioActivo);
+    TipoCambio? TipoCambioActivo,
+    IReadOnlyList<ProveedorBasico> ProveedoresDisponibles);
 
 public sealed record OfertaBasica(
     Guid Id,
@@ -21,3 +22,5 @@ public sealed record OfertaBasica(
     string NombreProveedor,
     decimal MontoOfertadoCrc,
     DateTimeOffset FechaRegistro);
+
+public sealed record ProveedorBasico(Guid Id, string Nombre);

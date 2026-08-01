@@ -11,7 +11,8 @@ public sealed record LicitacionDetalleDto(
     DateTimeOffset FechaCierre,
     decimal PresupuestoEstimadoCrc,
     PaginaResultado<OfertaDetalleDto> Ofertas,
-    MejorOfertaInfo? MejorOferta);
+    MejorOfertaInfo? MejorOferta,
+    IReadOnlyList<ProveedorBasicoDto> ProveedoresDisponibles);
 
 public sealed record OfertaDetalleDto(
     Guid Id,
@@ -27,3 +28,5 @@ public sealed record MejorOfertaInfo(
     string? Aprobador,
     decimal? MontoUsd,
     DateTimeOffset? FechaVigenciaTipoCambio);
+
+public sealed record ProveedorBasicoDto(Guid Id, string Nombre);

@@ -34,7 +34,7 @@ public sealed class EditarLicitacionHandlerTests
     public async Task Handle_LicitacionCerrada_Rechaza()
     {
         var licitacion = new Licitacion("LIC-001", "Título", Clock.UtcNow.AddDays(10), 1_000_000m);
-        licitacion.Cerrar();
+        licitacion.Cerrar("Test", Clock.UtcNow);
         var repository = new FakeEditRepository(licitacion, rowVersion: 1, maxMontoOfertado: 0m);
         var handler = new EditarLicitacionHandler(repository, Clock);
 

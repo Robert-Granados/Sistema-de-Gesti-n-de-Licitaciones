@@ -33,5 +33,36 @@ public sealed class OfertaTests
         Assert.Throws<ArgumentException>(() =>
             new Oferta(Guid.Empty, Guid.NewGuid(), 100m, DateTimeOffset.UtcNow));
     }
+
+    [Fact]
+    public void ActualizarMonto_ConMontoValido_ActualizaElMonto()
+    {
+        var oferta = new Oferta(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            500m,
+            new DateTimeOffset(2026, 7, 23, 12, 0, 0, TimeSpan.Zero));
+
+        oferta.ActualizarMonto(750m);
+
+        Assert.Equal(750m, oferta.MontoOfertadoCrc);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-100)]
+    public void ActualizarMonto_ConMontoNoPositivo_LanzaExcepcion(decimal monto)
+    {
+        var oferta = new Oferta(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            500m,
+            DateTimeOffset.UtcNow);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            oferta.ActualizarMonto(monto));
+
+        Assert.Equal(500m, oferta.MontoOfertadoCrc);
+    }
 }
 

@@ -45,8 +45,18 @@ internal sealed class LicitacionConfiguration : IEntityTypeConfiguration<Licitac
         builder.Property(x => x.PresupuestoEstimadoCrc)
             .HasColumnName("presupuesto_estimado_crc")
             .HasColumnType("numeric(18,2)");
+        builder.Property(x => x.PublicadaEn)
+            .HasColumnName("publicada_en");
+        builder.Property(x => x.CerradaEn)
+            .HasColumnName("cerrada_en");
+        builder.Property(x => x.MotivoCierre)
+            .HasColumnName("motivo_cierre")
+            .HasMaxLength(500);
+        builder.Property(x => x.EliminadoEn)
+            .HasColumnName("deleted_at");
+        builder.Ignore(x => x.EstaEliminada);
 
-        builder.ConfigureAuditProperties(includeDeletedAt: true);
+        builder.ConfigureAuditProperties(includeDeletedAt: false);
 
         builder.HasIndex("CodigoNormalizado")
             .IsUnique()
@@ -56,7 +66,7 @@ internal sealed class LicitacionConfiguration : IEntityTypeConfiguration<Licitac
             .HasDatabaseName("ix_licitaciones_estado");
         builder.HasIndex(x => x.FechaCierre)
             .HasDatabaseName("ix_licitaciones_fecha_cierre");
-        builder.HasIndex("DeletedAt")
+        builder.HasIndex(x => x.EliminadoEn)
             .HasDatabaseName("ix_licitaciones_deleted_at");
     }
 }
