@@ -1,0 +1,187 @@
+@using Licitaciones.Application.Licitaciones.Detalle
+@using System.Globalization
+@model LicitacionDetalleDto
+
+@{
+    ViewData["Title"] = $"Detalle — {Model.Codigo}";
+    var crCulture = new CultureInfo("es-CR");
+}
+
+<div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+        <h1>@Model.Codigo</h1>
+        <p class="text-muted mb-0">@Model.Titulo</p>
+    </div>
+    <div class="d-flex gap-2">
+        @if (Model.Estado != Licitaciones.Domain.Enums.EstadoLicitacion.Cerrada)
+        {
+            <a asp-action="Editar"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">Editar</a>
+        }
+        <a asp-action="Index" class="btn btn-outline-secondary">Volver a licitaciones</a>
+    </div>
+</div>
+
+@if (TempData["MensajeExito"] is string mensaje)
+{
+    <div class="alert alert-success" role="alert">@mensaje</div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Estado</h6>
+                @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
+                {
+                    <span class="badge bg-success">Publicada</span>
+                }
+                else if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Cerrada)
+                {
+                    <span class="badge bg-danger">Cerrada</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">Borrador</span>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Fecha de cierre</h6>
+                <p class="mb-0">@Model.FechaCierre.ToOffset(TimeSpan.FromHours(-6)).ToString("dd/MM/yyyy HH:mm") (CRT)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Presupuesto estimado</h6>
+                <p class="mb-0 fw-bold">@Model.PresupuestoEstimadoCrc.ToString("C", crCulture)</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title text-muted">Total ofertas</h6>
+                <p class="mb-0 fw-bold">@Model.Ofertas.TotalRegistros</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (Model.MejorOferta is not null)
+{
+    var me = Model.MejorOferta;
+    <div class="card mb-4 border-success">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Mejor oferta</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <h6 class="text-muted">Proveedor</h6>
+                    <p class="mb-0 fw-bold">@me.NombreProveedor</p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted">Monto</h6>
+                    <p class="mb-0 fw-bold">@me.MontoOfertadoCrc.ToString("C", crCulture)</p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted">Clasificación de ahorro</h6>
+                    @switch (me.Clasificacion)
+                    {
+                        case ClasificacionAhorro.OfertaConveniente:
+                            <span class="badge bg-success">Oferta conveniente</span>
+                            <small class="d-block text-muted mt-1">≥ 10% de ahorro</small>
+                            break;
+                        case ClasificacionAhorro.OfertaAceptable:
+                            <span class="badge bg-warning text-dark">Oferta aceptable</span>
+                            <small class="d-block text-muted mt-1">&gt; 0% y &lt; 10% de ahorro</small>
+                            break;
+                        case ClasificacionAhorro.OfertaValidaSinAhorro:
+                            <span class="badge bg-info">Oferta válida sin ahorro</span>
+                            <small class="d-block text-muted mt-1">Igual al presupuesto</small>
+                            break;
+                    }
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-muted">Aprobador</h6>
+                    @if (me.Aprobador is not null)
+                    {
+                        <p class="mb-0 fw-bold">@me.Aprobador</p>
+                    }
+                    else
+                    {
+                        <p class="mb-0 text-muted">Sin nivel de aprobación definido</p>
+                    }
+                </div>
+            </div>
+            @if (me.MontoUsd.HasValue)
+            {
+                <hr />
+                <div class="row">
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Equivalente en USD</h6>
+                        <p class="mb-0">@me.MontoUsd.Value.ToString("N2") USD</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6 class="text-muted">Tipo de cambio (fecha vigencia)</h6>
+                        <p class="mb-0">@me.FechaVigenciaTipoCambio!.Value.ToString("dd/MM/yyyy")</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info mb-4" role="status">
+        Sin ofertas válidas.
+    </div>
+}
+
+<h2 class="h4 mb-3">Ofertas registradas</h2>
+
+@if (Model.Ofertas.Elementos.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        Esta licitación todavía no tiene ofertas registradas.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Proveedor</th>
+                    <th scope="col">Monto CRC</th>
+                    <th scope="col">Fecha de registro</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var oferta in Model.Ofertas.Elementos)
+                {
+                    var esMejor = Model.MejorOferta is not null
+                        && Model.MejorOferta.OfertaId == oferta.Id;
+                    <tr class="@(esMejor ? "table-success" : null)">
+                        <td>
+                            @oferta.NombreProveedor
+                            @if (esMejor)
+                            {
+                                <span class="badge bg-success ms-1">Mejor</span>
+                            }
+                        </td>
+                        <td>@oferta.MontoOfertadoCrc.ToString("C", crCulture)</td>
+                        <td>@oferta.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

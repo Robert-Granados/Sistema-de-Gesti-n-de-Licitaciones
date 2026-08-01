@@ -1,0 +1,162 @@
+@model Licitaciones.Web.Models.Licitaciones.ListarLicitacionesViewModel
+
+@{
+    ViewData["Title"] = "Licitaciones";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Licitaciones</h1>
+        <p class="text-muted mb-0">Consulte las licitaciones registradas.</p>
+    </div>
+    <a asp-action="Crear" class="btn btn-primary">Crear licitación</a>
+</div>
+
+<form method="get" asp-action="Index" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <label for="search" class="form-label">Buscar por código o título</label>
+        <input id="search"
+               name="search"
+               value="@Model.Search"
+               class="form-control"
+               placeholder="Código o título" />
+    </div>
+    <div class="col-md-2">
+        <label for="filtroEstado" class="form-label">Estado</label>
+        <select id="filtroEstado" name="filtroEstado" class="form-select">
+            <option value="" selected="@(string.IsNullOrEmpty(Model.FiltroEstado))">Todos</option>
+            <option value="Borrador" selected="@(Model.FiltroEstado == "Borrador")">Borrador</option>
+            <option value="Publicada" selected="@(Model.FiltroEstado == "Publicada")">Publicada</option>
+            <option value="Cerrada" selected="@(Model.FiltroEstado == "Cerrada")">Cerrada</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label for="fechaDesde" class="form-label">Fecha desde</label>
+        <input id="fechaDesde"
+               name="fechaDesde"
+               type="date"
+               value="@Model.FechaDesde"
+               class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label for="fechaHasta" class="form-label">Fecha hasta</label>
+        <input id="fechaHasta"
+               name="fechaHasta"
+               type="date"
+               value="@Model.FechaHasta"
+               class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label for="sortBy" class="form-label">Orden</label>
+        <select id="sortBy" name="sortBy" class="form-select">
+            <option value="fecha_cierre" selected="@(Model.SortBy == "fecha_cierre")">Fecha cierre ↑</option>
+            <option value="fecha_cierre_desc" selected="@(Model.SortBy == "fecha_cierre_desc")">Fecha cierre ↓</option>
+            <option value="codigo" selected="@(Model.SortBy == "codigo")">Código A–Z</option>
+            <option value="codigo_desc" selected="@(Model.SortBy == "codigo_desc")">Código Z–A</option>
+        </select>
+    </div>
+    <div class="col-md-1 d-flex align-items-end">
+        <button type="submit" class="btn btn-outline-primary w-100">Aplicar</button>
+    </div>
+</form>
+
+@if (Model.Resultado.Elementos.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        No se encontraron licitaciones con los criterios indicados.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Código</th>
+                    <th scope="col">Título</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col">Fecha cierre</th>
+                    <th scope="col">Presupuesto (₡)</th>
+                    <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var licitacion in Model.Resultado.Elementos)
+                {
+                    var estadoDisplay = licitacion.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
+                        && licitacion.EstaCerradaFuncionalmente
+                        ? "Cerrada (funcional)"
+                        : licitacion.Estado.ToString();
+
+                    <tr>
+                        <td><code>@licitacion.Codigo</code></td>
+                        <td>@licitacion.Titulo</td>
+                        <td>
+                            @if (licitacion.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada
+                                && licitacion.EstaCerradaFuncionalmente)
+                            {
+                                <span class="badge bg-warning text-dark">@estadoDisplay</span>
+                            }
+                            else if (licitacion.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
+                            {
+                                <span class="badge bg-success">@estadoDisplay</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">@estadoDisplay</span>
+                            }
+                        </td>
+                        <td>@licitacion.FechaCierre.ToOffset(TimeSpan.FromHours(-6)).ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>@licitacion.PresupuestoEstimadoCrc.ToString("N2")</td>
+                        <td class="text-end">
+                            <a asp-action="Detalle"
+                               asp-route-id="@licitacion.Id"
+                               class="btn btn-sm btn-outline-primary">Ver detalle</a>
+                            @if (licitacion.Estado != Licitaciones.Domain.Enums.EstadoLicitacion.Cerrada)
+                            {
+                                <a asp-action="Editar"
+                                   asp-route-id="@licitacion.Id"
+                                   class="btn btn-sm btn-outline-secondary">Editar</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <p class="mb-0">
+        Total: <strong>@Model.Resultado.TotalRegistros</strong> ·
+        Página <strong>@Model.Resultado.PaginaActual</strong> de
+        <strong>@Model.Resultado.TotalPaginas</strong>
+    </p>
+
+    <nav aria-label="Paginación de licitaciones">
+        <ul class="pagination mb-0">
+            <li class="page-item @(!Model.Resultado.TienePaginaAnterior ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Resultado.PaginaActual - 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-search="@Model.Search"
+                   asp-route-filtroEstado="@Model.FiltroEstado"
+                   asp-route-fechaDesde="@Model.FechaDesde"
+                   asp-route-fechaHasta="@Model.FechaHasta"
+                   asp-route-sortBy="@Model.SortBy">Anterior</a>
+            </li>
+            <li class="page-item @(!Model.Resultado.TienePaginaSiguiente ? "disabled" : null)">
+                <a class="page-link"
+                   asp-action="Index"
+                   asp-route-page="@(Model.Resultado.PaginaActual + 1)"
+                   asp-route-pageSize="@Model.PageSize"
+                   asp-route-search="@Model.Search"
+                   asp-route-filtroEstado="@Model.FiltroEstado"
+                   asp-route-fechaDesde="@Model.FechaDesde"
+                   asp-route-fechaHasta="@Model.FechaHasta"
+                   asp-route-sortBy="@Model.SortBy">Siguiente</a>
+            </li>
+        </ul>
+    </nav>
+</div>
