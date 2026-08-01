@@ -60,6 +60,10 @@ public sealed class ObtenerLicitacionPorIdHandler(
                 o.FechaRegistro))
             .ToList();
 
+        var proveedoresDto = detalle.ProveedoresDisponibles
+            .Select(p => new ProveedorBasicoDto(p.Id, p.Nombre))
+            .ToList();
+
         return new LicitacionDetalleDto(
             detalle.Licitacion.Id,
             detalle.Licitacion.Codigo,
@@ -72,6 +76,7 @@ public sealed class ObtenerLicitacionPorIdHandler(
                 ofertasDto.Count,
                 1,
                 PageSizeMaximum),
-            mejorOfertaInfo);
+            mejorOfertaInfo,
+            proveedoresDto);
     }
 }
