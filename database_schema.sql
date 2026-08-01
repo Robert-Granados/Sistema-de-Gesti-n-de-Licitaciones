@@ -158,7 +158,7 @@ CREATE TABLE proveedores (
 
     CONSTRAINT pk_proveedores PRIMARY KEY (id),
     CONSTRAINT ck_proveedores_nombre_caracteres
-        CHECK (nombre ~ '^[\p{L}\p{N}\s.,()]+$'),
+        CHECK (nombre ~ '^[[:alnum:][:space:].,()]+$'),
     CONSTRAINT ck_proveedores_nombre_no_vacio
         CHECK (length(trim(nombre)) > 0)
 );
@@ -191,6 +191,9 @@ CREATE TABLE licitaciones (
     estado                      estado_licitacion   NOT NULL DEFAULT 'Borrador',
     fecha_cierre                timestamptz         NOT NULL,
     presupuesto_estimado_crc    numeric(18,2)       NOT NULL,
+    publicada_en                timestamptz         NULL,
+    cerrada_en                  timestamptz         NULL,
+    motivo_cierre               varchar(500)        NULL,
     created_at                  timestamptz         NOT NULL DEFAULT now(),
     updated_at                  timestamptz         NOT NULL DEFAULT now(),
     deleted_at                  timestamptz         NULL,
