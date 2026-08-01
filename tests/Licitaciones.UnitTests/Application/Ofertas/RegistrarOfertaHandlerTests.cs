@@ -94,6 +94,30 @@ public sealed class RegistrarOfertaHandlerTests
     }
 
     [Fact]
+    public async Task Handle_FechaCierreIgualAhora_Rechaza()
+    {
+        var licitacionId = Guid.NewGuid();
+        var validacion = new FakeValidacionRepository(
+            licitacionId: licitacionId,
+            estaPublicada: true,
+            fechaCierre: Clock.UtcNow,
+            presupuesto: 1_000_000m,
+            proveedorExiste: true,
+            yaTieneOferta: false);
+        var write = new FakeWriteRepository();
+        var handler = new RegistrarOfertaHandler(validacion, write, Clock);
+
+        var exception = await Assert.ThrowsAsync<LicitacionNoDisponibleException>(
+            () => handler.HandleAsync(
+                new RegistrarOfertaCommand(licitacionId, Guid.NewGuid(), 100m)));
+
+        Assert.Equal(
+            "No se pueden registrar ofertas para licitaciones vencidas.",
+            exception.Message);
+        Assert.False(write.Agregada);
+    }
+
+    [Fact]
     public async Task Handle_ProveedorNoExiste_Rechaza()
     {
         var licitacionId = Guid.NewGuid();
@@ -336,6 +360,25 @@ public sealed class RegistrarOfertaHandlerTests
             Agregada = true;
             Oferta = oferta;
             ofertasRegistradas?.Add(oferta);
+            return Task.CompletedTask;
+        }
+
+        public Task<Oferta?> ObtenerPorIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(
+                ofertasRegistradas?.FirstOrDefault(oferta => oferta.Id == id));
+
+        public Task ActualizarAsync(
+            Oferta oferta,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task EliminarAsync(
+            Oferta oferta,
+            CancellationToken cancellationToken = default)
+        {
+            ofertasRegistradas?.Remove(oferta);
             return Task.CompletedTask;
         }
     }
