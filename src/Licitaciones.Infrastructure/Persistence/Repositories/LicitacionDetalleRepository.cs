@@ -57,10 +57,18 @@ internal sealed class LicitacionDetalleRepository(AppDbContext dbContext)
             .AsNoTracking()
             .FirstOrDefaultAsync(t => t.Activo, cancellationToken);
 
+        var proveedoresDisponibles = await dbContext.Proveedores
+            .AsNoTracking()
+            .Where(p => p.EliminadoEn == null)
+            .OrderBy(p => p.Nombre)
+            .Select(p => new ProveedorBasico(p.Id, p.Nombre))
+            .ToListAsync(cancellationToken);
+
         return new LicitacionDetalleCompleta(
             licitacion,
             ofertas,
             niveles,
-            tipoCambioActivo);
+            tipoCambioActivo,
+            proveedoresDisponibles);
     }
 }

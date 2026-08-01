@@ -56,6 +56,10 @@ public sealed class Licitacion
 
     public string? MotivoCierre { get; private set; }
 
+    public DateTimeOffset? EliminadoEn { get; private set; }
+
+    public bool EstaEliminada => EliminadoEn.HasValue;
+
     public void Publicar(DateTimeOffset ahora)
     {
         if (Estado != EstadoLicitacion.Borrador)
@@ -128,6 +132,16 @@ public sealed class Licitacion
         }
 
         return valor.Trim();
+    }
+
+    public void Eliminar(DateTimeOffset eliminadoEn)
+    {
+        if (EstaEliminada)
+        {
+            throw new InvalidOperationException("La licitación ya fue eliminada.");
+        }
+
+        EliminadoEn = eliminadoEn;
     }
 }
 

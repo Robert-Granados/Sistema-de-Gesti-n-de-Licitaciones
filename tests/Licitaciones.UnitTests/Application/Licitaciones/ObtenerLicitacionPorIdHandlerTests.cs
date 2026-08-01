@@ -240,8 +240,8 @@ public sealed class ObtenerLicitacionPorIdHandlerTests
             }
 
             return Task.FromResult<LicitacionDetalleCompleta?>(
-                new LicitacionDetalleCompleta(
-                    licitacion, ofertas, niveles, tipoCambio));
+                    new LicitacionDetalleCompleta(
+                        licitacion, ofertas, niveles, tipoCambio, []));
         }
     }
 }

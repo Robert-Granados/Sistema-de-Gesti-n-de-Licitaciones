@@ -199,4 +199,47 @@ public sealed class LicitacionTests
 
         Assert.Equal(EstadoLicitacion.Cerrada, licitacion.Estado);
     }
+
+    [Fact]
+    public void Eliminar_ConFechaValida_MarcaComoEliminada()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+
+        licitacion.Eliminar(Ahora);
+
+        Assert.True(licitacion.EstaEliminada);
+        Assert.Equal(Ahora, licitacion.EliminadoEn);
+    }
+
+    [Fact]
+    public void Eliminar_DobleEliminacion_LanzaExcepcion()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+        licitacion.Eliminar(Ahora);
+
+        Assert.Throws<InvalidOperationException>(
+            () => licitacion.Eliminar(Ahora.AddDays(1)));
+    }
+
+    [Fact]
+    public void Eliminar_DesdePublicada_Permitido()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+        licitacion.Publicar(Ahora);
+
+        licitacion.Eliminar(Ahora);
+
+        Assert.True(licitacion.EstaEliminada);
+    }
+
+    [Fact]
+    public void Eliminar_DesdeCerrada_Permitido()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+        licitacion.Cerrar("Motivo", Ahora);
+
+        licitacion.Eliminar(Ahora);
+
+        Assert.True(licitacion.EstaEliminada);
+    }
 }
