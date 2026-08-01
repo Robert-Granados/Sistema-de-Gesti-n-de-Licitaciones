@@ -1,5 +1,7 @@
 using Licitaciones.Application.Common.Clock;
 using Licitaciones.Application.Licitaciones.Crear;
+using Licitaciones.Application.Licitaciones.Detalle;
+using Licitaciones.Application.Licitaciones.Editar;
 using Licitaciones.Application.Licitaciones.Exceptions;
 using Licitaciones.Application.Licitaciones.Listar;
 using Licitaciones.Web.Models.Licitaciones;
@@ -11,8 +13,12 @@ namespace Licitaciones.Web.Controllers;
 public sealed class LicitacionesController(
     CrearLicitacionHandler crearLicitacionHandler,
     ListarLicitacionesHandler listarLicitacionesHandler,
+    ObtenerLicitacionPorIdHandler obtenerLicitacionPorIdHandler,
+    EditarLicitacionHandler editarLicitacionHandler,
     IClock clock) : Controller
 {
+    private const string AmericaCostaRica = "America/Costa_Rica";
+
     [HttpGet("")]
     public async Task<IActionResult> Index(
         [FromQuery] int page = 1,
@@ -115,6 +121,113 @@ public sealed class LicitacionesController(
         catch (ArgumentOutOfRangeException exception)
         {
             ModelState.AddModelError(string.Empty, exception.Message);
+            return View(model);
+        }
+    }
+
+    [HttpGet("Detalle/{id:guid}")]
+    public async Task<IActionResult> Detalle(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var detalle = await obtenerLicitacionPorIdHandler.HandleAsync(
+            new ObtenerLicitacionPorIdQuery(id),
+            cancellationToken);
+
+        return detalle is null
+            ? NotFound()
+            : View(detalle);
+    }
+
+    [HttpGet("Editar/{id:guid}")]
+    public async Task<IActionResult> Editar(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var licitacion = await editarLicitacionHandler.ObtenerAsync(
+            id,
+            cancellationToken);
+
+        return licitacion is null
+            ? NotFound()
+            : View(new EditarLicitacionViewModel
+            {
+                Id = licitacion.Id,
+                Codigo = licitacion.Codigo,
+                Titulo = licitacion.Titulo,
+                FechaCierre = licitacion.FechaCierre,
+                PresupuestoEstimadoCrc = licitacion.PresupuestoEstimadoCrc,
+                RowVersion = licitacion.RowVersion
+            });
+    }
+
+    [HttpPost("Editar/{id:guid}")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(
+        Guid id,
+        EditarLicitacionViewModel model,
+        CancellationToken cancellationToken)
+    {
+        if (id != model.Id)
+        {
+            return BadRequest();
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return View(model);
+        }
+
+        if (model.FechaCierre!.Value <= clock.UtcNow)
+        {
+            ModelState.AddModelError(
+                nameof(model.FechaCierre),
+                "La fecha de cierre debe ser futura.");
+            return View(model);
+        }
+
+        try
+        {
+            await editarLicitacionHandler.HandleAsync(
+                new EditarLicitacionCommand(
+                    model.Id,
+                    model.Titulo,
+                    model.FechaCierre.Value,
+                    model.PresupuestoEstimadoCrc,
+                    model.RowVersion),
+                cancellationToken);
+
+            TempData["MensajeExito"] =
+                "La licitación se actualizó correctamente.";
+
+            return RedirectToAction(nameof(Detalle), new { id = model.Id });
+        }
+        catch (LicitacionNoEncontradaException)
+        {
+            return NotFound();
+        }
+        catch (LicitacionCerradaException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            return View(model);
+        }
+        catch (PresupuestoInsuficienteException exception)
+        {
+            ModelState.AddModelError(
+                nameof(model.PresupuestoEstimadoCrc), exception.Message);
+            return View(model);
+        }
+        catch (LicitacionConcurrenciaException exception)
+        {
+            ModelState.AddModelError(string.Empty, exception.Message);
+            Response.StatusCode = StatusCodes.Status409Conflict;
+            return View(model);
+        }
+        catch (LicitacionDuplicadaException exception)
+        {
+            ModelState.AddModelError(
+                nameof(model.Codigo), exception.Message);
+            Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);
         }
     }
