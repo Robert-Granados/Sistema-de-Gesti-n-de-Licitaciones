@@ -362,5 +362,24 @@ public sealed class RegistrarOfertaHandlerTests
             ofertasRegistradas?.Add(oferta);
             return Task.CompletedTask;
         }
+
+        public Task<Oferta?> ObtenerPorIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult(
+                ofertasRegistradas?.FirstOrDefault(oferta => oferta.Id == id));
+
+        public Task ActualizarAsync(
+            Oferta oferta,
+            CancellationToken cancellationToken = default) =>
+            Task.CompletedTask;
+
+        public Task EliminarAsync(
+            Oferta oferta,
+            CancellationToken cancellationToken = default)
+        {
+            ofertasRegistradas?.Remove(oferta);
+            return Task.CompletedTask;
+        }
     }
 }

@@ -1,5 +1,6 @@
 using Licitaciones.Application.Common.Models;
 using Licitaciones.Application.Licitaciones.Detalle;
+using Licitaciones.Application.Ofertas.Editar;
 using Licitaciones.Application.Ofertas.Listar;
 using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
@@ -46,5 +47,10 @@ public sealed class OpcionesFiltroOfertasHandlerTests
             FueConsultado = true;
             return Task.FromResult(opciones);
         }
+
+        public Task<EditarOfertaDto?> ObtenerParaEdicionAsync(
+            Guid id,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<EditarOfertaDto?>(null);
     }
 }

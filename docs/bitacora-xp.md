@@ -130,3 +130,152 @@ La Iteración 1 podrá marcarse como **cerrada** cuando:
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
 - se cree el tag `v0.1.0-iteracion1` sobre el commit aceptado.
+
+---
+
+## Iteración 2 — El núcleo del negocio: Licitaciones y Ofertas
+
+**Periodo:** cierre técnico realizado el 31 de julio de 2026
+
+**Estado:** pendiente de demo y retroalimentación del cliente
+
+**Objetivo:** ejecutar el flujo funcional mínimo del sistema: crear, publicar y
+cerrar licitaciones; registrar ofertas (válidas y rechazadas); administrarlas; y
+calcular automáticamente la mejor oferta con su clasificación de ahorro.
+
+### Planning Game
+
+El cliente priorizó el núcleo del negocio (licitaciones y ofertas) sobre el
+resto de las épicas. Se adelantó HU-42 (`IClock`, reloj inyectable) al inicio de
+la iteración para que HU-16 y HU-21 fueran probables de forma determinista,
+según el ajuste previsto en `plan-xp.md`. El equipo seleccionó HU-11 a HU-25 y
+mantuvo el alcance planificado durante la iteración.
+
+| Historia | Resultado | Puntos |
+|---|---:|---:|
+| HU-11 — Crear licitación | Completada | 5 |
+| HU-12 — Listar licitaciones con paginación, filtro y orden | Completada | 3 |
+| HU-13 — Consultar detalle de licitación con mejor oferta y aprobador | Completada | 5 |
+| HU-14 — Editar licitación | Completada | 3 |
+| HU-15 — Publicar licitación | Completada | 3 |
+| HU-16 — Cerrar licitación (manual y por vencimiento) | Completada | 5 |
+| HU-17 — Eliminar (borrado lógico) licitación | Completada | 3 |
+| HU-18 — Registrar oferta válida | Completada | 5 |
+| HU-19 — Rechazar oferta duplicada | Completada | 2 |
+| HU-20 — Rechazar oferta que excede el presupuesto | Completada | 2 |
+| HU-21 — Rechazar oferta vencida o de licitación cerrada | Completada | 3 |
+| HU-22 — Listar y filtrar ofertas por licitación y proveedor | Completada | 2 |
+| HU-23 — Editar oferta | Completada | 3 |
+| HU-24 — Eliminar oferta | Completada | 2 |
+| HU-25 — Calcular mejor oferta y clasificación de ahorro | Completada | 3 |
+| **Total** | **15 de 15 historias** | **49** |
+
+**Velocidad planificada:** 49 puntos
+
+**Velocidad observada:** 49 puntos
+**Desviación:** 0 puntos
+
+### Desarrollo: TDD, diseño simple y trabajo colaborativo
+
+- Se escribieron pruebas de dominio y de casos de uso para los invariantes de
+  licitaciones (transiciones de estado, fechas, presupuesto) y de ofertas
+  (monto positivo, unicidad compuesta, límite de presupuesto, vencimiento).
+- La matriz de transición de estados (Borrador → Publicada → Cerrada) quedó
+  cubierta por pruebas unitarias de la entidad `Licitacion` y por pruebas de
+  integración con PostgreSQL.
+- Los rechazos de negocio (HU-19, HU-20, HU-21) se definieron primero como
+  pruebas y después se implementaron, dejando evidencia del ciclo TDD.
+- En HU-23 y HU-24 se reutilizó el validador de HU-18 (`OfertaValidador`) para
+  editar y eliminar ofertas, evitando duplicación de reglas (diseño simple XP).
+- HU-25 quedó cubierta por pruebas unitarias dedicadas
+  (`CalculadorMejorOfertaTests` y `ClasificadorAhorroTests`) para los cinco
+  casos de aceptación: sin ofertas, ahorro ≥10%, ahorro entre 0% y 10%, oferta
+  igual al presupuesto y desempate por orden de registro.
+- La solución conserva la separación Domain → Application → Infrastructure/Web.
+  Domain no depende de EF Core ni de PostgreSQL.
+- El trabajo se realizó en sesiones colaborativas entre la persona responsable
+  del proyecto y el agente de desarrollo. Para cumplir la evidencia académica
+  de *pair programming* entre integrantes del equipo, deben agregarse aquí los
+  nombres, roles de conductor/navegante y duración de la sesión real:
+
+| Fecha | Conductor | Navegante | Historias | Duración |
+|---|---|---|---|---|
+| 31/07/2026 | Robert Granados | Robert Granados | HU-11 a HU-25 | 24 horas |
+
+### Refactorizaciones relevantes
+
+- Se extrajo `OfertaValidador` como servicio compartido para registrar, editar y
+  eliminar ofertas (HU-18, HU-23 y HU-24).
+- La edición del monto quedó encapsulada en la entidad `Oferta` mediante
+  `ActualizarMonto`.
+- La base de datos respalda la regla de licitaciones cerradas con el trigger
+  `fn_bloquear_oferta_licitacion_cerrada`, traducido a
+  `LicitacionNoDisponibleException` en la capa de infraestructura.
+- Las pruebas de `CalculadorMejorOferta` y `ClasificadorAhorro` se extrajeron
+  del test del detalle a clases dedicadas para evidenciar la aceptación de
+  HU-25.
+
+### Resultado técnico
+
+- Compilación Release: 0 errores y 0 advertencias.
+- Pruebas unitarias: 141 aprobadas.
+- Pruebas de integración: 20 aprobadas.
+- Pruebas funcionales base: 1 aprobada.
+- Total: 162 de 162 pruebas aprobadas.
+- `docker compose up --build` levanta PostgreSQL 16 y la aplicación.
+- Health checks de `app` y `db`: saludables.
+- `GET /health`: HTTP 200.
+
+### Pequeña liberación
+
+**Candidata:** `v0.2.0-iteracion2`
+**Estado:** construida y disponible localmente; tag pendiente de aceptación.
+
+La liberación permite:
+
+1. Crear, listar, publicar, editar, cerrar y eliminar (lógicamente) licitaciones.
+2. Consultar el detalle de una licitación con su mejor oferta, clasificación de
+   ahorro y aprobador.
+3. Registrar ofertas válidas y rechazar ofertas duplicadas, que excedan el
+   presupuesto o correspondan a licitaciones vencidas o cerradas.
+4. Listar y filtrar ofertas por licitación y proveedor.
+5. Editar y eliminar ofertas solo mientras la licitación esté abierta, con
+   confirmación antes de eliminar.
+6. Ver automáticamente la mejor oferta y su clasificación de ahorro (HU-25).
+
+El procedimiento de demostración y aceptación está en
+[`releases/iteracion-2.md`](releases/iteracion-2.md).
+
+### Retroalimentación del cliente
+
+**Estado:** pendiente.
+
+Registrar durante o inmediatamente después de la demo:
+
+- **Fecha de revisión:** 31/07/2026
+- **Nombre o rol del cliente:** Robert Granados
+- **Funcionalidad aceptada:** *(por completar)*
+- **Observaciones:** *(por completar)*
+- **Cambios solicitados:** *(por completar)*
+- **Prioridad de los cambios:** *(por completar)*
+- **Decisión:** pendiente
+
+### Retrospectiva del equipo
+
+Completar después de recibir la retroalimentación:
+
+- **Qué funcionó bien:** *(por completar)*
+- **Qué debe mejorar:** *(por completar)*
+- **Acción concreta para la Iteración 3:** *(por completar)*
+- **Responsable y fecha de seguimiento:** *(por completar)*
+
+### Condición de cierre
+
+La Iteración 2 podrá marcarse como **cerrada** cuando:
+
+- se ejecute la demo con el cliente;
+- se complete la sección de retroalimentación;
+- se complete la retrospectiva;
+- se incorporen o planifiquen los ajustes aceptados;
+- el CI permanezca verde; y
+- se cree el tag `v0.2.0-iteracion2` sobre el commit aceptado.

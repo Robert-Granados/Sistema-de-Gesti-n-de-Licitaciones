@@ -1,4 +1,5 @@
 using Licitaciones.Application.Common.Models;
+using Licitaciones.Application.Ofertas.Editar;
 using Licitaciones.Application.Ofertas.Listar;
 using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
@@ -95,5 +96,10 @@ public sealed class ListarOfertasHandlerTests
         public Task<OpcionesFiltroOfertasDto> ObtenerOpcionesFiltroAsync(
             CancellationToken cancellationToken = default) =>
             Task.FromResult(new OpcionesFiltroOfertasDto([], []));
+
+        public Task<EditarOfertaDto?> ObtenerParaEdicionAsync(
+            Guid id,
+            CancellationToken cancellationToken = default) =>
+            Task.FromResult<EditarOfertaDto?>(null);
     }
 }

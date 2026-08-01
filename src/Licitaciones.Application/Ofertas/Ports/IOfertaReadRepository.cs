@@ -1,4 +1,5 @@
 using Licitaciones.Application.Common.Models;
+using Licitaciones.Application.Ofertas.Editar;
 using Licitaciones.Application.Ofertas.Listar;
 using Licitaciones.Application.Ofertas.OpcionesFiltro;
 
@@ -11,6 +12,10 @@ public interface IOfertaReadRepository
         CancellationToken cancellationToken = default);
 
     Task<OpcionesFiltroOfertasDto> ObtenerOpcionesFiltroAsync(
+        CancellationToken cancellationToken = default);
+
+    Task<EditarOfertaDto?> ObtenerParaEdicionAsync(
+        Guid id,
         CancellationToken cancellationToken = default);
 }
 
