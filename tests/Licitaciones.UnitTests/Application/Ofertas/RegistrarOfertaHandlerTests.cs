@@ -94,6 +94,30 @@ public sealed class RegistrarOfertaHandlerTests
     }
 
     [Fact]
+    public async Task Handle_FechaCierreIgualAhora_Rechaza()
+    {
+        var licitacionId = Guid.NewGuid();
+        var validacion = new FakeValidacionRepository(
+            licitacionId: licitacionId,
+            estaPublicada: true,
+            fechaCierre: Clock.UtcNow,
+            presupuesto: 1_000_000m,
+            proveedorExiste: true,
+            yaTieneOferta: false);
+        var write = new FakeWriteRepository();
+        var handler = new RegistrarOfertaHandler(validacion, write, Clock);
+
+        var exception = await Assert.ThrowsAsync<LicitacionNoDisponibleException>(
+            () => handler.HandleAsync(
+                new RegistrarOfertaCommand(licitacionId, Guid.NewGuid(), 100m)));
+
+        Assert.Equal(
+            "No se pueden registrar ofertas para licitaciones vencidas.",
+            exception.Message);
+        Assert.False(write.Agregada);
+    }
+
+    [Fact]
     public async Task Handle_ProveedorNoExiste_Rechaza()
     {
         var licitacionId = Guid.NewGuid();
