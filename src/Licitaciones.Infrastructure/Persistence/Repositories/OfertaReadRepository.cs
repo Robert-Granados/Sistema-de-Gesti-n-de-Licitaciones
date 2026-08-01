@@ -1,5 +1,6 @@
 using Licitaciones.Application.Common.Models;
 using Licitaciones.Application.Licitaciones.Detalle;
+using Licitaciones.Application.Ofertas.Editar;
 using Licitaciones.Application.Ofertas.Listar;
 using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Ports;
@@ -11,6 +12,20 @@ namespace Licitaciones.Infrastructure.Persistence.Repositories;
 internal sealed class OfertaReadRepository(AppDbContext dbContext)
     : IOfertaReadRepository
 {
+    public Task<EditarOfertaDto?> ObtenerParaEdicionAsync(
+        Guid id,
+        CancellationToken cancellationToken = default) =>
+        dbContext.Ofertas
+            .AsNoTracking()
+            .Where(oferta => oferta.Id == id)
+            .Select(oferta => new EditarOfertaDto(
+                oferta.Id,
+                oferta.LicitacionId,
+                oferta.Licitacion.Codigo,
+                oferta.Proveedor.Nombre,
+                oferta.MontoOfertadoCrc))
+            .FirstOrDefaultAsync(cancellationToken);
+
     public async Task<PaginaResultado<OfertaListadoDto>> ListarAsync(
         OfertasConsulta consulta,
         CancellationToken cancellationToken = default)
