@@ -41,6 +41,7 @@ public static class DependencyInjection
         services.AddScoped<ILicitacionDeleteRepository, LicitacionDeleteRepository>();
         services.AddScoped<IOfertaValidacionRepository, OfertaRepository>();
         services.AddScoped<IOfertaWriteRepository, OfertaRepository>();
+        services.AddScoped<IOfertaReadRepository, OfertaReadRepository>();
 
         return services;
     }

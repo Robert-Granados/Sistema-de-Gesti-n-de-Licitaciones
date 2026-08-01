@@ -1,8 +1,22 @@
+using Licitaciones.Domain.Entities;
+
 namespace Licitaciones.Application.Ofertas.Ports;
 
 public interface IOfertaWriteRepository
 {
     Task AgregarAsync(
-        Domain.Entities.Oferta oferta,
+        Oferta oferta,
+        CancellationToken cancellationToken = default);
+
+    Task<Oferta?> ObtenerPorIdAsync(
+        Guid id,
+        CancellationToken cancellationToken = default);
+
+    Task ActualizarAsync(
+        Oferta oferta,
+        CancellationToken cancellationToken = default);
+
+    Task EliminarAsync(
+        Oferta oferta,
         CancellationToken cancellationToken = default);
 }
