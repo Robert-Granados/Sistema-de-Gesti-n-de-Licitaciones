@@ -1,0 +1,37 @@
+@{
+    var mensajeExito = TempData["MensajeExito"] as string;
+    var mensajeAdvertencia = TempData["MensajeAdvertencia"] as string;
+    var mensajeError = TempData["MensajeError"] as string;
+}
+
+<div id="notificaciones" class="notificaciones" aria-live="polite" aria-atomic="true">
+    @if (!string.IsNullOrEmpty(mensajeExito))
+    {
+        <div class="alert alert-success alert-dismissible fade show notificacion"
+             role="status"
+             data-notificacion="exito">
+            <strong>Éxito.</strong> @mensajeExito
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensajeAdvertencia))
+    {
+        <div class="alert alert-warning alert-dismissible fade show notificacion"
+             role="alert"
+             data-notificacion="advertencia">
+            <strong>Advertencia.</strong> @mensajeAdvertencia
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(mensajeError))
+    {
+        <div class="alert alert-danger alert-dismissible fade show notificacion"
+             role="alert"
+             data-notificacion="error">
+            <strong>Error.</strong> @mensajeError
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+    }
+</div>

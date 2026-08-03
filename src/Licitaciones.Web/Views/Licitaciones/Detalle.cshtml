@@ -19,7 +19,19 @@
         <h1>@Model.Codigo</h1>
         <p class="text-muted mb-0">@Model.Titulo</p>
     </div>
-    <div class="d-flex gap-2">
+    <div class="d-flex flex-wrap gap-2">
+        @if (Model.TipoCambio is not null)
+        {
+            <div class="btn-group"
+                 role="group"
+                 aria-label="Moneda de visualización"
+                 data-currency-toggle
+                 data-exchange-rate="@Model.TipoCambio.CrcPorUsd.ToString(CultureInfo.InvariantCulture)"
+                 data-rate-date="@Model.TipoCambio.FechaVigencia.ToString("dd/MM/yyyy")">
+                <button type="button" class="btn btn-outline-success active" data-currency="CRC">CRC</button>
+                <button type="button" class="btn btn-outline-success" data-currency="USD">USD</button>
+            </div>
+        }
         @if (Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Borrador
             || Model.Estado == Licitaciones.Domain.Enums.EstadoLicitacion.Publicada)
         {
@@ -67,14 +79,13 @@
     </div>
 </div>
 
-@if (TempData["MensajeExito"] is string mensajeExito)
+@if (Model.TipoCambio is not null)
 {
-    <div class="alert alert-success" role="alert">@mensajeExito</div>
-}
-
-@if (TempData["MensajeError"] is string mensajeError)
-{
-    <div class="alert alert-danger" role="alert">@mensajeError</div>
+    <p class="small text-muted text-end mt-n2 mb-3">
+        La vista USD usa el tipo de cambio local vigente desde
+        <strong>@Model.TipoCambio.FechaVigencia.ToString("dd/MM/yyyy")</strong>
+        (1 USD = @Model.TipoCambio.CrcPorUsd.ToString("N6", crCulture) CRC).
+    </p>
 }
 
 <div class="row g-4 mb-4">
@@ -113,7 +124,10 @@
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title text-muted">Presupuesto estimado</h6>
-                <p class="mb-0 fw-bold">@Model.PresupuestoEstimadoCrc.ToString("C", crCulture)</p>
+                <p class="mb-0 fw-bold"
+                   data-currency-amount="@Model.PresupuestoEstimadoCrc.ToString(CultureInfo.InvariantCulture)">
+                    @Model.PresupuestoEstimadoCrc.ToString("C", crCulture)
+                </p>
             </div>
         </div>
     </div>
@@ -142,7 +156,10 @@
                 </div>
                 <div class="col-md-3">
                     <h6 class="text-muted">Monto</h6>
-                    <p class="mb-0 fw-bold">@me.MontoOfertadoCrc.ToString("C", crCulture)</p>
+                    <p class="mb-0 fw-bold"
+                       data-currency-amount="@me.MontoOfertadoCrc.ToString(CultureInfo.InvariantCulture)">
+                        @me.MontoOfertadoCrc.ToString("C", crCulture)
+                    </p>
                 </div>
                 <div class="col-md-3">
                     <h6 class="text-muted">Clasificación de ahorro</h6>
@@ -174,19 +191,14 @@
                     }
                 </div>
             </div>
-            @if (me.MontoUsd.HasValue)
+            @if (Model.TipoCambio is not null)
             {
                 <hr />
-                <div class="row">
-                    <div class="col-md-4">
-                        <h6 class="text-muted">Equivalente en USD</h6>
-                        <p class="mb-0">@me.MontoUsd.Value.ToString("N2") USD</p>
-                    </div>
-                    <div class="col-md-4">
-                        <h6 class="text-muted">Tipo de cambio (fecha vigencia)</h6>
-                        <p class="mb-0">@me.FechaVigenciaTipoCambio!.Value.ToString("dd/MM/yyyy")</p>
-                    </div>
-                </div>
+                <p class="mb-0 small text-muted">
+                    Tipo de cambio local: 1 USD =
+                    @Model.TipoCambio.CrcPorUsd.ToString("N6", crCulture) CRC ·
+                    vigencia @Model.TipoCambio.FechaVigencia.ToString("dd/MM/yyyy").
+                </p>
             }
         </div>
     </div>
@@ -232,7 +244,8 @@ else
                                required
                                placeholder="0.00" />
                         <div class="form-text">
-                            Máximo: @Model.PresupuestoEstimadoCrc.ToString("C", crCulture)
+                            Máximo: @Model.PresupuestoEstimadoCrc.ToString("C", crCulture).
+                            Los datos se registran siempre en CRC.
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -258,7 +271,7 @@ else
             <thead>
                 <tr>
                     <th scope="col">Proveedor</th>
-                    <th scope="col">Monto CRC</th>
+                    <th scope="col">Monto <span data-currency-label>CRC</span></th>
                     <th scope="col">Fecha de registro</th>
                 </tr>
             </thead>
@@ -275,7 +288,9 @@ else
                                 <span class="badge bg-success ms-1">Mejor</span>
                             }
                         </td>
-                        <td>@oferta.MontoOfertadoCrc.ToString("C", crCulture)</td>
+                        <td data-currency-amount="@oferta.MontoOfertadoCrc.ToString(CultureInfo.InvariantCulture)">
+                            @oferta.MontoOfertadoCrc.ToString("C", crCulture)
+                        </td>
                         <td>@oferta.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</td>
                     </tr>
                 }

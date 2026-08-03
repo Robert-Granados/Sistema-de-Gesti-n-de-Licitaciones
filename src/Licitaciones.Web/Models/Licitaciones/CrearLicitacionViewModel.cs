@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Licitaciones.Web.Validation;
 
 namespace Licitaciones.Web.Models.Licitaciones;
 
@@ -19,6 +20,7 @@ public sealed class CrearLicitacionViewModel
     public string Titulo { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "La fecha de cierre es obligatoria.")]
+    [FechaFutura(ErrorMessage = "La fecha de cierre debe ser futura.")]
     [Display(Name = "Fecha y hora de cierre")]
     public DateTimeOffset? FechaCierre { get; set; }
 

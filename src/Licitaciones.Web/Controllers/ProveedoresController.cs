@@ -92,17 +92,20 @@ public sealed class ProveedoresController(
         }
         catch (NombreProveedorInvalidoException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(nameof(model.Nombre), exception.Message);
             return View(model);
         }
         catch (ProveedorDuplicadoException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(nameof(model.Nombre), exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);
         }
         catch (ProveedorConcurrenciaException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(string.Empty, exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);
@@ -176,11 +179,13 @@ public sealed class ProveedoresController(
         }
         catch (NombreProveedorInvalidoException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(nameof(model.Nombre), exception.Message);
             return View(model);
         }
         catch (ProveedorDuplicadoException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(nameof(model.Nombre), exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);

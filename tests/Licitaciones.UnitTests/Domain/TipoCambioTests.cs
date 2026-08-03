@@ -34,4 +34,13 @@ public sealed class TipoCambioTests
         Assert.True(tipoCambio.Activo);
         Assert.False(typeof(TipoCambio).GetProperty(nameof(TipoCambio.Activo))!.SetMethod!.IsPublic);
     }
+
+    [Fact]
+    public void Actualizar_ConValorNoPositivo_EsRechazado()
+    {
+        var tipoCambio = new TipoCambio(505.25m, DateTimeOffset.UtcNow);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            tipoCambio.Actualizar(-1m, DateTimeOffset.UtcNow));
+    }
 }

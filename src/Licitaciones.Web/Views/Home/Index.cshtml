@@ -1,8 +1,168 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Inicio";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="landing-hero rounded-4 overflow-hidden mb-5" aria-labelledby="landing-title">
+    <div class="row g-0 align-items-center">
+        <div class="col-lg-7 p-4 p-md-5">
+            <span class="badge text-bg-light text-primary mb-3">Gestión de compras</span>
+            <h1 id="landing-title" class="display-5 fw-bold mb-3">
+                Licitaciones claras, decisiones respaldadas
+            </h1>
+            <p class="lead mb-4">
+                Centralice proveedores, licitaciones y ofertas. El sistema identifica
+                la mejor propuesta, determina quién debe aprobarla y presenta los
+                montos en CRC o USD con una tasa administrada localmente.
+            </p>
+            <div class="d-flex flex-column flex-sm-row gap-2">
+                <a asp-controller="Licitaciones"
+                   asp-action="Index"
+                   class="btn btn-light btn-lg px-4">
+                    Consultar licitaciones
+                </a>
+                <a asp-controller="Licitaciones"
+                   asp-action="Crear"
+                   class="btn btn-outline-light btn-lg px-4">
+                    Crear licitación
+                </a>
+            </div>
+        </div>
+        <div class="col-lg-5 p-4 p-md-5">
+            <div class="landing-summary rounded-4 p-4">
+                <p class="text-uppercase small fw-semibold mb-3">De inicio a aprobación</p>
+                <ul class="list-unstyled mb-0 d-grid gap-3">
+                    <li><span aria-hidden="true">✓</span> Presupuesto siempre almacenado en CRC</li>
+                    <li><span aria-hidden="true">✓</span> Ofertas comparadas automáticamente</li>
+                    <li><span aria-hidden="true">✓</span> Aprobador definido por rangos configurables</li>
+                    <li><span aria-hidden="true">✓</span> Conversión local, disponible sin Internet</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mb-5" aria-labelledby="flujo-title">
+    <div class="text-center mx-auto mb-4 landing-section-heading">
+        <p class="text-primary fw-semibold text-uppercase small mb-2">Cómo funciona</p>
+        <h2 id="flujo-title" class="fw-bold">Un flujo completo en cinco pasos</h2>
+        <p class="text-muted mb-0">
+            Cada etapa conserva la trazabilidad necesaria para tomar una decisión de compra.
+        </p>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
+        <div class="col">
+            <article class="card h-100 border-0 shadow-sm landing-step">
+                <div class="card-body">
+                    <span class="landing-step-number">1</span>
+                    <h3 class="h5 mt-3">Preparar</h3>
+                    <p class="text-muted mb-0">
+                        Registre proveedores y cree la licitación con presupuesto y fecha de cierre.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="col">
+            <article class="card h-100 border-0 shadow-sm landing-step">
+                <div class="card-body">
+                    <span class="landing-step-number">2</span>
+                    <h3 class="h5 mt-3">Publicar</h3>
+                    <p class="text-muted mb-0">
+                        Abra la licitación para recibir propuestas dentro del plazo establecido.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="col">
+            <article class="card h-100 border-0 shadow-sm landing-step">
+                <div class="card-body">
+                    <span class="landing-step-number">3</span>
+                    <h3 class="h5 mt-3">Ofertar</h3>
+                    <p class="text-muted mb-0">
+                        Registre ofertas válidas en CRC y mantenga visible su historial.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="col">
+            <article class="card h-100 border-0 shadow-sm landing-step">
+                <div class="card-body">
+                    <span class="landing-step-number">4</span>
+                    <h3 class="h5 mt-3">Comparar</h3>
+                    <p class="text-muted mb-0">
+                        El sistema selecciona la mejor oferta y clasifica el ahorro obtenido.
+                    </p>
+                </div>
+            </article>
+        </div>
+        <div class="col">
+            <article class="card h-100 border-0 shadow-sm landing-step">
+                <div class="card-body">
+                    <span class="landing-step-number">5</span>
+                    <h3 class="h5 mt-3">Aprobar</h3>
+                    <p class="text-muted mb-0">
+                        El monto determina automáticamente el nivel de aprobación correspondiente.
+                    </p>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4 mb-5" aria-label="Funciones principales">
+    <div class="col-md-6">
+        <article class="card h-100 border-0 bg-body-tertiary">
+            <div class="card-body p-4 p-lg-5">
+                <span class="landing-feature-mark" aria-hidden="true">₡</span>
+                <h2 class="h3 mt-3">Montos fáciles de interpretar</h2>
+                <p class="text-muted">
+                    Los datos permanecen en colones como fuente oficial. En el detalle
+                    puede alternar la presentación a dólares sin modificar lo almacenado.
+                </p>
+                <p class="small mb-0">
+                    La tasa activa y su fecha de vigencia siempre acompañan la conversión.
+                </p>
+            </div>
+        </article>
+    </div>
+    <div class="col-md-6">
+        <article class="card h-100 border-0 bg-body-tertiary">
+            <div class="card-body p-4 p-lg-5">
+                <span class="landing-feature-mark" aria-hidden="true">✓</span>
+                <h2 class="h3 mt-3">Aprobación sin reglas rígidas</h2>
+                <p class="text-muted">
+                    Los niveles se configuran por rangos de monto. Así, la mejor oferta
+                    se dirige al encargado de área, gerencia o junta directiva según
+                    corresponda.
+                </p>
+                <p class="small mb-0">
+                    Los rangos se validan para evitar traslapes o configuraciones ambiguas.
+                </p>
+            </div>
+        </article>
+    </div>
+</section>
+
+<section class="landing-cta rounded-4 p-4 p-md-5 mb-4">
+    <div class="row align-items-center g-3">
+        <div class="col-lg-7">
+            <h2 class="h3 fw-bold mb-2">¿Qué desea gestionar?</h2>
+            <p class="text-muted mb-0">
+                Acceda directamente a los módulos operativos del sistema.
+            </p>
+        </div>
+        <div class="col-lg-5">
+            <nav class="d-flex flex-wrap gap-2 justify-content-lg-end" aria-label="Accesos rápidos">
+                <a asp-controller="Proveedores" asp-action="Index" class="btn btn-outline-primary">
+                    Proveedores
+                </a>
+                <a asp-controller="Licitaciones" asp-action="Index" class="btn btn-primary">
+                    Licitaciones
+                </a>
+                <a asp-controller="Ofertas" asp-action="Index" class="btn btn-outline-primary">
+                    Ofertas
+                </a>
+            </nav>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,56 @@
+@model Licitaciones.Web.Models.TiposCambio.EditarTipoCambioViewModel
+
+@{
+    ViewData["Title"] = "Editar tipo de cambio";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-6">
+        <h1>Editar tipo de cambio</h1>
+        <p class="text-muted">
+            Actualice el valor y la vigencia del tipo de cambio local.
+        </p>
+
+        <form asp-action="Editar" asp-route-id="@Model.Id" method="post">
+            <input asp-for="Id" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="mb-3">
+                <label asp-for="CrcPorUsd" class="form-label"></label>
+                <input asp-for="CrcPorUsd"
+                       type="number"
+                       step="0.000001"
+                       min="0.01"
+                       class="form-control"
+                       placeholder="500.000000" />
+                <div class="form-text">
+                    Cantidad de colones por un dólar estadounidense (debe ser mayor a cero).
+                </div>
+                <span asp-validation-for="CrcPorUsd" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="FechaVigencia" class="form-label"></label>
+                <input asp-for="FechaVigencia"
+                       type="date"
+                       class="form-control" />
+                <span asp-validation-for="FechaVigencia" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3 form-check">
+                <input asp-for="Activo" class="form-check-input" disabled />
+                <label asp-for="Activo" class="form-check-label"></label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Guardar cambios</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

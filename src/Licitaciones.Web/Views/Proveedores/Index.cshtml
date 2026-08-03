@@ -1,7 +1,19 @@
+@using Licitaciones.Web.Models.Shared
 @model Licitaciones.Web.Models.Proveedores.ListarProveedoresViewModel
 
 @{
     ViewData["Title"] = "Proveedores";
+
+    var paginador = new PaginadorViewModel(
+        Model.Resultado,
+        "Index",
+        "Proveedores",
+        Model.PageSize,
+        new Dictionary<string, string>
+        {
+            ["search"] = Model.Search ?? string.Empty,
+            ["sortBy"] = Model.SortBy
+        });
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -90,34 +102,7 @@ else
     </div>
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-    <p class="mb-0">
-        Total: <strong>@Model.Resultado.TotalRegistros</strong> ·
-        Página <strong>@Model.Resultado.PaginaActual</strong> de
-        <strong>@Model.Resultado.TotalPaginas</strong>
-    </p>
-
-    <nav aria-label="Paginación de proveedores">
-        <ul class="pagination mb-0">
-            <li class="page-item @(!Model.Resultado.TienePaginaAnterior ? "disabled" : null)">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.Resultado.PaginaActual - 1)"
-                   asp-route-pageSize="@Model.PageSize"
-                   asp-route-search="@Model.Search"
-                   asp-route-sortBy="@Model.SortBy">Anterior</a>
-            </li>
-            <li class="page-item @(!Model.Resultado.TienePaginaSiguiente ? "disabled" : null)">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.Resultado.PaginaActual + 1)"
-                   asp-route-pageSize="@Model.PageSize"
-                   asp-route-search="@Model.Search"
-                   asp-route-sortBy="@Model.SortBy">Siguiente</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<partial name="_TablaPaginada" model="paginador" />
 
 <div class="modal fade"
      id="eliminarProveedorModal"

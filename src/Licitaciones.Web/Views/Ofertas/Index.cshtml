@@ -1,19 +1,22 @@
 @using System.Globalization
+@using Licitaciones.Web.Models.Shared
 @model Licitaciones.Web.Models.Ofertas.ListarOfertasViewModel
 
 @{
     ViewData["Title"] = "Ofertas";
     var crCulture = new CultureInfo("es-CR");
-}
 
-@if (TempData["MensajeExito"] is string mensajeExito)
-{
-    <div class="alert alert-success" role="alert">@mensajeExito</div>
-}
-
-@if (TempData["MensajeError"] is string mensajeError)
-{
-    <div class="alert alert-danger" role="alert">@mensajeError</div>
+    var paginador = new PaginadorViewModel(
+        Model.Resultado,
+        "Index",
+        "Ofertas",
+        Model.PageSize,
+        new Dictionary<string, string>
+        {
+            ["licitacionId"] = Model.LicitacionId?.ToString() ?? string.Empty,
+            ["proveedorId"] = Model.ProveedorId?.ToString() ?? string.Empty,
+            ["sortBy"] = Model.SortBy
+        });
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -113,33 +116,4 @@ else
     </div>
 }
 
-<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
-    <p class="mb-0">
-        Total: <strong>@Model.Resultado.TotalRegistros</strong> ·
-        Página <strong>@Model.Resultado.PaginaActual</strong> de
-        <strong>@Model.Resultado.TotalPaginas</strong>
-    </p>
-
-    <nav aria-label="Paginación de ofertas">
-        <ul class="pagination mb-0">
-            <li class="page-item @(!Model.Resultado.TienePaginaAnterior ? "disabled" : null)">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.Resultado.PaginaActual - 1)"
-                   asp-route-pageSize="@Model.PageSize"
-                   asp-route-licitacionId="@Model.LicitacionId"
-                   asp-route-proveedorId="@Model.ProveedorId"
-                   asp-route-sortBy="@Model.SortBy">Anterior</a>
-            </li>
-            <li class="page-item @(!Model.Resultado.TienePaginaSiguiente ? "disabled" : null)">
-                <a class="page-link"
-                   asp-action="Index"
-                   asp-route-page="@(Model.Resultado.PaginaActual + 1)"
-                   asp-route-pageSize="@Model.PageSize"
-                   asp-route-licitacionId="@Model.LicitacionId"
-                   asp-route-proveedorId="@Model.ProveedorId"
-                   asp-route-sortBy="@Model.SortBy">Siguiente</a>
-            </li>
-        </ul>
-    </nav>
-</div>
+<partial name="_TablaPaginada" model="paginador" />

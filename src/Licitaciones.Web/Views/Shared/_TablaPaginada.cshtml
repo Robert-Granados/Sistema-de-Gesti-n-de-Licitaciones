@@ -1,0 +1,83 @@
+@model Licitaciones.Web.Models.Shared.PaginadorViewModel
+
+@{
+    var resultado = Model.Resultado;
+
+    const int maxPaginasVisibles = 7;
+    var paginaInicio = 1;
+    var paginaFin = resultado.TotalPaginas;
+
+    if (resultado.TotalPaginas > maxPaginasVisibles)
+    {
+        var desplazamiento = (maxPaginasVisibles - 1) / 2;
+        paginaInicio = Math.Max(1, resultado.PaginaActual - desplazamiento);
+        paginaFin = Math.Min(resultado.TotalPaginas, paginaInicio + maxPaginasVisibles - 1);
+        paginaInicio = Math.Max(1, paginaFin - maxPaginasVisibles + 1);
+    }
+}
+
+@functions {
+    private static Dictionary<string, string> RutaConPagina(
+        IReadOnlyDictionary<string, string> extra,
+        int pagina,
+        int pageSize)
+    {
+        var ruta = new Dictionary<string, string>(extra)
+        {
+            ["page"] = pagina.ToString(),
+            ["pageSize"] = pageSize.ToString()
+        };
+
+        return ruta
+            .Where(p => !string.IsNullOrEmpty(p.Value))
+            .ToDictionary(p => p.Key, p => p.Value);
+    }
+}
+
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <p class="mb-0">
+        Total: <strong>@resultado.TotalRegistros</strong> ·
+        Página <strong>@resultado.PaginaActual</strong> de
+        <strong>@resultado.TotalPaginas</strong>
+    </p>
+
+    @if (resultado.TotalPaginas > 1)
+    {
+        <nav aria-label="Paginación">
+            <ul class="pagination mb-0">
+                <li class="page-item @(!resultado.TienePaginaAnterior ? "disabled" : null)">
+                    <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="@RutaConPagina(Model.RutaExtra, resultado.PaginaActual - 1, Model.PageSize)">Anterior</a>
+                </li>
+
+                @for (var pagina = paginaInicio; pagina <= paginaFin; pagina++)
+                {
+                    @if (pagina == resultado.PaginaActual)
+                    {
+                        <li class="page-item active" aria-current="page">
+                            <span class="page-link">@pagina</span>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="page-item">
+                            <a class="page-link"
+                               asp-action="@Model.Action"
+                               asp-controller="@Model.Controller"
+                               asp-all-route-data="@RutaConPagina(Model.RutaExtra, pagina, Model.PageSize)">@pagina</a>
+                        </li>
+                    }
+                }
+
+                <li class="page-item @(!resultado.TienePaginaSiguiente ? "disabled" : null)">
+                    <a class="page-link"
+                       asp-action="@Model.Action"
+                       asp-controller="@Model.Controller"
+                       asp-all-route-data="@RutaConPagina(Model.RutaExtra, resultado.PaginaActual + 1, Model.PageSize)">Siguiente</a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

@@ -1,9 +1,22 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Licitaciones.Web</title>
+    <title>@ViewData["Title"] - Sistema de Licitaciones</title>
+    <script>
+        (() => {
+            try {
+                const savedTheme = localStorage.getItem("licitaciones-theme");
+                const theme = savedTheme === "dark" ? "dark" : "light";
+                document.documentElement.dataset.theme = theme;
+                document.documentElement.dataset.bsTheme = theme;
+            } catch {
+                document.documentElement.dataset.theme = "light";
+                document.documentElement.dataset.bsTheme = "light";
+            }
+        })();
+    </script>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -11,29 +24,51 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-xl bg-body border-bottom box-shadow mb-3"
+             aria-label="Navegación principal">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Licitaciones.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <a class="navbar-brand fw-semibold" asp-area="" asp-controller="Home" asp-action="Index">Sistema de Licitaciones</a>
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#menuPrincipal"
+                        aria-controls="menuPrincipal"
+                        aria-expanded="false"
+                        aria-label="Mostrar u ocultar menú principal">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div id="menuPrincipal" class="collapse navbar-collapse">
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Inicio</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-controller="Licitaciones" asp-action="Index">Licitaciones</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Proveedores" asp-action="Index">Proveedores</a>
+                            <a class="nav-link" asp-controller="Proveedores" asp-action="Index">Proveedores</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Licitaciones" asp-action="Index">Licitaciones</a>
+                            <a class="nav-link" asp-controller="Ofertas" asp-action="Index">Ofertas</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Ofertas" asp-action="Index">Ofertas</a>
+                            <a class="nav-link" href="/NivelesAprobacion">Niveles de aprobación</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/TiposCambio">Tipo de cambio</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/swagger">API (Swagger)</a>
+                        </li>
+                        <li class="nav-item ms-xl-2">
+                            <button id="themeToggle"
+                                    type="button"
+                                    class="btn btn-outline-secondary w-100"
+                                    aria-label="Cambiar a modo oscuro"
+                                    aria-pressed="false">
+                                <span data-theme-icon aria-hidden="true">☾</span>
+                                <span data-theme-label>Modo oscuro</span>
+                            </button>
                         </li>
                     </ul>
                 </div>
@@ -42,13 +77,14 @@
     </header>
     <div class="container">
         <main role="main" class="pb-3">
+            <partial name="_Notificaciones" />
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer class="border-top footer text-body-secondary">
         <div class="container">
-            &copy; 2026 - Licitaciones.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2026 — Sistema de Gestión de Licitaciones
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

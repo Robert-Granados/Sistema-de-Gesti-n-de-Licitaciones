@@ -1,6 +1,19 @@
 namespace Licitaciones.Application.Common.Models;
 
-public sealed class PaginaResultado<T>
+public interface IPaginaResultado
+{
+    int TotalRegistros { get; }
+
+    int PaginaActual { get; }
+
+    int TotalPaginas { get; }
+
+    bool TienePaginaAnterior { get; }
+
+    bool TienePaginaSiguiente { get; }
+}
+
+public sealed class PaginaResultado<T> : IPaginaResultado
 {
     public PaginaResultado(
         IReadOnlyList<T> elementos,

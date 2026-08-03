@@ -6,4 +6,11 @@
         var match = new RegExp(params, "u").exec(value);
         return (match && (match.index === 0) && (match[0].length === value.length));
     }, "");
+
+    $.validator.addMethod("fechafutura", function (value, element, params) {
+        if (this.optional(element)) { return true; }
+        var fecha = new Date(value);
+        return !isNaN(fecha.getTime()) && fecha > new Date();
+    }, "");
+    $.validator.unobtrusive.adapters.addBool("fechafutura");
 </script>

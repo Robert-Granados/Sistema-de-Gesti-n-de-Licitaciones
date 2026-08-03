@@ -21,6 +21,106 @@ body {
   margin-bottom: 60px;
 }
 
+#themeToggle {
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .landing-hero {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.1), transparent 35%),
+    linear-gradient(135deg, #082a45, #084298);
+}
+
+[data-theme="dark"] .landing-cta {
+  border-color: rgba(110, 168, 254, 0.3);
+  background: rgba(13, 110, 253, 0.12);
+}
+
+@media (max-width: 1199.98px) {
+  #menuPrincipal {
+    padding-block: 0.75rem;
+  }
+
+  #menuPrincipal .nav-link {
+    padding-block: 0.65rem;
+  }
+
+  #themeToggle {
+    margin-top: 0.5rem;
+  }
+}
+
+.landing-hero {
+  color: #fff;
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.16), transparent 35%),
+    linear-gradient(135deg, #0b3d63, #0d6efd);
+}
+
+.landing-summary {
+  background-color: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(6px);
+}
+
+.landing-summary li span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-right: 0.45rem;
+  color: #0b3d63;
+  background: #fff;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.landing-section-heading {
+  max-width: 42rem;
+}
+
+.landing-step {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.landing-step:hover {
+  transform: translateY(-0.2rem);
+}
+
+.landing-step-number,
+.landing-feature-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: #fff;
+  background: #0d6efd;
+  border-radius: 0.75rem;
+  font-weight: 700;
+}
+
+.landing-feature-mark {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  font-size: 1.25rem;
+}
+
+.landing-cta {
+  border: 1px solid rgba(13, 110, 253, 0.2);
+  background: rgba(13, 110, 253, 0.06);
+}
+
+@media (max-width: 575.98px) {
+  .landing-hero .display-5 {
+    font-size: 2.15rem;
+  }
+
+  .landing-hero .btn {
+    width: 100%;
+  }
+}
+
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
@@ -29,3 +129,24 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+.input-validation-error {
+  border-color: var(--bs-danger);
+}
+
+.input-validation-error:focus {
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+}
+
+.field-validation-error {
+  display: block;
+}
+
+.field-validation-valid {
+  display: none;
+}
+
+.validation-summary-errors ul {
+  margin-bottom: 0;
+}
+

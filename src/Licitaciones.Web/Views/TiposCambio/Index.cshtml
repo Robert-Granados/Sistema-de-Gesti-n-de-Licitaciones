@@ -1,0 +1,81 @@
+@using System.Globalization
+@model IReadOnlyList<Licitaciones.Application.TiposCambio.TipoCambioDto>
+
+@{
+    ViewData["Title"] = "Tipo de cambio";
+    var crCulture = new CultureInfo("es-CR");
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1>Tipo de cambio</h1>
+        <p class="text-muted mb-0">
+            Administre el tipo de cambio local CRC/USD usado en la conversión de montos.
+        </p>
+    </div>
+    <a asp-action="Crear" class="btn btn-primary">Registrar tipo de cambio</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info" role="status">
+        Todavía no hay tipos de cambio registrados.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped align-middle">
+            <thead>
+                <tr>
+                    <th scope="col">Tipo de cambio (₡ por USD)</th>
+                    <th scope="col">Fecha de vigencia</th>
+                    <th scope="col">Estado</th>
+                    <th scope="col"><span class="visually-hidden">Acciones</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var tipoCambio in Model)
+                {
+                    var vigencia = tipoCambio.FechaVigencia.ToString("dd/MM/yyyy");
+                    <tr>
+                        <td>@tipoCambio.CrcPorUsd.ToString("N6", crCulture)</td>
+                        <td>@vigencia</td>
+                        <td>
+                            @if (tipoCambio.Activo)
+                            {
+                                <span class="badge bg-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactivo</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="d-flex justify-content-end gap-1">
+                                @if (!tipoCambio.Activo)
+                                {
+                                    <form asp-action="Activar"
+                                          asp-route-id="@tipoCambio.Id"
+                                          method="post"
+                                          onsubmit="return confirm('¿Desea activar este tipo de cambio como el vigente?');">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Activar</button>
+                                    </form>
+                                }
+                                <a asp-action="Editar"
+                                   asp-route-id="@tipoCambio.Id"
+                                   class="btn btn-sm btn-outline-secondary">Editar</a>
+                                <form asp-action="Eliminar"
+                                      asp-route-id="@tipoCambio.Id"
+                                      method="post"
+                                      onsubmit="return confirm('¿Confirma la eliminación del tipo de cambio con vigencia @vigencia?');">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -98,21 +98,13 @@ public sealed class LicitacionesController(
             return View(model);
         }
 
-        if (model.FechaCierre!.Value <= clock.UtcNow)
-        {
-            ModelState.AddModelError(
-                nameof(model.FechaCierre),
-                "La fecha de cierre debe ser futura.");
-            return View(model);
-        }
-
         try
         {
             var result = await crearLicitacionHandler.HandleAsync(
                 new CrearLicitacionCommand(
                     model.Codigo,
                     model.Titulo,
-                    model.FechaCierre.Value,
+                    model.FechaCierre!.Value,
                     model.PresupuestoEstimadoCrc),
                 cancellationToken);
 
@@ -123,6 +115,7 @@ public sealed class LicitacionesController(
         }
         catch (LicitacionDuplicadaException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(
                 nameof(model.Codigo), exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
@@ -130,6 +123,7 @@ public sealed class LicitacionesController(
         }
         catch (ArgumentOutOfRangeException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(string.Empty, exception.Message);
             return View(model);
         }
@@ -188,21 +182,13 @@ public sealed class LicitacionesController(
             return View(model);
         }
 
-        if (model.FechaCierre!.Value <= clock.UtcNow)
-        {
-            ModelState.AddModelError(
-                nameof(model.FechaCierre),
-                "La fecha de cierre debe ser futura.");
-            return View(model);
-        }
-
         try
         {
             await editarLicitacionHandler.HandleAsync(
                 new EditarLicitacionCommand(
                     model.Id,
                     model.Titulo,
-                    model.FechaCierre.Value,
+                    model.FechaCierre!.Value,
                     model.PresupuestoEstimadoCrc,
                     model.RowVersion),
                 cancellationToken);
@@ -218,23 +204,27 @@ public sealed class LicitacionesController(
         }
         catch (LicitacionCerradaException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(string.Empty, exception.Message);
             return View(model);
         }
         catch (PresupuestoInsuficienteException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(
                 nameof(model.PresupuestoEstimadoCrc), exception.Message);
             return View(model);
         }
         catch (LicitacionConcurrenciaException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(string.Empty, exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
             return View(model);
         }
         catch (LicitacionDuplicadaException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(
                 nameof(model.Codigo), exception.Message);
             Response.StatusCode = StatusCodes.Status409Conflict;
@@ -343,6 +333,10 @@ public sealed class LicitacionesController(
 
         if (!ModelState.IsValid)
         {
+            var errores = ModelState.Values
+                .SelectMany(v => v.Errors)
+                .Select(e => e.ErrorMessage);
+            TempData["MensajeError"] = string.Join(" ", errores);
             return RedirectToAction(nameof(Detalle), new { id = licitacionId });
         }
 
@@ -367,12 +361,7 @@ public sealed class LicitacionesController(
         }
         catch (OfertaDuplicadaException exception)
         {
-            return Conflict(new ProblemDetails
-            {
-                Status = StatusCodes.Status409Conflict,
-                Title = "Oferta duplicada",
-                Detail = exception.Message
-            });
+            TempData["MensajeError"] = exception.Message;
         }
         catch (ArgumentOutOfRangeException exception)
         {

@@ -11,11 +11,6 @@
             Registre una nueva licitación para iniciar el proceso de recepción de ofertas.
         </p>
 
-        @if (TempData["MensajeExito"] is string mensaje)
-        {
-            <div class="alert alert-success" role="alert">@mensaje</div>
-        }
-
         <form asp-controller="Licitaciones" asp-action="Crear" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
