@@ -3,6 +3,8 @@ using Licitaciones.Application.Common.Clock;
 using Licitaciones.Application.Licitaciones.Ports;
 using Licitaciones.Application.Ofertas.Ports;
 using Licitaciones.Application.Proveedores.Ports;
+using Licitaciones.Application.NivelesAprobacion;
+using Licitaciones.Application.TiposCambio;
 using Licitaciones.Infrastructure.Common;
 using Licitaciones.Infrastructure.Persistence;
 using Licitaciones.Infrastructure.Persistence.Repositories;
@@ -42,6 +44,8 @@ public static class DependencyInjection
         services.AddScoped<IOfertaValidacionRepository, OfertaRepository>();
         services.AddScoped<IOfertaWriteRepository, OfertaRepository>();
         services.AddScoped<IOfertaReadRepository, OfertaReadRepository>();
+        services.AddScoped<INivelAprobacionRepository, NivelAprobacionRepository>();
+        services.AddScoped<ITipoCambioRepository, TipoCambioRepository>();
 
         return services;
     }
