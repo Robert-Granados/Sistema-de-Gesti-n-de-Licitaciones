@@ -279,3 +279,68 @@ La Iteración 2 podrá marcarse como **cerrada** cuando:
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
 - se cree el tag `v0.2.0-iteracion2` sobre el commit aceptado.
+
+---
+
+## Iteración 3 — Reglas paramétricas, moneda y experiencia de usuario
+
+**Inicio:** 02/08/2026
+**Estado:** en curso
+
+### Planning Game y alcance iniciado
+
+| Historia | Estado | Estimación |
+|---|---|---:|
+| HU-26 — CRUD de niveles de aprobación sin traslapes | Completada | 5 |
+| HU-27 — Resolver aprobador según monto | Completada | 2 |
+| HU-28 — CRUD de tipo de cambio con un único activo | Completada | 3 |
+| HU-29 — Alternar visualización CRC/USD sin modificar datos | Completada | 3 |
+| HU-30 — Landing page explicativa | Completada | 2 |
+| HU-31 — Menú de navegación principal | Completada | 1 |
+| HU-32 — Modo claro y modo oscuro persistente | Completada | 2 |
+
+### Evidencia técnica de HU-26 y HU-27
+
+- El servicio de aplicación permite listar, obtener, crear, editar y eliminar
+  niveles de aprobación.
+- La creación y edición validan los traslapes antes de persistir y rechazan un
+  segundo rango abierto.
+- PostgreSQL conserva una segunda defensa mediante
+  `ex_niveles_rango_sin_traslape` y
+  `ux_niveles_aprobacion_unico_abierto`.
+- Los tres rangos semilla requeridos permanecen configurados tanto en EF Core
+  como en `database_schema.sql`.
+- El resolutor consulta los niveles ordenados por monto mínimo, sin una cadena
+  fija de `if/else`, y retorna explícitamente `Sin aprobador configurado` cuando
+  ningún rango contiene el monto.
+- Se agregaron pruebas unitarias para rango traslapado, segundo rango abierto,
+  resolución correcta y ausencia de configuración.
+- El CRUD de tipos de cambio registra el valor CRC/USD y su fecha de vigencia;
+  el dominio rechaza valores menores o iguales a cero.
+- La activación se ejecuta en una transacción: desactiva el registro previamente
+  activo, activa el seleccionado y confirma ambos cambios juntos.
+- El índice parcial `ux_tipos_cambio_unico_activo` y el trigger
+  `trg_tipos_cambio_desactivar_previos` respaldan la regla en PostgreSQL.
+- El detalle de licitación ofrece un selector CRC/USD que convierte presupuesto
+  y ofertas en el navegador usando únicamente la tasa activa cargada desde la
+  base de datos local.
+- Cada conversión muestra la tasa y su fecha de vigencia. Los formularios y DTO
+  de escritura continúan recibiendo CRC, por lo que alternar la vista no
+  modifica ni persiste montos en USD y no requiere conexión a Internet.
+- La página de inicio explica el recorrido desde la preparación de una
+  licitación hasta su aprobación, incluyendo selección de mejor oferta y
+  visualización CRC/USD. Usa la cuadrícula responsive de Bootstrap y ofrece
+  accesos directos a los módulos operativos.
+- La barra principal incluye Inicio, Licitaciones, Proveedores, Ofertas,
+  Niveles de aprobación, Tipo de cambio y Swagger. En pantallas pequeñas se
+  presenta como un menú Bootstrap colapsable con etiquetas accesibles.
+- El menú incorpora un control visible de tema claro/oscuro. La preferencia se
+  conserva en `localStorage` y un script en el encabezado aplica `data-theme`
+  y `data-bs-theme` antes de cargar las hojas de estilo para evitar parpadeos.
+
+### Validación inicial
+
+- Pruebas unitarias: 149 aprobadas.
+- Pruebas de integración: 20 aprobadas.
+- Pruebas funcionales base: 1 aprobada.
+- Total: 170 de 170 pruebas aprobadas.

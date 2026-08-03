@@ -105,11 +105,13 @@ public sealed class OfertasController(
         }
         catch (LicitacionNoDisponibleException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(string.Empty, exception.Message);
             return View(model);
         }
         catch (ArgumentOutOfRangeException exception)
         {
+            TempData["MensajeError"] = exception.Message;
             ModelState.AddModelError(
                 nameof(model.MontoOfertadoCrc),
                 exception.Message);
