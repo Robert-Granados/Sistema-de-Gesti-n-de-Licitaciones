@@ -126,6 +126,9 @@ public sealed class ObtenerLicitacionPorIdHandlerTests
         Assert.NotNull(result.MejorOferta.MontoUsd);
         Assert.Equal(1000m, result.MejorOferta.MontoUsd);
         Assert.NotNull(result.MejorOferta.FechaVigenciaTipoCambio);
+        Assert.NotNull(result.TipoCambio);
+        Assert.Equal(520m, result.TipoCambio.CrcPorUsd);
+        Assert.Equal(tipoCambio.FechaVigencia, result.TipoCambio.FechaVigencia);
     }
 
     [Fact]
@@ -155,11 +158,11 @@ public sealed class ObtenerLicitacionPorIdHandlerTests
     }
 
     [Fact]
-    public void ResolverAprobador_MontoFueraDeRango_RetornaNull()
+    public void ResolverAprobador_MontoFueraDeRango_RetornaResultadoExplicito()
     {
         var niveles = NivelesDefault();
         var aprobador = ResolverAprobadorService.Resolver(niveles, -1m);
-        Assert.Null(aprobador);
+        Assert.Equal(ResolverAprobadorService.SinAprobadorConfigurado, aprobador);
     }
 
     private static IReadOnlyList<NivelAprobacion> NivelesDefault()

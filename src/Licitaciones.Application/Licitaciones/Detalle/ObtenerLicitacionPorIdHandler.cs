@@ -77,6 +77,11 @@ public sealed class ObtenerLicitacionPorIdHandler(
                 1,
                 PageSizeMaximum),
             mejorOfertaInfo,
-            proveedoresDto);
+            proveedoresDto,
+            detalle.TipoCambioActivo is null
+                ? null
+                : new TipoCambioVisualizacionDto(
+                    detalle.TipoCambioActivo.CrcPorUsd,
+                    detalle.TipoCambioActivo.FechaVigencia));
     }
 }
