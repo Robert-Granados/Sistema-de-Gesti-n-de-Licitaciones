@@ -45,8 +45,40 @@ public sealed class NivelAprobacion
 
     public string Aprobador { get; private set; }
 
+    public void Actualizar(
+        decimal montoMinimoCrc,
+        decimal? montoMaximoCrc,
+        string aprobador)
+    {
+        Validar(montoMinimoCrc, montoMaximoCrc, aprobador);
+        MontoMinimoCrc = montoMinimoCrc;
+        MontoMaximoCrc = montoMaximoCrc;
+        Aprobador = aprobador.Trim();
+    }
+
     public bool Contiene(decimal monto) =>
         monto >= MontoMinimoCrc
         && (!MontoMaximoCrc.HasValue || monto <= MontoMaximoCrc.Value);
+
+    private static void Validar(
+        decimal montoMinimoCrc,
+        decimal? montoMaximoCrc,
+        string aprobador)
+    {
+        if (montoMinimoCrc < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(montoMinimoCrc));
+        }
+
+        if (montoMaximoCrc.HasValue && montoMaximoCrc.Value <= montoMinimoCrc)
+        {
+            throw new ArgumentOutOfRangeException(nameof(montoMaximoCrc));
+        }
+
+        if (string.IsNullOrWhiteSpace(aprobador))
+        {
+            throw new ArgumentException("El aprobador es obligatorio.", nameof(aprobador));
+        }
+    }
 }
 
