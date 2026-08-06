@@ -87,6 +87,41 @@
             &copy; 2026 — Sistema de Gestión de Licitaciones
         </div>
     </footer>
+
+    <div class="modal fade"
+         id="confirmDeleteModal"
+         tabindex="-1"
+         aria-labelledby="confirmDeleteModalTitle"
+         aria-describedby="confirmDeleteModalMessage"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title fs-5" id="confirmDeleteModalTitle">
+                        Confirmar eliminación
+                    </h2>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmDeleteModalMessage" class="mb-0">
+                        ¿Confirma que desea eliminar este registro?
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button"
+                            class="btn btn-danger"
+                            id="confirmDeleteButton">Sí, eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -2,6 +2,20 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Licitaciones.Application\Licitaciones.Application.csproj" />
+    <ProjectReference Include="..\Licitaciones.Infrastructure\Licitaciones.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Cuando Api se carga desde Web, evita colisiones de appsettings al publicar.
+         La configuración del contenedor pertenece al host Web y se complementa
+         mediante variables de entorno de Docker Compose. -->
+    <Content Update="appsettings.json" CopyToPublishDirectory="Never" />
+    <Content Update="appsettings.Development.json" CopyToPublishDirectory="Never" />
   </ItemGroup>
 
   <PropertyGroup>

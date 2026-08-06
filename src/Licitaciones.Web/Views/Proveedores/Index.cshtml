@@ -86,14 +86,15 @@ else
                             <a asp-action="Editar"
                                asp-route-id="@proveedor.Id"
                                class="btn btn-sm btn-outline-secondary">Editar</a>
-                            <button type="button"
-                                    class="btn btn-sm btn-outline-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#eliminarProveedorModal"
-                                    data-proveedor-id="@proveedor.Id"
-                                    data-proveedor-nombre="@proveedor.Nombre">
-                                Eliminar
-                            </button>
+                            <form asp-action="Eliminar"
+                                  asp-route-id="@proveedor.Id"
+                                  method="post"
+                                  class="d-inline"
+                                  data-confirm-delete
+                                  data-confirm-title="Eliminar proveedor"
+                                  data-confirm-message="¿Confirma que desea eliminar al proveedor “@proveedor.Nombre”? Su historial de ofertas se conservará.">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
+                            </form>
                         </td>
                     </tr>
                 }
@@ -103,54 +104,3 @@ else
 }
 
 <partial name="_TablaPaginada" model="paginador" />
-
-<div class="modal fade"
-     id="eliminarProveedorModal"
-     tabindex="-1"
-     aria-labelledby="eliminarProveedorModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title fs-5" id="eliminarProveedorModalLabel">
-                    Confirmar eliminación
-                </h2>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                ¿Confirma que desea eliminar al proveedor
-                <strong id="proveedorAEliminar"></strong>?
-                Su historial de ofertas se conservará.
-            </div>
-            <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">Cancelar</button>
-                <form id="formEliminarProveedor" method="post">
-                    @Html.AntiForgeryToken()
-                    <button type="submit" class="btn btn-danger">
-                        Sí, eliminar
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        document.getElementById('eliminarProveedorModal')
-            .addEventListener('show.bs.modal', event => {
-                const button = event.relatedTarget;
-                const id = button.getAttribute('data-proveedor-id');
-                const nombre = button.getAttribute('data-proveedor-nombre');
-
-                document.getElementById('proveedorAEliminar').textContent = nombre;
-                document.getElementById('formEliminarProveedor').action =
-                    '@Url.Action("Eliminar", "Proveedores")/' + encodeURIComponent(id);
-            });
-    </script>
-}

@@ -15,50 +15,15 @@
         <a asp-action="Editar"
            asp-route-id="@Model.Id"
            class="btn btn-primary">Editar</a>
-        <button type="button"
-                class="btn btn-outline-danger"
-                data-bs-toggle="modal"
-                data-bs-target="#eliminarProveedorModal">
-            Eliminar
-        </button>
+        <form asp-action="Eliminar"
+              asp-route-id="@Model.Id"
+              method="post"
+              data-confirm-delete
+              data-confirm-title="Eliminar proveedor"
+              data-confirm-message="¿Confirma que desea eliminar al proveedor “@Model.Nombre”? Su historial de ofertas se conservará.">
+            <button type="submit" class="btn btn-outline-danger">Eliminar</button>
+        </form>
         <a asp-action="Index" class="btn btn-outline-secondary">Volver a proveedores</a>
-    </div>
-</div>
-
-<div class="modal fade"
-     id="eliminarProveedorModal"
-     tabindex="-1"
-     aria-labelledby="eliminarProveedorModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title fs-5" id="eliminarProveedorModalLabel">
-                    Confirmar eliminación
-                </h2>
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body">
-                ¿Confirma que desea eliminar al proveedor
-                <strong>@Model.Nombre</strong>?
-                Su historial de ofertas se conservará.
-            </div>
-            <div class="modal-footer">
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-dismiss="modal">Cancelar</button>
-                <form asp-action="Eliminar"
-                      asp-route-id="@Model.Id"
-                      method="post">
-                    <button type="submit" class="btn btn-danger">
-                        Sí, eliminar
-                    </button>
-                </form>
-            </div>
-        </div>
     </div>
 </div>
 

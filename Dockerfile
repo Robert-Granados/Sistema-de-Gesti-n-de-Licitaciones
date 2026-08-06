@@ -5,12 +5,14 @@ COPY ["Directory.Build.props", "."]
 COPY ["src/Licitaciones.Domain/Licitaciones.Domain.csproj", "src/Licitaciones.Domain/"]
 COPY ["src/Licitaciones.Application/Licitaciones.Application.csproj", "src/Licitaciones.Application/"]
 COPY ["src/Licitaciones.Infrastructure/Licitaciones.Infrastructure.csproj", "src/Licitaciones.Infrastructure/"]
+COPY ["src/Licitaciones.Api/Licitaciones.Api.csproj", "src/Licitaciones.Api/"]
 COPY ["src/Licitaciones.Web/Licitaciones.Web.csproj", "src/Licitaciones.Web/"]
 RUN dotnet restore "src/Licitaciones.Web/Licitaciones.Web.csproj"
 
 COPY src/Licitaciones.Domain/ src/Licitaciones.Domain/
 COPY src/Licitaciones.Application/ src/Licitaciones.Application/
 COPY src/Licitaciones.Infrastructure/ src/Licitaciones.Infrastructure/
+COPY src/Licitaciones.Api/ src/Licitaciones.Api/
 COPY src/Licitaciones.Web/ src/Licitaciones.Web/
 RUN dotnet publish "src/Licitaciones.Web/Licitaciones.Web.csproj" \
     --configuration Release \

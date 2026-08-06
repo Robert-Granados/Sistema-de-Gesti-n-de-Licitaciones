@@ -4,6 +4,48 @@
 (() => {
     "use strict";
 
+    const modalElement = document.getElementById("confirmDeleteModal");
+    const confirmButton = document.getElementById("confirmDeleteButton");
+    const title = document.getElementById("confirmDeleteModalTitle");
+    const message = document.getElementById("confirmDeleteModalMessage");
+    if (!modalElement || !confirmButton || !window.bootstrap) return;
+
+    const modal = window.bootstrap.Modal.getOrCreateInstance(modalElement);
+    let pendingForm = null;
+
+    document.addEventListener("submit", event => {
+        const form = event.target;
+        if (!(form instanceof HTMLFormElement)
+            || !form.matches("[data-confirm-delete]")
+            || form.dataset.deleteConfirmed === "true") {
+            return;
+        }
+
+        event.preventDefault();
+        pendingForm = form;
+        title.textContent = form.dataset.confirmTitle || "Confirmar eliminación";
+        message.textContent = form.dataset.confirmMessage
+            || "¿Confirma que desea eliminar este registro? Esta acción no se puede deshacer.";
+        modal.show();
+    });
+
+    confirmButton.addEventListener("click", () => {
+        if (!pendingForm) return;
+        const form = pendingForm;
+        pendingForm = null;
+        form.dataset.deleteConfirmed = "true";
+        modal.hide();
+        form.requestSubmit();
+    });
+
+    modalElement.addEventListener("hidden.bs.modal", () => {
+        pendingForm = null;
+    });
+})();
+
+(() => {
+    "use strict";
+
     const button = document.getElementById("themeToggle");
     if (!button) return;
 

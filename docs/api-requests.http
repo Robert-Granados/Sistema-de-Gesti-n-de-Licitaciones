@@ -1,0 +1,352 @@
+################################################################################
+# Sistema de Licitaciones — colección reproducible de API v1
+#
+# Compatible con REST Client de VS Code y JetBrains HTTP Client.
+# 1. Ejecute: docker compose up --build -d
+# 2. Ejecute las solicitudes de arriba hacia abajo.
+# 3. Los IDs se capturan automáticamente desde las respuestas con nombre.
+################################################################################
+
+@host = http://localhost:8080
+@json = application/json
+@correlationId = hu39-rest-client
+@missingId = 00000000-0000-0000-0000-000000000404
+@seedNivelId = 10000000-0000-0000-0000-000000000001
+@seedTipoCambioId = 20000000-0000-0000-0000-000000000001
+
+### OpenAPI — 200 OK
+GET {{host}}/swagger/v1/swagger.json
+Accept: {{json}}
+X-Correlation-ID: {{correlationId}}
+
+################################################################################
+# PROVEEDORES — CRUD
+################################################################################
+
+### Crear proveedor — 201 Created
+# @name crearProveedor
+POST {{host}}/api/v1/proveedores
+Content-Type: {{json}}
+X-Correlation-ID: {{correlationId}}
+
+{
+  "nombre": "Proveedor API HU39 {{$timestamp}}"
+}
+
+### Listar proveedores con paginación, filtro y orden — 200 OK
+GET {{host}}/api/v1/proveedores?page=1&pageSize=10&search=Proveedor%20API&sortBy=nombre
+Accept: {{json}}
+
+### Obtener proveedor — 200 OK
+# @name obtenerProveedor
+GET {{host}}/api/v1/proveedores/{{crearProveedor.response.body.$.id}}
+Accept: {{json}}
+
+### Actualizar proveedor — 204 No Content
+PUT {{host}}/api/v1/proveedores/{{crearProveedor.response.body.$.id}}
+Content-Type: {{json}}
+
+{
+  "nombre": "Proveedor API actualizado {{$timestamp}}",
+  "rowVersion": {{obtenerProveedor.response.body.$.rowVersion}}
+}
+
+### Consultar proveedor actualizado
+# @name proveedorActualizado
+GET {{host}}/api/v1/proveedores/{{crearProveedor.response.body.$.id}}
+Accept: {{json}}
+
+### Error 409 — nombre de proveedor duplicado
+POST {{host}}/api/v1/proveedores
+Content-Type: {{json}}
+
+{
+  "nombre": "{{proveedorActualizado.response.body.$.detalle.nombre}}"
+}
+
+### Error 400 — DTO inválido (nombre obligatorio)
+POST {{host}}/api/v1/proveedores
+Content-Type: {{json}}
+
+{
+  "nombre": ""
+}
+
+### Error 404 — proveedor inexistente
+GET {{host}}/api/v1/proveedores/{{missingId}}
+Accept: {{json}}
+
+################################################################################
+# LICITACIONES — CRUD + publicar/cerrar
+################################################################################
+
+### Crear licitación principal — 201 Created
+# @name crearLicitacion
+POST {{host}}/api/v1/licitaciones
+Content-Type: {{json}}
+
+{
+  "codigo": "API-{{$timestamp}}",
+  "titulo": "Compra de equipo para pruebas HU-39",
+  "fechaCierre": "2027-12-31T18:00:00Z",
+  "presupuestoEstimadoCrc": 1000000
+}
+
+### Listar licitaciones con filtros y orden — 200 OK
+GET {{host}}/api/v1/licitaciones?page=1&pageSize=10&search=HU-39&estado=Borrador&fechaDesde=2026-01-01T00:00:00Z&fechaHasta=2028-01-01T00:00:00Z&sortBy=fecha_desc
+Accept: {{json}}
+
+### Obtener licitación — 200 OK
+# @name obtenerLicitacion
+GET {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}
+Accept: {{json}}
+
+### Actualizar licitación — 204 No Content
+PUT {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}
+Content-Type: {{json}}
+
+{
+  "titulo": "Compra de equipo actualizada HU-39",
+  "fechaCierre": "2027-12-31T20:00:00Z",
+  "presupuestoEstimadoCrc": 1000000,
+  "rowVersion": {{obtenerLicitacion.response.body.$.rowVersion}}
+}
+
+### Publicar licitación — 204 No Content
+POST {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}/publicar
+
+### Error 409 — intentar publicar nuevamente
+POST {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}/publicar
+
+### Error 404 — licitación inexistente
+GET {{host}}/api/v1/licitaciones/{{missingId}}
+Accept: {{json}}
+
+################################################################################
+# OFERTAS — CRUD
+################################################################################
+
+### Registrar oferta — 201 Created
+# @name crearOferta
+POST {{host}}/api/v1/ofertas
+Content-Type: {{json}}
+
+{
+  "licitacionId": "{{crearLicitacion.response.body.$.id}}",
+  "proveedorId": "{{crearProveedor.response.body.$.id}}",
+  "montoOfertadoCrc": 750000
+}
+
+### Listar ofertas con filtros y orden — 200 OK
+GET {{host}}/api/v1/ofertas?page=1&pageSize=10&licitacionId={{crearLicitacion.response.body.$.id}}&proveedorId={{crearProveedor.response.body.$.id}}&sortBy=monto
+Accept: {{json}}
+
+### Obtener oferta — 200 OK
+GET {{host}}/api/v1/ofertas/{{crearOferta.response.body.$.id}}
+Accept: {{json}}
+
+### Actualizar oferta — 204 No Content
+PUT {{host}}/api/v1/ofertas/{{crearOferta.response.body.$.id}}
+Content-Type: {{json}}
+
+{
+  "montoOfertadoCrc": 700000
+}
+
+### Error 409 — oferta duplicada para licitación/proveedor
+POST {{host}}/api/v1/ofertas
+Content-Type: {{json}}
+
+{
+  "licitacionId": "{{crearLicitacion.response.body.$.id}}",
+  "proveedorId": "{{crearProveedor.response.body.$.id}}",
+  "montoOfertadoCrc": 650000
+}
+
+### Error 422 — presupuesto menor que una oferta existente
+# Primero obtenga la versión actual, pues publicar/registrar oferta actualiza datos.
+# @name obtenerLicitacionConOferta
+GET {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}
+Accept: {{json}}
+
+###
+PUT {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}
+Content-Type: {{json}}
+
+{
+  "titulo": "Presupuesto inválido",
+  "fechaCierre": "2027-12-31T20:00:00Z",
+  "presupuestoEstimadoCrc": 100,
+  "rowVersion": {{obtenerLicitacionConOferta.response.body.$.rowVersion}}
+}
+
+### Error 404 — oferta inexistente
+GET {{host}}/api/v1/ofertas/{{missingId}}
+Accept: {{json}}
+
+### Eliminar oferta — 204 No Content
+DELETE {{host}}/api/v1/ofertas/{{crearOferta.response.body.$.id}}
+
+### Cerrar licitación — 204 No Content
+POST {{host}}/api/v1/licitaciones/{{crearLicitacion.response.body.$.id}}/cerrar
+Content-Type: {{json}}
+
+{
+  "motivo": "Finalización de prueba reproducible HU-39"
+}
+
+### Crear una licitación borrador destinada a probar DELETE — 201 Created
+# @name crearLicitacionParaEliminar
+POST {{host}}/api/v1/licitaciones
+Content-Type: {{json}}
+
+{
+  "codigo": "DEL-{{$timestamp}}",
+  "titulo": "Licitación temporal para DELETE",
+  "fechaCierre": "2027-12-31T18:00:00Z",
+  "presupuestoEstimadoCrc": 500000
+}
+
+### Eliminar licitación borrador — 204 No Content
+DELETE {{host}}/api/v1/licitaciones/{{crearLicitacionParaEliminar.response.body.$.id}}
+
+### Eliminar proveedor creado — 204 No Content
+DELETE {{host}}/api/v1/proveedores/{{crearProveedor.response.body.$.id}}
+
+################################################################################
+# NIVELES DE APROBACIÓN — CRUD
+################################################################################
+
+### Listar niveles con paginación, filtro y orden — 200 OK
+GET {{host}}/api/v1/nivelesaprobacion?page=1&pageSize=10&search=Encargado&sortBy=minimo
+Accept: {{json}}
+
+### Obtener nivel semilla — 200 OK
+GET {{host}}/api/v1/nivelesaprobacion/{{seedNivelId}}
+Accept: {{json}}
+
+### Reducir temporalmente el primer rango para crear un nivel sin traslape — 200 OK
+PUT {{host}}/api/v1/nivelesaprobacion/{{seedNivelId}}
+Content-Type: {{json}}
+
+{
+  "montoMinimoCrc": 0.01,
+  "montoMaximoCrc": 499999.99,
+  "aprobador": "Encargado de área"
+}
+
+### Crear nivel temporal en el espacio liberado — 201 Created
+# @name crearNivel
+POST {{host}}/api/v1/nivelesaprobacion
+Content-Type: {{json}}
+
+{
+  "montoMinimoCrc": 500000,
+  "montoMaximoCrc": 999999.99,
+  "aprobador": "Comité temporal"
+}
+
+### Eliminar nivel temporal — 204 No Content
+DELETE {{host}}/api/v1/nivelesaprobacion/{{crearNivel.response.body.$.id}}
+
+### Restaurar el rango semilla — 200 OK
+PUT {{host}}/api/v1/nivelesaprobacion/{{seedNivelId}}
+Content-Type: {{json}}
+
+{
+  "montoMinimoCrc": 0.01,
+  "montoMaximoCrc": 999999.99,
+  "aprobador": "Encargado de área"
+}
+
+### Error 422 — rango traslapado (respuesta ProblemDetails)
+POST {{host}}/api/v1/nivelesaprobacion
+Content-Type: {{json}}
+X-Correlation-ID: ejemplo-422-niveles
+
+{
+  "montoMinimoCrc": 1,
+  "montoMaximoCrc": 100,
+  "aprobador": "Aprobador traslapado"
+}
+
+### Error 404 — nivel inexistente
+GET {{host}}/api/v1/nivelesaprobacion/{{missingId}}
+Accept: {{json}}
+
+################################################################################
+# TIPOS DE CAMBIO — CRUD + activar
+################################################################################
+
+### Crear tipo de cambio inactivo — 201 Created
+# @name crearTipoCambio
+POST {{host}}/api/v1/tiposcambio
+Content-Type: {{json}}
+
+{
+  "crcPorUsd": 525.25,
+  "fechaVigencia": "2026-08-05T00:00:00-06:00",
+  "activar": false
+}
+
+### Listar tipos con paginación, filtro y orden — 200 OK
+GET {{host}}/api/v1/tiposcambio?page=1&pageSize=10&activo=false&sortBy=fecha
+Accept: {{json}}
+
+### Obtener tipo de cambio — 200 OK
+GET {{host}}/api/v1/tiposcambio/{{crearTipoCambio.response.body.$.id}}
+Accept: {{json}}
+
+### Actualizar tipo de cambio — 200 OK
+PUT {{host}}/api/v1/tiposcambio/{{crearTipoCambio.response.body.$.id}}
+Content-Type: {{json}}
+
+{
+  "crcPorUsd": 526.50,
+  "fechaVigencia": "2026-08-06T00:00:00-06:00",
+  "activar": false
+}
+
+### Activar tipo de cambio — 200 OK
+POST {{host}}/api/v1/tiposcambio/{{crearTipoCambio.response.body.$.id}}/activar
+
+### Error 400 — valor CRC/USD no positivo
+POST {{host}}/api/v1/tiposcambio
+Content-Type: {{json}}
+
+{
+  "crcPorUsd": 0,
+  "fechaVigencia": "2026-08-05T00:00:00-06:00",
+  "activar": false
+}
+
+### Error 404 — tipo de cambio inexistente
+GET {{host}}/api/v1/tiposcambio/{{missingId}}
+Accept: {{json}}
+
+### Reactivar el tipo semilla para conservar configuración local — 200 OK
+POST {{host}}/api/v1/tiposcambio/{{seedTipoCambioId}}/activar
+
+### Eliminar tipo de cambio creado — 204 No Content
+DELETE {{host}}/api/v1/tiposcambio/{{crearTipoCambio.response.body.$.id}}
+
+################################################################################
+# CONTRATO DE ERROR 500
+################################################################################
+
+# No se expone un endpoint que provoque intencionalmente errores internos.
+# Ante una falla inesperada real, la API responde de forma controlada:
+#
+# HTTP/1.1 500 Internal Server Error
+# Content-Type: application/problem+json
+# X-Correlation-ID: <id>
+#
+# {
+#   "title": "Error interno",
+#   "status": 500,
+#   "detail": "Ocurrió un error interno al procesar la solicitud.",
+#   "errorCode": "internal_error",
+#   "correlationId": "<id>"
+# }
+#
+# La respuesta nunca incluye stack traces, rutas internas, SQL ni secretos.

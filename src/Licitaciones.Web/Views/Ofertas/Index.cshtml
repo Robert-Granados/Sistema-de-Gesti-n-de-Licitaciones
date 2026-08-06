@@ -104,7 +104,9 @@ else
                                 <form asp-action="Eliminar"
                                       asp-route-id="@oferta.Id"
                                       method="post"
-                                      onsubmit="return confirm('¿Confirma la eliminación de la oferta de @oferta.NombreProveedor para la licitación @oferta.CodigoLicitacion?');">
+                                      data-confirm-delete
+                                      data-confirm-title="Eliminar oferta"
+                                      data-confirm-message="¿Confirma la eliminación de la oferta de @oferta.NombreProveedor para la licitación @oferta.CodigoLicitacion?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                 </form>
                             </div>
