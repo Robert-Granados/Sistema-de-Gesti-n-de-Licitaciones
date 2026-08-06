@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
+    <ProjectReference Include="..\Licitaciones.Api\Licitaciones.Api.csproj" />
     <ProjectReference Include="..\Licitaciones.Application\Licitaciones.Application.csproj" />
     <ProjectReference Include="..\Licitaciones.Infrastructure\Licitaciones.Infrastructure.csproj" />
   </ItemGroup>

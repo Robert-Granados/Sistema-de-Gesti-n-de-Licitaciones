@@ -19,11 +19,27 @@ using Licitaciones.Application.Ofertas.OpcionesFiltro;
 using Licitaciones.Application.Ofertas.Registrar;
 using Licitaciones.Application.NivelesAprobacion;
 using Licitaciones.Application.TiposCambio;
+using Licitaciones.Api;
+using Licitaciones.Api.Controllers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services
+    .AddControllersWithViews()
+    .AddApplicationPart(typeof(ApiLicitacionesController).Assembly);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddStandardApiValidation();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "Sistema de Licitaciones API",
+        Version = "v1",
+        Description = "API REST versionada para la integración con el sistema."
+    });
+});
 builder.Services.AddHealthChecks();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddScoped<CrearProveedorHandler>();
@@ -49,6 +65,12 @@ builder.Services.AddScoped<ResolverAprobadorService>();
 builder.Services.AddScoped<TipoCambioService>();
 
 var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/swagger/v1/swagger.json", "Sistema de Licitaciones API v1");
+    options.RoutePrefix = "swagger";
+});
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -59,12 +81,14 @@ if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 }
 
+app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseRouting();
 
 app.UseAuthorization();
 
 app.MapStaticAssets();
 app.MapHealthChecks("/health");
+app.MapControllers();
 
 app.MapControllerRoute(
     name: "default",
