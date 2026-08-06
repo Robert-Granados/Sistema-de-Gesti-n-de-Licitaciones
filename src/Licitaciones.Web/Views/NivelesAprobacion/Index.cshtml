@@ -58,7 +58,9 @@ else
                                 <form asp-action="Eliminar"
                                       asp-route-id="@nivel.Id"
                                       method="post"
-                                      onsubmit="return confirm('¿Confirma la eliminación del nivel para “@nivel.Aprobador”?');">
+                                      data-confirm-delete
+                                      data-confirm-title="Eliminar nivel de aprobación"
+                                      data-confirm-message="¿Confirma la eliminación del nivel correspondiente a “@nivel.Aprobador”?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                 </form>
                             </div>

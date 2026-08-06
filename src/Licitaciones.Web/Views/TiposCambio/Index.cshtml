@@ -68,7 +68,9 @@ else
                                 <form asp-action="Eliminar"
                                       asp-route-id="@tipoCambio.Id"
                                       method="post"
-                                      onsubmit="return confirm('¿Confirma la eliminación del tipo de cambio con vigencia @vigencia?');">
+                                      data-confirm-delete
+                                      data-confirm-title="Eliminar tipo de cambio"
+                                      data-confirm-message="¿Confirma la eliminación del tipo de cambio con vigencia @vigencia?">
                                     <button type="submit" class="btn btn-sm btn-outline-danger">Eliminar</button>
                                 </form>
                             </div>
