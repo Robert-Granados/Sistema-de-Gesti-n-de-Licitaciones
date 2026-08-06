@@ -1,6 +1,38 @@
-@Licitaciones.Api_HostAddress = http://localhost:5067
+@host = http://localhost:8080
+@licitacionId = 00000000-0000-0000-0000-000000000000
 
-GET {{Licitaciones.Api_HostAddress}}/weatherforecast/
+### Swagger / OpenAPI
+GET {{host}}/swagger/v1/swagger.json
 Accept: application/json
 
-###
+### Listar licitaciones con paginación, filtro y orden
+GET {{host}}/api/v1/licitaciones?page=1&pageSize=20&search=equipo&estado=Publicada&sortBy=fecha_desc
+Accept: application/json
+
+### Crear licitación
+POST {{host}}/api/v1/licitaciones
+Content-Type: application/json
+
+{
+  "codigo": "LIC-2026-001",
+  "titulo": "Compra de equipo",
+  "fechaCierre": "2026-09-01T18:00:00Z",
+  "presupuestoEstimadoCrc": 1000000
+}
+
+### Publicar licitación
+POST {{host}}/api/v1/licitaciones/{{licitacionId}}/publicar
+
+### Cerrar licitación
+POST {{host}}/api/v1/licitaciones/{{licitacionId}}/cerrar
+Content-Type: application/json
+
+{
+  "motivo": "Proceso adjudicado"
+}
+
+### Recursos restantes
+GET {{host}}/api/v1/proveedores?page=1&pageSize=20&sortBy=nombre
+GET {{host}}/api/v1/ofertas?page=1&pageSize=20&sortBy=monto
+GET {{host}}/api/v1/nivelesaprobacion?page=1&pageSize=20&sortBy=minimo
+GET {{host}}/api/v1/tiposcambio?page=1&pageSize=20&activo=true
