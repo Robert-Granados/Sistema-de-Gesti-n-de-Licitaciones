@@ -137,7 +137,7 @@ La Iteración 1 podrá marcarse como **cerrada** cuando:
 
 **Periodo:** cierre técnico realizado el 31 de julio de 2026
 
-**Estado:** pendiente de demo y retroalimentación del cliente
+**Estado:** Aceptada con ajustes; pendiente de crear el tag de liberación.
 
 **Objetivo:** ejecutar el flujo funcional mínimo del sistema: crear, publicar y
 cerrar licitaciones; registrar ofertas (válidas y rechazadas); administrarlas; y
@@ -248,26 +248,26 @@ El procedimiento de demostración y aceptación está en
 
 ### Retroalimentación del cliente
 
-**Estado:** pendiente.
-
-Registrar durante o inmediatamente después de la demo:
+**Estado:** Aceptada con ajustes.
 
 - **Fecha de revisión:** 31/07/2026
 - **Nombre o rol del cliente:** Robert Granados
-- **Funcionalidad aceptada:** *(por completar)*
-- **Observaciones:** *(por completar)*
-- **Cambios solicitados:** *(por completar)*
-- **Prioridad de los cambios:** *(por completar)*
-- **Decisión:** pendiente
+- **Funcionalidad aceptada:** Crear licitación, Publicar licitación, Cerrar licitación, Registrar oferta, Listar y filtrar ofertas, Editar oferta, Eliminar oferta, Consultar detalle con mejor oferta
+- **Observaciones:** El flujo funcional mínimo del negocio (crear, publicar y cerrar; registrar y administrar ofertas; mejor oferta con clasificación de ahorro) funciona correctamente y los rechazos de negocio son claros. La interfaz sigue siendo básica: se requiere completar la experiencia de usuario y ver el aprobador y la conversión CRC/USD en el detalle.
+- **Cambios solicitados:** Completar la experiencia de usuario (landing, menú, modo claro/oscuro, validaciones y mensajes) y mostrar el aprobador y la conversión de moneda en el detalle de licitación.
+- **Prioridad de los cambios:** Media
+- **Decisión:** Aceptada con ajustes
 
 ### Retrospectiva del equipo
 
-Completar después de recibir la retroalimentación:
-
-- **Qué funcionó bien:** *(por completar)*
-- **Qué debe mejorar:** *(por completar)*
-- **Acción concreta para la Iteración 3:** *(por completar)*
-- **Responsable y fecha de seguimiento:** *(por completar)*
+- **Qué funcionó bien:** La matriz de transición de estados y el flujo licitación → publicación → ofertas → mejor oferta quedaron cubiertos por pruebas unitarias y de integración; se reutilizó `OfertaValidador` para registrar, editar y eliminar ofertas, evitando duplicación de reglas.
+- **Qué debe mejorar:** La interfaz de usuario sigue siendo básica y falta la API REST documentada y sus pruebas para cerrar el alcance de la Iteración 3.
+- **Acción concreta para la Iteración 3:**
+  - Completar la experiencia de usuario (landing, menú, temas, validaciones, mensajes y confirmaciones).
+  - Exponer la API REST versionada con DTOs, Swagger y errores estandarizados.
+- **Responsable y fecha de seguimiento:**
+  - Responsable: Robert Granados
+  - Fecha de seguimiento: 07/08/2026
 
 ### Condición de cierre
 
@@ -284,12 +284,23 @@ La Iteración 2 podrá marcarse como **cerrada** cuando:
 
 ## Iteración 3 — Reglas paramétricas, moneda y experiencia de usuario
 
-**Inicio:** 02/08/2026
-**Estado:** en curso
+**Periodo:** cierre técnico realizado el 05 de agosto de 2026
 
-### Planning Game y alcance iniciado
+**Estado:** Aceptada con ajustes; pendiente de crear el tag de liberación.
 
-| Historia | Estado | Estimación |
+**Objetivo:** hacer la aplicación usable de principio a fin (landing, menú,
+temas, validaciones, mensajes y confirmaciones), parametrizar la aprobación
+mediante niveles y tipos de cambio, y exponer una API REST versionada y
+documentada en Swagger que refleje el aprobador y la conversión CRC/USD.
+
+### Planning Game
+
+El cliente priorizó las reglas paramétricas (niveles de aprobación y tipo de
+cambio), la experiencia de usuario completa y la exposición de la API REST,
+según el alcance previsto para la Iteración 3 en `plan-xp.md`. El equipo
+seleccionó HU-26 a HU-39 y mantuvo el alcance planificado durante la iteración.
+
+| Historia | Resultado | Puntos |
 |---|---|---:|
 | HU-26 — CRUD de niveles de aprobación sin traslapes | Completada | 5 |
 | HU-27 — Resolver aprobador según monto | Completada | 2 |
@@ -298,35 +309,73 @@ La Iteración 2 podrá marcarse como **cerrada** cuando:
 | HU-30 — Landing page explicativa | Completada | 2 |
 | HU-31 — Menú de navegación principal | Completada | 1 |
 | HU-32 — Modo claro y modo oscuro persistente | Completada | 2 |
+| HU-33 — Formularios con validación junto al campo | Completada | 3 |
+| HU-34 — Tablas con paginación, filtrado y ordenamiento | Completada | 3 |
+| HU-35 — Mensajes de éxito, advertencia y error | Completada | 2 |
+| HU-36 — Confirmación antes de eliminar | Completada | 1 |
+| HU-37 — API REST versionada con DTOs y Swagger | Completada | 8 |
+| HU-38 — Manejo estandarizado de errores en la API | Completada | 3 |
+| HU-39 — Colección reproducible de solicitudes de API | Completada | 2 |
+| **Total** | **14 de 14 historias** | **40** |
 
-### Evidencia técnica de HU-26 y HU-27
+**Velocidad planificada:** 40 puntos
+
+**Velocidad observada:** 40 puntos
+**Desviación:** 0 puntos
+
+### Desarrollo: TDD, diseño simple y trabajo colaborativo
+
+- Se escribieron pruebas unitarias de dominio y de casos de uso para los
+  invariantes de los niveles de aprobación (rango traslapado, segundo rango
+  abierto, resolución correcta y ausencia de configuración) y del tipo de
+  cambio (valor CRC/USD mayor que cero y único activo).
+- La activación de un tipo de cambio se definió primero como prueba y después
+  se implementó en una transacción que desactiva el registro previamente activo
+  y activa el seleccionado, dejando evidencia del ciclo rojo-verde-refactor.
+- HU-37 y HU-38 se cubrieron con pruebas de contrato y del middleware antes de
+  la implementación final: `ApiContractTests` verifica rutas versionadas,
+  ausencia de entidades de dominio en firmas, acciones `publicar`/`cerrar` y el
+  documento OpenAPI; `ApiExceptionMiddlewareTests` verifica `ProblemDetails`
+  con `errorCode` y `correlationId`, y que los errores 500 no exponen datos
+  sensibles.
+- El resolutor de aprobador (HU-27) consulta los niveles ordenados por monto
+  mínimo sin una cadena fija de `if/else` (diseño simple XP, según exige la
+  historia) y retorna explícitamente `Sin aprobador configurado` cuando ningún
+  rango contiene el monto.
+- La solución conserva la separación Domain → Application → Infrastructure/Web,
+  con la API compartiendo los mismos casos de uso de la UI y Domain sin
+  depender de EF Core ni de PostgreSQL.
+- El trabajo se realizó en sesiones colaborativas entre la persona responsable
+  del proyecto y el agente de desarrollo. Para cumplir la evidencia académica
+  de *pair programming* entre integrantes del equipo, deben agregarse aquí los
+  nombres, roles de conductor/navegante y duración de la sesión real:
+
+| Fecha | Conductor | Navegante | Historias | Duración |
+|---|---|---|---|---|
+| 05/08/2026 | Robert Granados | Robert Granados | HU-26 a HU-39 | 24 horas |
+
+### Refactorizaciones relevantes
 
 - El servicio de aplicación permite listar, obtener, crear, editar y eliminar
-  niveles de aprobación.
-- La creación y edición validan los traslapes antes de persistir y rechazan un
-  segundo rango abierto.
-- PostgreSQL conserva una segunda defensa mediante
-  `ex_niveles_rango_sin_traslape` y
+  niveles de aprobación; la creación y edición validan los traslapes antes de
+  persistir y rechazan un segundo rango abierto. PostgreSQL conserva una
+  segunda defensa mediante `ex_niveles_rango_sin_traslape` y
   `ux_niveles_aprobacion_unico_abierto`.
 - Los tres rangos semilla requeridos permanecen configurados tanto en EF Core
   como en `database_schema.sql`.
-- El resolutor consulta los niveles ordenados por monto mínimo, sin una cadena
-  fija de `if/else`, y retorna explícitamente `Sin aprobador configurado` cuando
-  ningún rango contiene el monto.
-- Se agregaron pruebas unitarias para rango traslapado, segundo rango abierto,
-  resolución correcta y ausencia de configuración.
-- El CRUD de tipos de cambio registra el valor CRC/USD y su fecha de vigencia;
-  el dominio rechaza valores menores o iguales a cero.
-- La activación se ejecuta en una transacción: desactiva el registro previamente
-  activo, activa el seleccionado y confirma ambos cambios juntos.
 - El índice parcial `ux_tipos_cambio_unico_activo` y el trigger
-  `trg_tipos_cambio_desactivar_previos` respaldan la regla en PostgreSQL.
+  `trg_tipos_cambio_desactivar_previos` respaldan la regla de un único tipo de
+  cambio activo en PostgreSQL.
 - El detalle de licitación ofrece un selector CRC/USD que convierte presupuesto
   y ofertas en el navegador usando únicamente la tasa activa cargada desde la
-  base de datos local.
-- Cada conversión muestra la tasa y su fecha de vigencia. Los formularios y DTO
-  de escritura continúan recibiendo CRC, por lo que alternar la vista no
-  modifica ni persiste montos en USD y no requiere conexión a Internet.
+  base de datos local. Cada conversión muestra la tasa y su fecha de vigencia.
+  Los formularios y DTO de escritura continúan recibiendo CRC, por lo que
+  alternar la vista no modifica ni persiste montos en USD y no requiere
+  conexión a Internet.
+- Todas las eliminaciones visibles —proveedor, licitación, oferta, nivel de
+  aprobación y tipo de cambio— pasan por un único modal Bootstrap definido en
+  el layout. El componente reutiliza el formulario POST original con su token
+  antifalsificación y solo lo envía después de una confirmación explícita.
 - La página de inicio explica el recorrido desde la preparación de una
   licitación hasta su aprobación, incluyendo selección de mejor oferta y
   visualización CRC/USD. Usa la cuadrícula responsive de Bootstrap y ofrece
@@ -337,10 +386,100 @@ La Iteración 2 podrá marcarse como **cerrada** cuando:
 - El menú incorpora un control visible de tema claro/oscuro. La preferencia se
   conserva en `localStorage` y un script en el encabezado aplica `data-theme`
   y `data-bs-theme` antes de cargar las hojas de estilo para evitar parpadeos.
+- Los formularios muestran errores de validación junto al campo (cliente y
+  servidor), las tablas de licitaciones, proveedores y ofertas paginan, filtran
+  y ordenan de forma consistente, y cada operación CRUD notifica éxito,
+  advertencia o error con texto comprensible.
+- La API expone CRUD versionado bajo `/api/v1` para licitaciones, proveedores,
+  ofertas, niveles de aprobación y tipos de cambio, además de las acciones
+  `publicar`, `cerrar` y `activar`.
+- Corrección posterior: los controladores API usan nombres internos con prefijo
+  `Api` y rutas explícitas. Esto evita que el generador de enlaces MVC los
+  confunda con los controladores de vistas y dirija Crear/Editar hacia JSON.
+- Los contratos HTTP usan DTOs de entrada/salida con validación, paginación,
+  filtros y ordenamiento. Las entidades de Domain/EF Core no forman parte de
+  ninguna firma de controlador.
+- Swagger/OpenAPI está habilitado en `/swagger`, con descripciones y ejemplos,
+  y el ensamblado API se carga también en el host Web para que el enlace del
+  menú funcione en el despliegue actual.
+- Un middleware global traduce excepciones de aplicación a respuestas
+  `ProblemDetails` con 400, 404, 409, 422 o 500 según corresponda. Los errores
+  incluyen `errorCode`, `correlationId` y el encabezado `X-Correlation-ID`.
+- El identificador de correlación forma parte del alcance de logs. Los fallos
+  desconocidos se registran internamente, pero su respuesta usa un detalle
+  genérico que no expone stack traces, SQL, secretos ni rutas del servidor.
+- La validación automática de DTOs también usa el mismo contrato de error con
+  el código interno `validation_failed`.
+- `docs/api-requests.http` documenta y permite ejecutar el CRUD y las acciones
+  específicas de los cinco recursos. Usa respuestas nombradas para encadenar
+  IDs y versiones sin copiarlos manualmente, e incluye casos representativos
+  de 400, 404, 409, 422 y el contrato seguro esperado para 500.
 
-### Validación inicial
+### Resultado técnico
 
+- Compilación Release: 0 errores y 0 advertencias.
 - Pruebas unitarias: 149 aprobadas.
 - Pruebas de integración: 20 aprobadas.
-- Pruebas funcionales base: 1 aprobada.
-- Total: 170 de 170 pruebas aprobadas.
+- Pruebas funcionales y contractuales: 8 aprobadas.
+- Total: 177 de 177 pruebas aprobadas.
+- `docker compose up --build` levanta PostgreSQL 16 y la aplicación.
+- Health checks de `app` y `db`: saludables.
+- `GET /health`: HTTP 200.
+
+### Pequeña liberación
+
+**Candidata:** `v0.3.0-iteracion3`
+**Estado:** construida y disponible localmente; tag pendiente de aceptación.
+
+La liberación permite:
+
+1. Administrar niveles de aprobación con rangos sin traslapes y un único rango
+   abierto, y resolver el aprobador según el monto de la mejor oferta.
+2. Administrar tipos de cambio CRC/USD con un único activo y fecha de vigencia.
+3. Alternar la visualización CRC/USD en el detalle de licitación sin modificar
+   los montos almacenados, mostrando la tasa y su fecha de vigencia.
+4. Navegar por la landing page explicativa, el menú principal y el modo
+   claro/oscuro persistente.
+5. Ver validaciones junto al campo, tablas paginadas/filtradas/ordenables,
+   mensajes de éxito/advertencia/error y confirmación antes de eliminar.
+6. Consumir la API REST versionada en `/api/v1` con DTOs, Swagger y errores
+   `ProblemDetails` estandarizados.
+7. Ejecutar la colección reproducible de solicitudes en `docs/api-requests.http`.
+
+El procedimiento de demostración y aceptación está en
+[`releases/iteracion-3.md`](releases/iteracion-3.md).
+
+### Retroalimentación del cliente
+
+**Estado:** Aceptada con ajustes.
+
+- **Fecha de revisión:** 05/08/2026
+- **Nombre o rol del cliente:** Robert Granados
+- **Funcionalidad aceptada:** Landing page, menú de navegación, modo claro/oscuro, CRUD de niveles de aprobación, resolución del aprobador, CRUD de tipo de cambio, conversión CRC/USD, validación en formularios, tablas paginadas, confirmación antes de eliminar, API REST v1 con Swagger
+- **Observaciones:** La aplicación es usable de principio a fin y la API documentada facilita la integración con otros clientes. Para el cierre del proyecto se sugiere reforzar la cobertura de pruebas, completar el despliegue en Kubernetes y terminar la documentación.
+- **Cambios solicitados:** Completar la Iteración 4: cobertura mínima de pruebas, despliegue en Kubernetes y documentación final de `/docs`.
+- **Prioridad de los cambios:** Media
+- **Decisión:** Aceptada con ajustes
+
+### Retrospectiva del equipo
+
+- **Qué funcionó bien:** Se completó la experiencia de usuario solicitada desde la Iteración 1; la API quedó versionada, con DTOs y errores estandarizados, y las pruebas de contrato (`ApiContractTests`) y del middleware (`ApiExceptionMiddlewareTests`) validan el contrato HTTP sin depender de una instancia en ejecución.
+- **Qué debe mejorar:** Ampliar las pruebas funcionales de extremo a extremo desde el navegador y preparar el despliegue en Kubernetes.
+- **Acción concreta para la Iteración 4:**
+  - Alcanzar la cobertura mínima (≥80% en Domain/Application y ≥70% global).
+  - Completar el despliegue en Kubernetes y el pipeline de CI/CD.
+  - Cerrar la documentación de `/docs` (HU-51 a HU-54).
+- **Responsable y fecha de seguimiento:**
+  - Responsable: Robert Granados
+  - Fecha de seguimiento: 12/08/2026
+
+### Condición de cierre
+
+La Iteración 3 podrá marcarse como **cerrada** cuando:
+
+- se ejecute la demo con el cliente;
+- se complete la sección de retroalimentación;
+- se complete la retrospectiva;
+- se incorporen o planifiquen los ajustes aceptados;
+- el CI permanezca verde; y
+- se cree el tag `v0.3.0-iteracion3` sobre el commit aceptado.
