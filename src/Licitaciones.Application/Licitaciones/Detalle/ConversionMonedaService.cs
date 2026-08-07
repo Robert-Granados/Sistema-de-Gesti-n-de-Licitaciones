@@ -8,7 +8,9 @@ public static class ConversionMonedaService
         TipoCambio? tipoCambioActivo,
         decimal montoCrc)
     {
-        if (tipoCambioActivo is null || tipoCambioActivo.CrcPorUsd <= 0)
+        if (tipoCambioActivo is null
+            || tipoCambioActivo.CrcPorUsd <= 0
+            || montoCrc <= 0)
         {
             return null;
         }
