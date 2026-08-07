@@ -2,23 +2,28 @@ using Licitaciones.Application.Proveedores.Eliminar;
 using Licitaciones.Application.Proveedores.Exceptions;
 using Licitaciones.Application.Proveedores.Ports;
 using Licitaciones.Domain.Entities;
+using Licitaciones.UnitTests.Common;
 
 namespace Licitaciones.UnitTests.Application.Proveedores;
 
 public sealed class EliminarProveedorHandlerTests
 {
+    private static readonly DateTimeOffset Now =
+        new(2026, 8, 7, 12, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task HandleAsync_ProveedorConOfertas_AplicaBorradoLogico()
     {
         var proveedor = new Proveedor("Proveedor Histórico", "PROVEEDOR HISTORICO");
         var repository = new FakeProveedorDeleteRepository(proveedor, tieneOfertas: true);
-        var handler = new EliminarProveedorHandler(repository);
+        var handler = new EliminarProveedorHandler(repository, new FakeClock(Now));
 
         var resultado = await handler.HandleAsync(
             new EliminarProveedorCommand(proveedor.Id));
 
         Assert.True(resultado.TeniaOfertas);
         Assert.True(proveedor.EstaEliminado);
+        Assert.Equal(Now, proveedor.EliminadoEn);
         Assert.True(repository.Guardado);
         Assert.False(repository.EliminacionFisicaIntentada);
     }
@@ -28,7 +33,7 @@ public sealed class EliminarProveedorHandlerTests
     {
         var proveedor = new Proveedor("Proveedor Nuevo", "PROVEEDOR NUEVO");
         var repository = new FakeProveedorDeleteRepository(proveedor, tieneOfertas: false);
-        var handler = new EliminarProveedorHandler(repository);
+        var handler = new EliminarProveedorHandler(repository, new FakeClock(Now));
 
         var resultado = await handler.HandleAsync(
             new EliminarProveedorCommand(proveedor.Id));
@@ -42,7 +47,8 @@ public sealed class EliminarProveedorHandlerTests
     public async Task HandleAsync_ProveedorInexistente_LanzaExcepcionControlada()
     {
         var handler = new EliminarProveedorHandler(
-            new FakeProveedorDeleteRepository(null, tieneOfertas: false));
+            new FakeProveedorDeleteRepository(null, tieneOfertas: false),
+            new FakeClock(Now));
 
         await Assert.ThrowsAsync<ProveedorNoEncontradoException>(
             () => handler.HandleAsync(

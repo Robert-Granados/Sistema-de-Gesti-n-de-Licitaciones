@@ -1,6 +1,8 @@
+using Licitaciones.Application.Common.Clock;
 using Licitaciones.Application.Proveedores.Eliminar;
 using Licitaciones.Application.Proveedores.Ports;
 using Licitaciones.Domain.Entities;
+using Licitaciones.Infrastructure.Common;
 using Licitaciones.Infrastructure.Persistence;
 using Licitaciones.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -92,6 +94,7 @@ public sealed class EliminarProveedorIntegrationTests
             options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
         services.AddScoped<IProveedorDeleteRepository, ProveedorDeleteRepository>();
         services.AddScoped<EliminarProveedorHandler>();
+        services.AddSingleton<IClock, SystemClock>();
 
         return services.BuildServiceProvider();
     }

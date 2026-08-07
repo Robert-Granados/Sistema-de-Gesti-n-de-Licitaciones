@@ -2,23 +2,28 @@ using Licitaciones.Application.Licitaciones.Eliminar;
 using Licitaciones.Application.Licitaciones.Exceptions;
 using Licitaciones.Application.Licitaciones.Ports;
 using Licitaciones.Domain.Entities;
+using Licitaciones.UnitTests.Common;
 
 namespace Licitaciones.UnitTests.Application.Licitaciones;
 
 public sealed class EliminarLicitacionHandlerTests
 {
+    private static readonly DateTimeOffset Now =
+        new(2026, 8, 7, 12, 0, 0, TimeSpan.Zero);
+
     [Fact]
     public async Task Handle_LicitacionConOfertas_AplicaBorradoLogico()
     {
         var licitacion = new Licitacion("LIC-001", "Título", DateTimeOffset.UtcNow.AddDays(10), 1_000_000m);
         var repository = new FakeDeleteRepository(licitacion, tieneOfertas: true);
-        var handler = new EliminarLicitacionHandler(repository);
+        var handler = new EliminarLicitacionHandler(repository, new FakeClock(Now));
 
         var resultado = await handler.HandleAsync(
             new EliminarLicitacionCommand(licitacion.Id));
 
         Assert.True(resultado.TeniaOfertas);
         Assert.True(licitacion.EstaEliminada);
+        Assert.Equal(Now, licitacion.EliminadoEn);
         Assert.True(repository.Guardado);
     }
 
@@ -27,7 +32,7 @@ public sealed class EliminarLicitacionHandlerTests
     {
         var licitacion = new Licitacion("LIC-001", "Título", DateTimeOffset.UtcNow.AddDays(10), 1_000_000m);
         var repository = new FakeDeleteRepository(licitacion, tieneOfertas: false);
-        var handler = new EliminarLicitacionHandler(repository);
+        var handler = new EliminarLicitacionHandler(repository, new FakeClock(Now));
 
         var resultado = await handler.HandleAsync(
             new EliminarLicitacionCommand(licitacion.Id));
@@ -41,7 +46,8 @@ public sealed class EliminarLicitacionHandlerTests
     public async Task Handle_LicitacionInexistente_LanzaExcepcion()
     {
         var handler = new EliminarLicitacionHandler(
-            new FakeDeleteRepository(null, tieneOfertas: false));
+            new FakeDeleteRepository(null, tieneOfertas: false),
+            new FakeClock(Now));
 
         await Assert.ThrowsAsync<LicitacionNoEncontradaException>(
             () => handler.HandleAsync(
@@ -52,7 +58,8 @@ public sealed class EliminarLicitacionHandlerTests
     public async Task Handle_IdVacio_LanzaExcepcion()
     {
         var handler = new EliminarLicitacionHandler(
-            new FakeDeleteRepository(null, tieneOfertas: false));
+            new FakeDeleteRepository(null, tieneOfertas: false),
+            new FakeClock(Now));
 
         await Assert.ThrowsAsync<LicitacionNoEncontradaException>(
             () => handler.HandleAsync(
@@ -65,7 +72,7 @@ public sealed class EliminarLicitacionHandlerTests
         var licitacion = new Licitacion("LIC-001", "Título", DateTimeOffset.UtcNow.AddDays(10), 1_000_000m);
         licitacion.Eliminar(DateTimeOffset.UtcNow);
         var repository = new FakeDeleteRepository(licitacion, tieneOfertas: false);
-        var handler = new EliminarLicitacionHandler(repository);
+        var handler = new EliminarLicitacionHandler(repository, new FakeClock(Now));
 
         await Assert.ThrowsAsync<LicitacionNoEncontradaException>(
             () => handler.HandleAsync(
