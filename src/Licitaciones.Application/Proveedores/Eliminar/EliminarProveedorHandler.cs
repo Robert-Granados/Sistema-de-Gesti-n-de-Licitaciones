@@ -1,9 +1,12 @@
+using Licitaciones.Application.Common.Clock;
 using Licitaciones.Application.Proveedores.Exceptions;
 using Licitaciones.Application.Proveedores.Ports;
 
 namespace Licitaciones.Application.Proveedores.Eliminar;
 
-public sealed class EliminarProveedorHandler(IProveedorDeleteRepository repository)
+public sealed class EliminarProveedorHandler(
+    IProveedorDeleteRepository repository,
+    IClock clock)
 {
     public async Task<EliminarProveedorResult> HandleAsync(
         EliminarProveedorCommand command,
@@ -29,7 +32,7 @@ public sealed class EliminarProveedorHandler(IProveedorDeleteRepository reposito
             command.Id,
             cancellationToken);
 
-        proveedor.Eliminar(DateTimeOffset.UtcNow);
+        proveedor.Eliminar(clock.UtcNow);
         await repository.GuardarBorradoLogicoAsync(
             proveedor,
             cancellationToken);

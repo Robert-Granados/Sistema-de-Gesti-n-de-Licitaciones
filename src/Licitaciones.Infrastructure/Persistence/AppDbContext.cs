@@ -1,12 +1,27 @@
+using Licitaciones.Application.Common.Clock;
 using Licitaciones.Domain.Entities;
 using Licitaciones.Domain.Enums;
+using Licitaciones.Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Licitaciones.Infrastructure.Persistence;
 
-public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
-    : DbContext(options)
+public sealed class AppDbContext : DbContext
 {
+    private readonly IClock _clock;
+
+    public AppDbContext(
+        DbContextOptions<AppDbContext> options,
+        IClock clock) : base(options)
+    {
+        _clock = clock;
+    }
+
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : this(options, new SystemClock())
+    {
+    }
+
     public DbSet<Licitacion> Licitaciones => Set<Licitacion>();
 
     public DbSet<Proveedor> Proveedores => Set<Proveedor>();
@@ -27,6 +42,7 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {
         ValidarProveedoresActivosEnOfertas();
+        AplicarAuditoria();
         return base.SaveChanges(acceptAllChangesOnSuccess);
     }
 
@@ -35,9 +51,75 @@ public sealed class AppDbContext(DbContextOptions<AppDbContext> options)
         CancellationToken cancellationToken = default)
     {
         await ValidarProveedoresActivosEnOfertasAsync(cancellationToken);
+        AplicarAuditoria();
         return await base.SaveChangesAsync(
             acceptAllChangesOnSuccess,
             cancellationToken);
+    }
+
+    private void AplicarAuditoria()
+    {
+        ChangeTracker.DetectChanges();
+        var now = _clock.UtcNow;
+
+        foreach (var entry in ChangeTracker.Entries())
+        {
+            var createdAt = entry.Metadata.FindProperty("CreatedAt");
+            var updatedAt = entry.Metadata.FindProperty("UpdatedAt");
+            var deletedAt = entry.Metadata.FindProperty("DeletedAt")
+                ?? entry.Metadata.FindProperty("EliminadoEn");
+
+            if (entry.State == EntityState.Deleted && deletedAt is not null)
+            {
+                entry.State = EntityState.Modified;
+                entry.Property(deletedAt.Name).CurrentValue = now;
+            }
+
+            if (entry.State == EntityState.Added)
+            {
+                if (createdAt is not null)
+                {
+                    entry.Property(createdAt.Name).CurrentValue = now;
+                }
+
+                if (updatedAt is not null)
+                {
+                    entry.Property(updatedAt.Name).CurrentValue = now;
+                }
+
+                continue;
+            }
+
+            if (entry.State != EntityState.Modified)
+            {
+                continue;
+            }
+
+            if (createdAt is not null)
+            {
+                var property = entry.Property(createdAt.Name);
+                property.CurrentValue = property.OriginalValue;
+                property.IsModified = false;
+            }
+
+            if (updatedAt is not null)
+            {
+                var property = entry.Property(updatedAt.Name);
+                property.CurrentValue = now;
+                property.IsModified = true;
+            }
+
+            if (deletedAt is not null)
+            {
+                var property = entry.Property(deletedAt.Name);
+                if (property.IsModified
+                    && property.OriginalValue is null
+                    && property.CurrentValue is not null)
+                {
+                    property.CurrentValue = now;
+                }
+            }
+        }
     }
 
     private void ValidarProveedoresActivosEnOfertas()

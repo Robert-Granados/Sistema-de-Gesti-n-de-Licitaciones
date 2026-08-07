@@ -16,13 +16,13 @@ internal static class ConfigurationHelpers
             builder.Property<DateTimeOffset>("CreatedAt")
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("now()")
-                .ValueGeneratedOnAdd();
+                .ValueGeneratedNever();
         }
 
         builder.Property<DateTimeOffset>("UpdatedAt")
             .HasColumnName("updated_at")
             .HasDefaultValueSql("now()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedNever();
 
         if (includeDeletedAt)
         {
@@ -33,7 +33,6 @@ internal static class ConfigurationHelpers
         builder.Property<int>("RowVersion")
             .HasColumnName("row_version")
             .HasDefaultValue(0)
-            .IsConcurrencyToken()
-            .ValueGeneratedOnAddOrUpdate();
+            .IsRowVersion();
     }
 }
