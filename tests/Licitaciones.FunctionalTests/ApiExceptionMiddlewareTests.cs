@@ -2,6 +2,7 @@ using System.Text.Json;
 using Licitaciones.Api;
 using Licitaciones.Application.Licitaciones.Exceptions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Licitaciones.FunctionalTests;
@@ -50,6 +51,25 @@ public sealed class ApiExceptionMiddlewareTests
         Assert.DoesNotContain("SELECT", serialized, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("ConnectionString", serialized, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("secret", serialized, StringComparison.OrdinalIgnoreCase);
+    }
+
+    [Fact]
+    public async Task DbUpdateConcurrencyException_Retorna409Controlado()
+    {
+        var middleware = new ApiExceptionMiddleware(
+            _ => throw new DbUpdateConcurrencyException("Detalle técnico de EF Core."),
+            NullLogger<ApiExceptionMiddleware>.Instance);
+        var context = CrearContexto();
+
+        await middleware.InvokeAsync(context);
+
+        var body = await LeerBodyAsync(context);
+        Assert.Equal(StatusCodes.Status409Conflict, context.Response.StatusCode);
+        Assert.Equal("concurrency_conflict", body.RootElement.GetProperty("errorCode").GetString());
+        Assert.Equal(
+            "El registro fue modificado por otro proceso. Actualice los datos e intente nuevamente.",
+            body.RootElement.GetProperty("detail").GetString());
+        Assert.DoesNotContain("EF Core", body.RootElement.GetRawText(), StringComparison.Ordinal);
     }
 
     private static DefaultHttpContext CrearContexto()

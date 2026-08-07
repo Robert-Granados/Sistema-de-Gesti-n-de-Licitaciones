@@ -33,7 +33,6 @@ internal static class ConfigurationHelpers
         builder.Property<int>("RowVersion")
             .HasColumnName("row_version")
             .HasDefaultValue(0)
-            .IsConcurrencyToken()
-            .ValueGeneratedOnAddOrUpdate();
+            .IsRowVersion();
     }
 }

@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Licitaciones.Api;
 
@@ -95,7 +96,8 @@ public sealed partial class ApiExceptionMiddleware(
                 MensajeSeguro(exception, "El recurso solicitado no existe."));
         }
 
-        if (name.Contains("Concurrencia", StringComparison.Ordinal))
+        if (exception is DbUpdateConcurrencyException
+            || name.Contains("Concurrencia", StringComparison.Ordinal))
         {
             return new(
                 StatusCodes.Status409Conflict,

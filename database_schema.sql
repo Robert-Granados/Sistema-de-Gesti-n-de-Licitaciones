@@ -408,12 +408,9 @@ COMMIT;
 
 -- =====================================================================
 -- Notas de mapeo para Entity Framework Core (Npgsql):
---   * Mapear "row_version" con .IsRowVersion() o [Timestamp] no aplica
---     directamente (eso es para tipos "xmin"/byte[]); usar en su lugar
---     .Property(x => x.RowVersion).IsConcurrencyToken() con actualización
---     manual, o mapear la columna de sistema "xmin" con
---     .UseXminAsConcurrencyToken() como alternativa más idiomática en
---     PostgreSQL si se prefiere no mantener row_version manualmente.
+--   * "row_version" se mapea con .IsRowVersion(): EF Core lo utiliza como
+--     token de concurrencia generado al insertar/actualizar y el trigger
+--     fn_set_audit_fields incrementa el entero en PostgreSQL.
 --   * Mapear "estado" (estado_licitacion) con
 --     .HasPostgresEnum<EstadoLicitacion>() y .HasConversion<string>()
 --     según la versión del proveedor Npgsql utilizada.
