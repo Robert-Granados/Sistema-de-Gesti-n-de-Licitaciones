@@ -16,13 +16,13 @@ internal static class ConfigurationHelpers
             builder.Property<DateTimeOffset>("CreatedAt")
                 .HasColumnName("created_at")
                 .HasDefaultValueSql("now()")
-                .ValueGeneratedOnAdd();
+                .ValueGeneratedNever();
         }
 
         builder.Property<DateTimeOffset>("UpdatedAt")
             .HasColumnName("updated_at")
             .HasDefaultValueSql("now()")
-            .ValueGeneratedOnAddOrUpdate();
+            .ValueGeneratedNever();
 
         if (includeDeletedAt)
         {

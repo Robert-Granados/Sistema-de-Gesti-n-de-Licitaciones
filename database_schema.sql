@@ -45,6 +45,26 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- CreatedAt es inmutable incluso ante actualizaciones SQL directas.
+CREATE OR REPLACE FUNCTION fn_preserve_created_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.created_at := OLD.created_at;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Respaldo para borrado lógico realizado fuera de la aplicación.
+CREATE OR REPLACE FUNCTION fn_set_deleted_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF OLD.deleted_at IS NULL AND NEW.deleted_at IS NOT NULL THEN
+        NEW.deleted_at := now();
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Normaliza el código de licitación: trim + mayúsculas.
 CREATE OR REPLACE FUNCTION fn_normalizar_codigo_licitacion()
 RETURNS TRIGGER AS $$
@@ -180,6 +200,14 @@ CREATE TRIGGER trg_proveedores_audit
     BEFORE UPDATE ON proveedores
     FOR EACH ROW EXECUTE FUNCTION fn_set_audit_fields();
 
+CREATE TRIGGER trg_proveedores_created_at_inmutable
+    BEFORE UPDATE ON proveedores
+    FOR EACH ROW EXECUTE FUNCTION fn_preserve_created_at();
+
+CREATE TRIGGER trg_proveedores_deleted_at
+    BEFORE UPDATE OF deleted_at ON proveedores
+    FOR EACH ROW EXECUTE FUNCTION fn_set_deleted_at();
+
 -- ---------------------------------------------------------------------
 -- Tabla: licitaciones
 -- ---------------------------------------------------------------------
@@ -224,6 +252,14 @@ CREATE TRIGGER trg_licitaciones_normalizar
 CREATE TRIGGER trg_licitaciones_audit
     BEFORE UPDATE ON licitaciones
     FOR EACH ROW EXECUTE FUNCTION fn_set_audit_fields();
+
+CREATE TRIGGER trg_licitaciones_created_at_inmutable
+    BEFORE UPDATE ON licitaciones
+    FOR EACH ROW EXECUTE FUNCTION fn_preserve_created_at();
+
+CREATE TRIGGER trg_licitaciones_deleted_at
+    BEFORE UPDATE OF deleted_at ON licitaciones
+    FOR EACH ROW EXECUTE FUNCTION fn_set_deleted_at();
 
 -- ---------------------------------------------------------------------
 -- Tabla: ofertas
@@ -310,6 +346,10 @@ CREATE TRIGGER trg_niveles_aprobacion_audit
     BEFORE UPDATE ON niveles_aprobacion
     FOR EACH ROW EXECUTE FUNCTION fn_set_audit_fields();
 
+CREATE TRIGGER trg_niveles_aprobacion_created_at_inmutable
+    BEFORE UPDATE ON niveles_aprobacion
+    FOR EACH ROW EXECUTE FUNCTION fn_preserve_created_at();
+
 -- ---------------------------------------------------------------------
 -- Tabla: tipos_cambio
 -- ---------------------------------------------------------------------
@@ -345,6 +385,10 @@ CREATE TRIGGER trg_tipos_cambio_desactivar_previos
 CREATE TRIGGER trg_tipos_cambio_audit
     BEFORE UPDATE ON tipos_cambio
     FOR EACH ROW EXECUTE FUNCTION fn_set_audit_fields();
+
+CREATE TRIGGER trg_tipos_cambio_created_at_inmutable
+    BEFORE UPDATE ON tipos_cambio
+    FOR EACH ROW EXECUTE FUNCTION fn_preserve_created_at();
 
 -- ---------------------------------------------------------------------
 -- Datos semilla mínimos

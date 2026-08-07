@@ -34,6 +34,10 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTimeOffset?>("CerradaEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("cerrada_en");
+
                     b.Property<string>("Codigo")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -48,12 +52,11 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("codigo_normalizado");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
-                    b.Property<DateTimeOffset?>("DeletedAt")
+                    b.Property<DateTimeOffset?>("EliminadoEn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("deleted_at");
 
@@ -67,9 +70,18 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("fecha_cierre");
 
+                    b.Property<string>("MotivoCierre")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("motivo_cierre");
+
                     b.Property<decimal>("PresupuestoEstimadoCrc")
                         .HasColumnType("numeric(18,2)")
                         .HasColumnName("presupuesto_estimado_crc");
+
+                    b.Property<DateTimeOffset?>("PublicadaEn")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("publicada_en");
 
                     b.Property<int>("RowVersion")
                         .IsConcurrencyToken()
@@ -85,7 +97,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("titulo");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
@@ -98,7 +109,7 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("ux_licitaciones_codigo_normalizado")
                         .HasFilter("deleted_at IS NULL");
 
-                    b.HasIndex("DeletedAt")
+                    b.HasIndex("EliminadoEn")
                         .HasDatabaseName("ix_licitaciones_deleted_at");
 
                     b.HasIndex("Estado")
@@ -130,7 +141,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("aprobador");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
@@ -151,7 +161,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("row_version");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
@@ -234,7 +243,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("row_version");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
@@ -270,7 +278,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
@@ -287,7 +294,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
 
                     b.Property<string>("NombreNormalizado")
                         .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)")
                         .HasColumnName("nombre_normalizado");
@@ -300,7 +306,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("row_version");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
@@ -343,7 +348,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("crc_por_usd");
 
                     b.Property<DateTimeOffset>("CreatedAt")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
@@ -360,7 +364,6 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
                         .HasColumnName("row_version");
 
                     b.Property<DateTimeOffset>("UpdatedAt")
-                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
@@ -397,19 +400,28 @@ namespace Licitaciones.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("Licitaciones.Domain.Entities.Oferta", b =>
                 {
-                    b.HasOne("Licitaciones.Domain.Entities.Licitacion", null)
+                    b.HasOne("Licitaciones.Domain.Entities.Licitacion", "Licitacion")
                         .WithMany()
                         .HasForeignKey("LicitacionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_ofertas_licitacion");
 
-                    b.HasOne("Licitaciones.Domain.Entities.Proveedor", null)
-                        .WithMany()
+                    b.HasOne("Licitaciones.Domain.Entities.Proveedor", "Proveedor")
+                        .WithMany("Ofertas")
                         .HasForeignKey("ProveedorId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("fk_ofertas_proveedor");
+
+                    b.Navigation("Licitacion");
+
+                    b.Navigation("Proveedor");
+                });
+
+            modelBuilder.Entity("Licitaciones.Domain.Entities.Proveedor", b =>
+                {
+                    b.Navigation("Ofertas");
                 });
 #pragma warning restore 612, 618
         }
