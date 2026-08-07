@@ -18,7 +18,7 @@ public static partial class NombreProveedorNormalizer
 
     public static bool EsValido(string nombre) =>
         !string.IsNullOrWhiteSpace(nombre)
-        && nombre.Length is > 0 and <= 200
+        && nombre.Length <= 200
         && CaracteresPermitidosRegex().IsMatch(nombre);
 
     public static string Normalizar(string nombre)
