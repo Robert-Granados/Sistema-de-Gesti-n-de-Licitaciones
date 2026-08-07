@@ -483,3 +483,106 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
 - se cree el tag `v0.3.0-iteracion3` sobre el commit aceptado.
+
+## Iteración 4
+
+### HU-40 — Auditoría CreatedAt/UpdatedAt/DeletedAt
+
+- `AppDbContext` completa los campos de auditoría en `SaveChanges` y
+  `SaveChangesAsync` utilizando `IClock`. En una inserción asigna `CreatedAt`
+  y `UpdatedAt`; en una modificación conserva el `CreatedAt` original y
+  actualiza `UpdatedAt`.
+- Los intentos de establecer manualmente las fechas son reemplazados por el
+  reloj de la aplicación. Cuando una entidad compatible se marca como
+  `Deleted`, el contexto la transforma en una modificación y asigna su fecha
+  de borrado lógico, sin eliminar físicamente el registro.
+- La migración `20260807120000_HU40AuditCreatedAtImmutable` incorpora triggers
+  PostgreSQL que preservan `created_at` y respaldan la asignación de
+  `deleted_at`. Los triggers existentes continúan actualizando `updated_at`.
+- Se agregaron pruebas para creación y actualización, sustitución de una fecha
+  de borrado proporcionada por el llamador y conversión de un borrado físico
+  solicitado a borrado lógico.
+
+### Evidencia de HU-40
+
+- Compilación Release: 0 errores y 0 advertencias.
+- Pruebas específicas de auditoría: 3 de 3 aprobadas.
+- Pruebas unitarias: 149 de 149 aprobadas.
+- Pruebas funcionales: 8 de 8 aprobadas.
+- El modelo de EF Core no presenta cambios pendientes respecto de las
+  migraciones y el script SQL de la migración se genera correctamente.
+- Las 17 pruebas de integración basadas en Testcontainers no pudieron iniciarse
+  en esta ejecución porque una directiva de Control de aplicaciones de Windows
+  bloqueó `Testcontainers.PostgreSql.dll` (`0x800711C7`); las 6 pruebas de
+  integración que no dependen de esa DLL sí aprobaron.
+
+### HU-41 — Concurrencia optimista
+
+- Las cinco entidades editables (`Licitacion`, `Proveedor`, `Oferta`,
+  `NivelAprobacion` y `TipoCambio`) mapean la columna entera `row_version`
+  mediante `IsRowVersion()`. EF Core la incluye como token de concurrencia y
+  PostgreSQL la incrementa con `fn_set_audit_fields` en cada actualización.
+- Los flujos de edición de licitaciones y proveedores conservan la versión
+  leída en el formulario/DTO y la establecen como valor original antes de
+  guardar, por lo que una versión desactualizada no puede sobrescribir cambios.
+- El middleware de la API traduce tanto las excepciones de concurrencia de
+  aplicación como `DbUpdateConcurrencyException` de EF Core a HTTP 409 con
+  `ProblemDetails`, `errorCode=concurrency_conflict`, correlación y un mensaje
+  seguro orientado al usuario.
+- Una prueba de modelo verifica el token en cada entidad editable y una prueba
+  funcional valida que la excepción técnica se convierta en el contrato 409 sin
+  filtrar su detalle interno.
+
+### Evidencia de HU-41
+
+- Pruebas de modelo de concurrencia: 5 de 5 aprobadas.
+- Prueba funcional nueva del HTTP 409: aprobada.
+- Pruebas funcionales acumuladas: 9 de 9 aprobadas.
+- EF Core informa que no existen cambios pendientes en el modelo.
+
+### HU-42 — Reloj inyectable para pruebas deterministas
+
+- `IClock` permanece definido en Application con la propiedad
+  `DateTimeOffset UtcNow`, mientras que Infrastructure aporta `SystemClock` y
+  lo registra como singleton para producción.
+- Los manejadores de borrado de licitaciones y proveedores, que eran los dos
+  accesos directos restantes a `DateTimeOffset.UtcNow` en Application, ahora
+  reciben `IClock` y utilizan la hora inyectada.
+- Se incorporó un `FakeClock` compartido para pruebas, con operaciones `Set` y
+  `Advance`, y las pruebas de borrado comprueban la fecha exacta asignada.
+- Domain y Application no contienen llamadas directas a `DateTime.Now`,
+  `DateTime.UtcNow`, `DateTimeOffset.Now` ni `DateTimeOffset.UtcNow`.
+
+### Evidencia de HU-42
+
+- Prueba del reloj falso controlable: aprobada.
+- Pruebas unitarias acumuladas: 150 de 150 aprobadas.
+- Búsqueda estática de accesos directos al reloj en Domain/Application: sin
+  coincidencias.
+
+### HU-43 — Migraciones versionadas y datos semilla reproducibles
+
+- Los hosts Web y API crean un alcance de servicios al arrancar y ejecutan
+  `Database.MigrateAsync()` antes de configurar el pipeline que acepta
+  solicitudes. El proceso registra inicio y finalización; ante un error escribe
+  un log crítico y cancela el arranque para no operar sobre un esquema parcial.
+- Se agregó la migración incremental
+  `20260807150000_HU43LicitacionLifecycleColumns`, que incorpora de forma
+  idempotente `publicada_en`, `cerrada_en` y `motivo_cierre`. Estas propiedades
+  ya estaban en el modelo actual, pero faltaban en la secuencia de migraciones.
+- Los datos semilla de niveles de aprobación y tipo de cambio permanecen en la
+  migración inicial con identificadores y fechas deterministas, de modo que una
+  base nueva obtiene siempre los mismos valores iniciales.
+
+### Evidencia de HU-43
+
+- EF Core enumera tres migraciones versionadas y no reporta cambios pendientes
+  del modelo.
+- `docker compose up -d --build app` aplicó las migraciones pendientes antes de
+  que el host registrara `Application started`.
+- PostgreSQL contiene las tres entradas esperadas en
+  `__EFMigrationsHistory` y las tres columnas de ciclo de vida de licitación.
+- Un segundo arranque registró `No migrations were applied. The database is
+  already up to date`, confirmando que el proceso es idempotente.
+- Los contenedores `app` y `db` quedaron saludables y `GET /health` respondió
+  HTTP 200.

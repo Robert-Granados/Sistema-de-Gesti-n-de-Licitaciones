@@ -1,6 +1,8 @@
 using Licitaciones.Api;
 using Licitaciones.Api.Controllers;
 using Licitaciones.Infrastructure;
+using Licitaciones.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,27 @@ builder.Services.AddSwaggerGen(options =>
 });
 
 var app = builder.Build();
+
+await using (var migrationScope = app.Services.CreateAsyncScope())
+{
+    var logger = migrationScope.ServiceProvider
+        .GetRequiredService<ILoggerFactory>()
+        .CreateLogger("DatabaseMigration");
+
+    try
+    {
+        logger.LogInformation("Aplicando migraciones pendientes de la base de datos.");
+        var dbContext = migrationScope.ServiceProvider.GetRequiredService<AppDbContext>();
+        await dbContext.Database.MigrateAsync();
+        logger.LogInformation("Migraciones de base de datos aplicadas correctamente.");
+    }
+    catch (Exception exception)
+    {
+        logger.LogCritical(exception, "No fue posible aplicar las migraciones de la base de datos.");
+        throw;
+    }
+}
+
 app.UseMiddleware<ApiExceptionMiddleware>();
 app.UseSwagger();
 app.UseSwaggerUI(options =>
