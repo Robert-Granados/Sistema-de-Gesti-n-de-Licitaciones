@@ -38,6 +38,13 @@ public sealed class LicitacionTests
     }
 
     [Fact]
+    public void Constructor_ConFechaCierrePorDefecto_LanzaExcepcion()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Licitacion("LIC-001", "Título", default, 100m));
+    }
+
+    [Fact]
     public void Publicar_DesdeBorradorConFechaFutura_CambiaEstadoAPublicada()
     {
         var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
@@ -241,5 +248,43 @@ public sealed class LicitacionTests
         licitacion.Eliminar(Ahora);
 
         Assert.True(licitacion.EstaEliminada);
+    }
+
+    [Fact]
+    public void ActualizarFechaCierre_ConFechaValida_ActualizaElCierre()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+
+        licitacion.ActualizarFechaCierre(Ahora.AddDays(10));
+
+        Assert.Equal(Ahora.AddDays(10), licitacion.FechaCierre);
+    }
+
+    [Fact]
+    public void ActualizarFechaCierre_ConFechaPorDefecto_LanzaExcepcion()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+
+        Assert.Throws<ArgumentException>(() =>
+            licitacion.ActualizarFechaCierre(default));
+    }
+
+    [Fact]
+    public void ActualizarPresupuesto_ConValorValido_ActualizaElPresupuesto()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+
+        licitacion.ActualizarPresupuesto(250_000m);
+
+        Assert.Equal(250_000m, licitacion.PresupuestoEstimadoCrc);
+    }
+
+    [Fact]
+    public void ActualizarPresupuesto_ConValorNoPositivo_LanzaExcepcion()
+    {
+        var licitacion = new Licitacion("LIC-001", "Título", Ahora.AddDays(1), 100m);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            licitacion.ActualizarPresupuesto(0m));
     }
 }

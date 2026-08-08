@@ -8,7 +8,12 @@ public static class ConversionMonedaService
         TipoCambio? tipoCambioActivo,
         decimal montoCrc)
     {
-        if (tipoCambioActivo is null || tipoCambioActivo.CrcPorUsd <= 0)
+        if (tipoCambioActivo is null)
+        {
+            return null;
+        }
+
+        if (!EsMontoConvertible(tipoCambioActivo, montoCrc))
         {
             return null;
         }
@@ -16,4 +21,7 @@ public static class ConversionMonedaService
         var montoUsd = Math.Round(montoCrc / tipoCambioActivo.CrcPorUsd, 2);
         return (montoUsd, tipoCambioActivo.FechaVigencia);
     }
+
+    private static bool EsMontoConvertible(TipoCambio tipoCambioActivo, decimal montoCrc) =>
+        tipoCambioActivo.CrcPorUsd > 0 && montoCrc > 0;
 }
