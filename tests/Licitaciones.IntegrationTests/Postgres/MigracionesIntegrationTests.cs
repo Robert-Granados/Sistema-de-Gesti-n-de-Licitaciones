@@ -153,6 +153,6 @@ public sealed class MigracionesIntegrationTests
             new NpgsqlParameter("tabla", tabla),
             new NpgsqlParameter("trigger", trigger));
 
-        return resultado == 1;
+        return resultado > 0;
     }
 }
