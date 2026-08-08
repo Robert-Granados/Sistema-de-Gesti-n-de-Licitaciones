@@ -35,6 +35,20 @@ public sealed class OfertaTests
     }
 
     [Fact]
+    public void Constructor_ConProveedorIdVacio_LanzaExcepcion()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Oferta(Guid.NewGuid(), Guid.Empty, 100m, DateTimeOffset.UtcNow));
+    }
+
+    [Fact]
+    public void Constructor_ConFechaRegistroPorDefecto_LanzaExcepcion()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new Oferta(Guid.NewGuid(), Guid.NewGuid(), 100m, default));
+    }
+
+    [Fact]
     public void ActualizarMonto_ConMontoValido_ActualizaElMonto()
     {
         var oferta = new Oferta(
