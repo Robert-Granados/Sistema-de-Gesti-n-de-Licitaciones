@@ -586,3 +586,37 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
   already up to date`, confirmando que el proceso es idempotente.
 - Los contenedores `app` y `db` quedaron saludables y `GET /health` respondió
   HTTP 200.
+
+### HU-47 — Cobertura mínima de pruebas
+
+- Se definió el alcance de la medición con el cliente: `Domain` y `Application`
+  deben superar el 80% de cobertura de líneas cada una, y el núcleo
+  (`Domain` + `Application` + `Infrastructure`) debe superar el 70%.
+- Se agregaron pruebas unitarias de entidades para cubrir las líneas sin probar
+  de `Licitacion`, `Proveedor`, `Oferta`, `NivelAprobacion` y `TipoCambio`
+  (validaciones del constructor, métodos `Actualizar`, `CambiarNombre`,
+  `ActualizarFechaCierre`, `ActualizarPresupuesto`, doble eliminación y fechas
+  por defecto).
+- Se creó `tools/check-coverage.py`, que combina los reportes `cobertura` de
+  coverlet, excluye código generado (`obj/**` y `Persistence/Migrations/**`) y
+  hace fallar el pipeline si no se alcanzan los umbrales.
+- El job `cobertura` del pipeline de CI compila en Release, ejecuta las
+  pruebas unitarias, funcionales y de integración con `--collect:"XPlat Code
+  Coverage"`, genera un reporte HTML/Cobertura con `reportgenerator`, lo sube
+  como artefacto y verifica los umbrales.
+- En esta máquina (Windows con Smart App Control activo), el recopilador de
+  cobertura que reescribe ensamblados y `Testcontainers.dll` fueron bloqueados
+  (`0x800711C7`), por lo que la medición local se hizo con el recopilador de
+  perfil y `dotnet-coverage`.
+
+### Evidencia de HU-47
+
+- Pruebas unitarias acumuladas: 219 de 219 aprobadas (se añadieron 30 métodos
+  de dominio).
+- Cobertura local medida (unitarias): `Domain` 92,41% y `Application` 84,28%,
+  por encima del umbral del 80%.
+- Cobertura de integración local: solo 11 de 41 pruebas pudieron ejecutarse por
+  el bloqueo de `Testcontainers`; el umbral del núcleo (70%) se verifica en CI
+  sobre Ubuntu, donde las pruebas de integración con contenedor sí corren.
+- `reportgenerator` y `tools/check-coverage.py` coinciden en el cálculo sobre
+  los mismos reportes.
