@@ -43,4 +43,32 @@ public sealed class TipoCambioTests
         Assert.Throws<ArgumentOutOfRangeException>(() =>
             tipoCambio.Actualizar(-1m, DateTimeOffset.UtcNow));
     }
+
+    [Fact]
+    public void Constructor_ConFechaPorDefecto_LanzaExcepcion()
+    {
+        Assert.Throws<ArgumentException>(() =>
+            new TipoCambio(505.25m, default));
+    }
+
+    [Fact]
+    public void Actualizar_ConValoresValidos_ActualizaElTipoCambio()
+    {
+        var tipoCambio = new TipoCambio(505.25m, DateTimeOffset.UtcNow);
+        var nuevaFecha = new DateTimeOffset(2026, 8, 1, 0, 0, 0, TimeSpan.Zero);
+
+        tipoCambio.Actualizar(512.75m, nuevaFecha);
+
+        Assert.Equal(512.75m, tipoCambio.CrcPorUsd);
+        Assert.Equal(nuevaFecha, tipoCambio.FechaVigencia);
+    }
+
+    [Fact]
+    public void Actualizar_ConFechaPorDefecto_LanzaExcepcion()
+    {
+        var tipoCambio = new TipoCambio(505.25m, DateTimeOffset.UtcNow);
+
+        Assert.Throws<ArgumentException>(() =>
+            tipoCambio.Actualizar(512.75m, default));
+    }
 }
