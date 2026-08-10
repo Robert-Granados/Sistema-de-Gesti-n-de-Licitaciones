@@ -25,6 +25,7 @@ WORKDIR /app
 RUN apt-get update \
     && apt-get install --yes --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=build /app/publish .
+COPY --from=build --chown=app:app /app/publish .
+USER app
 EXPOSE 8080
 ENTRYPOINT ["dotnet", "Licitaciones.Web.dll"]
