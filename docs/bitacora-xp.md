@@ -8,7 +8,7 @@ retroalimentación queda registrada.
 
 **Periodo:** cierre técnico realizado el 23 de julio de 2026
 
-**Estado:** pendiente de demo y retroalimentación del cliente
+**Estado:** aceptada con ajustes; pendiente de crear el tag de liberación
 
 **Objetivo:** administrar proveedores de extremo a extremo, conservando las
 reglas de negocio, la unicidad normalizada y el historial de ofertas.
@@ -79,7 +79,7 @@ planificado durante la iteración.
 ### Pequeña liberación
 
 **Candidata:** `v0.1.0-iteracion1`
-**Estado:** construida y disponible localmente; tag pendiente de aceptación.
+**Estado:** aceptada con ajustes y disponible localmente; tag pendiente.
 
 La liberación permite:
 
@@ -95,21 +95,19 @@ El procedimiento de demostración y aceptación está en
 
 ### Retroalimentación del cliente
 
-**Estado:** pendiente.
-
-Registrar durante o inmediatamente después de la demo:
+**Estado:** aceptada con ajustes.
 
 - **Fecha de revisión: 23/07/2026**
 - **Nombre o rol del cliente: Robert Granados**
 - **Funcionalidad aceptada: Editar proveedor, Eliminar proveedor, Consultar detalle, Registrar proveedor, Listar proveedores, Buscar proveedores**
-- **Observaciones: La funcionalidad es adecuada y cumple con las expectativas para la iteración 1, pero se requiere mejorar la experiencia del usuario, tmabién es necesario un que la pruebas se puedan realizar con más datos en los diferentes apartados**
+- **Observaciones:** La funcionalidad es adecuada y cumple las expectativas de
+  la Iteración 1; se requiere mejorar la experiencia del usuario y facilitar
+  pruebas con más datos en los diferentes apartados.
 - **Cambios solicitados: Mejorar la experiencia del usuario (UX/UI)**
 - **Prioridad de los cambios: Media**
 - **Decisión:** Aceptada con ajustes
 
 ### Retrospectiva del equipo
-
-Completar después de recibir la retroalimentación:
 
 - **Qué funcionó bien:** Funcionalidad implementada correctamente, pruebas unitarias y de integración exitosas. 
 - **Qué debe mejorar:** Mejorar la experiencia del usuario (UX/UI) y permitir pruebas con más datos en los diferentes apartados.
@@ -484,7 +482,54 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
 - el CI permanezca verde; y
 - se cree el tag `v0.3.0-iteracion3` sobre el commit aceptado.
 
-## Iteración 4
+## Iteración 4 — Calidad, despliegue y cierre documental
+
+**Periodo:** en curso; corte documental al 09 de agosto de 2026
+
+**Estado:** cierre técnico parcial; demo final y aceptación pendientes
+
+**Objetivo:** completar trazabilidad y concurrencia, elevar la cobertura,
+automatizar Docker/Kubernetes/CI y cerrar la documentación verificable.
+
+### Planning Game
+
+| Bloque | Historias | Resultado al corte | Puntos |
+|---|---|---|---:|
+| Persistencia avanzada | HU-40 a HU-43 | 4 de 4 completadas | 11 |
+| TDD y pruebas | HU-44 a HU-47 | 4 de 4 completadas | 24 |
+| Docker, Kubernetes y CI | HU-48 a HU-50 | 3 de 3 completadas | 18 |
+| Documentación | HU-51 a HU-54 | HU-51 completada; HU-52 a HU-54 pendientes | 3 de 10 |
+| **Total** | **HU-40 a HU-54** | **12 de 15 historias** | **56 de 63** |
+
+**Velocidad planificada:** 63 puntos
+
+**Velocidad observada al corte:** 56 puntos
+
+**Desviación provisional:** -7 puntos, correspondientes a HU-52, HU-53 y
+HU-54. La velocidad final se registrará al cerrar la iteración.
+
+### Desarrollo: TDD, diseño simple y trabajo colaborativo
+
+- Las pruebas de auditoría se escribieron con un reloj falso y verifican fechas
+  exactas de creación, actualización y borrado lógico.
+- Las pruebas de concurrencia verifican el mapeo `row_version` de las cinco
+  entidades y el contrato HTTP 409 sin filtrar detalles de EF Core.
+- La ampliación de reglas de dominio elevó la suite unitaria a 219 casos y la
+  cobertura medida de Domain/Application superó el 80% acordado.
+- Docker, los manifiestos y el workflow se validaron con pruebas ejecutables
+  (`health`, persistencia real, Kubeconform, Actionlint y auditoría NuGet), no
+  solo mediante inspección documental.
+
+### Refactorizaciones relevantes
+
+- Se centralizó la auditoría en `AppDbContext` con `IClock`, retirando accesos
+  directos al reloj de Application.
+- El mapeo repetido de auditoría/concurrencia se consolidó en
+  `ConfigurationHelpers` y las excepciones de concurrencia convergen en un
+  `ProblemDetails` estándar.
+- El arranque distingue migración automática, migración exclusiva para Job y
+  ejecución normal, permitiendo reutilizar una sola imagen en Compose y K8s.
+- El CI se reorganizó como cadena de verificaciones con un gate final estable.
 
 ### HU-40 — Auditoría CreatedAt/UpdatedAt/DeletedAt
 
@@ -587,6 +632,74 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
 - Los contenedores `app` y `db` quedaron saludables y `GET /health` respondió
   HTTP 200.
 
+### HU-48 — Dockerfile multi-stage y Compose completo
+
+- El Dockerfile separa restauración/publicación con el SDK de .NET 9 del stage
+  final basado exclusivamente en ASP.NET Runtime 9.
+- Los archivos publicados se copian con propiedad `app:app` y el proceso final
+  se ejecuta con `USER app`, no como root.
+- Compose levanta la aplicación y PostgreSQL 16, usa variables de `.env`, espera
+  el health check de la base, expone health check de la aplicación y conserva
+  PostgreSQL en el volumen nombrado `postgres-data`.
+- El procedimiento de construcción, arranque y conservación del volumen está
+  documentado en `docs/docker.md`.
+
+### Evidencia de HU-48
+
+- `docker compose up -d --build`: construcción y arranque correctos.
+- Usuario efectivo del contenedor de aplicación: `uid=1654(app)`.
+- Se insertó un registro temporal, se ejecutó `docker compose down` sin `-v`,
+  se levantaron contenedores nuevos y se recuperó el mismo registro desde el
+  volumen persistente. El dato de prueba se retiró después de verificarlo.
+- Contenedores `app` y `db`: saludables. `GET /health`: HTTP 200.
+
+### HU-49 — Manifiestos de Kubernetes completos
+
+- `k8s/` contiene Namespace, ConfigMap, Secret con marcadores, PVC, Service y
+  StatefulSet para PostgreSQL, Service y Deployment para la aplicación, y un
+  Job dedicado a migraciones.
+- Ambos workloads definen `startupProbe`, `readinessProbe`, `livenessProbe`,
+  solicitudes y límites de CPU/memoria, contextos sin privilegios y
+  capacidades Linux eliminadas.
+- La imagen admite `Database__MigrationsOnly=true`: aplica migraciones y termina
+  con código de salida. El Deployment desactiva la migración automática y un
+  initContainer espera la migración esperada en `__EFMigrationsHistory` antes
+  de iniciar cada pod.
+- PostgreSQL usa un StatefulSet y el PVC `licitaciones-db-data`; las
+  credenciales y la cadena de conexión provienen del Secret y no del ConfigMap.
+- `docs/kubernetes.md` documenta preparación de imagen/Secret, aplicación,
+  verificación, actualización del Job y eliminación segura.
+
+### Evidencia de HU-49
+
+- Kubeconform en modo estricto: 9 recursos válidos, 0 inválidos, 0 errores.
+- Análisis sintáctico YAML: 9 de 9 archivos aprobados.
+- Imagen ejecutada localmente en modo `MigrationsOnly`: migraciones verificadas
+  y proceso finalizado con código 0 sin iniciar el servidor HTTP.
+
+### HU-50 — Pipeline de CI/CD completo
+
+- `.github/workflows/ci.yml` organiza una cadena bloqueante de restauración y
+  build, pruebas/cobertura, formato/análisis, imagen Docker, validación
+  Kubernetes, auditoría de dependencias y pruebas Playwright.
+- El job de dependencias convierte las alertas NuGet `NU1901` a `NU1904` en
+  errores e incorpora `actions/dependency-review-action` para pull requests.
+- Kubeconform valida en modo estricto los manifiestos y el job Docker confirma
+  que la imagen final se ejecuta con el usuario no privilegiado `app`.
+- El check final `CI obligatorio` usa `if: always()` y falla cuando cualquiera
+  de los jobs requeridos falla o queda omitido, ofreciendo un nombre estable
+  para la protección de `main`.
+- `docs/ci-cd.md` documenta el orden, los artefactos, las comprobaciones locales
+  y la configuración requerida de branch protection.
+
+### Evidencia de HU-50
+
+- Actionlint: workflow válido y sin observaciones.
+- `dotnet format --verify-no-changes`: aprobado.
+- Auditoría NuGet directa y transitiva: sin paquetes vulnerables conocidos.
+- Docker build: aprobado; usuario final `app`.
+- Kubeconform v0.6.7 estricto: 9 recursos válidos, 0 errores.
+
 ### HU-47 — Cobertura mínima de pruebas
 
 - Se definió el alcance de la medición con el cliente: `Domain` y `Application`
@@ -620,3 +733,79 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
   sobre Ubuntu, donde las pruebas de integración con contenedor sí corren.
 - `reportgenerator` y `tools/check-coverage.py` coinciden en el cálculo sobre
   los mismos reportes.
+
+### HU-51 — Historias, plan de liberación y bitácora XP
+
+- Se verificó automáticamente que `historias-usuario.md` contiene las 54
+  tarjetas consecutivas, todas con prioridad, estimación y criterios de
+  aceptación.
+- `plan-xp.md` se consolidó como plan real de liberación, con Iteración 0
+  habilitante, cuatro iteraciones XP uniformes, puntos planificados/observados,
+  candidatas de versión y reglas de integración, TDD, pairing y Planning Game.
+- Esta bitácora contiene para cada iteración velocidad, evidencia TDD,
+  refactorizaciones, resultado, pequeña liberación, feedback y retrospectiva.
+  La Iteración 4 distingue claramente evidencia terminada de pasos pendientes.
+
+### Evidencia de HU-51
+
+- Catálogo: 54 historias, 0 identificadores faltantes y 0 tarjetas
+  estructuralmente incompletas.
+- Bitácora: 4 de 4 iteraciones con las secciones XP requeridas.
+- Coherencia de velocidad: 23/23, 49/49, 40/40 y 56/63 al corte actual.
+- No se declararon como realizados tags, despliegues o aceptaciones pendientes.
+
+### Resultado técnico al corte
+
+- Compilación Release sin errores ni advertencias.
+- 219 pruebas unitarias y 9 pruebas funcionales aprobadas en la última
+  ejecución completa de esas suites.
+- Domain alcanzó 92,41% y Application 84,28% de cobertura local unitaria.
+- Docker Compose mantiene aplicación y PostgreSQL saludables, ejecuta como
+  usuario no privilegiado y conserva datos en un volumen nombrado.
+- Los 9 recursos Kubernetes pasan Kubeconform estricto; el despliegue en un
+  clúster real queda pendiente porque el contexto local no dispone de API.
+- El workflow CI/CD pasa Actionlint y contiene un gate final para bloquear
+  fallos u omisiones.
+
+### Pequeña liberación
+
+**Candidata:** `v1.0.0`
+
+**Estado:** no liberada todavía. La aplicación es demostrable mediante Docker
+Compose y tiene manifiestos Kubernetes validados, pero el tag final requiere
+terminar HU-52 a HU-54, ejecutar CI en GitHub y realizar la demo del cliente.
+
+La candidata incluye auditoría, concurrencia optimista, reloj inyectable,
+migraciones reproducibles, cobertura automatizada, imagen no privilegiada,
+persistencia Docker, manifiestos Kubernetes y pipeline bloqueante.
+
+### Retroalimentación del cliente
+
+**Estado:** pendiente de la demo final.
+
+- **Fecha prevista de revisión:** al completar HU-52 a HU-54.
+- **Funcionalidad preparada para revisión:** HU-40 a HU-51.
+- **Observaciones disponibles:** el cliente solicitó ejecutar la Iteración 4
+  historia por historia y revisar la documentación; no se registra aceptación
+  final hasta recibirla explícitamente.
+- **Decisión:** pendiente.
+
+### Retrospectiva provisional
+
+- **Qué funcionó bien:** las verificaciones ejecutables detectaron vacíos que
+  la inspección superficial no mostraba, como columnas ausentes en migraciones,
+  ejecución Docker como root y falta de un modo exclusivo de migración para K8s.
+- **Qué debe mejorar:** ejecutar el despliegue sobre un clúster Kubernetes real
+  y confirmar el pipeline en GitHub, no solo sus validaciones locales.
+- **Acción para el cierre:** completar HU-52 a HU-54, recopilar la decisión del
+  cliente y actualizar velocidad, liberación y retrospectiva como definitivas.
+
+### Condición de cierre
+
+La Iteración 4 permanece abierta hasta que:
+
+- HU-52, HU-53 y HU-54 estén completadas;
+- el workflow de GitHub finalice en verde;
+- se ejecute o documente la verificación Kubernetes disponible;
+- el cliente revise la pequeña liberación y su feedback quede registrado; y
+- se cree el tag `v1.0.0` sobre el commit aceptado.

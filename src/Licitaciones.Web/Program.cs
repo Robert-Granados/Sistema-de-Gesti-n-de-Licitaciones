@@ -68,24 +68,37 @@ builder.Services.AddScoped<TipoCambioService>();
 
 var app = builder.Build();
 
-await using (var migrationScope = app.Services.CreateAsyncScope())
-{
-    var logger = migrationScope.ServiceProvider
-        .GetRequiredService<ILoggerFactory>()
-        .CreateLogger("DatabaseMigration");
+var migrationsOnly = app.Configuration.GetValue<bool>("Database:MigrationsOnly");
+var applyMigrationsOnStartup = app.Configuration.GetValue(
+    "Database:ApplyMigrationsOnStartup",
+    true);
 
-    try
+if (migrationsOnly || applyMigrationsOnStartup)
+{
+    await using (var migrationScope = app.Services.CreateAsyncScope())
     {
-        logger.LogInformation("Aplicando migraciones pendientes de la base de datos.");
-        var dbContext = migrationScope.ServiceProvider.GetRequiredService<AppDbContext>();
-        await dbContext.Database.MigrateAsync();
-        logger.LogInformation("Migraciones de base de datos aplicadas correctamente.");
+        var logger = migrationScope.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("DatabaseMigration");
+
+        try
+        {
+            logger.LogInformation("Aplicando migraciones pendientes de la base de datos.");
+            var dbContext = migrationScope.ServiceProvider.GetRequiredService<AppDbContext>();
+            await dbContext.Database.MigrateAsync();
+            logger.LogInformation("Migraciones de base de datos aplicadas correctamente.");
+        }
+        catch (Exception exception)
+        {
+            logger.LogCritical(exception, "No fue posible aplicar las migraciones de la base de datos.");
+            throw;
+        }
     }
-    catch (Exception exception)
-    {
-        logger.LogCritical(exception, "No fue posible aplicar las migraciones de la base de datos.");
-        throw;
-    }
+}
+
+if (migrationsOnly)
+{
+    return;
 }
 
 app.UseSwagger();
