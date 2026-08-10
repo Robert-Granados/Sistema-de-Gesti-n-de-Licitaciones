@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: licitaciones-config
+  namespace: licitaciones
+data:
+  ASPNETCORE_ENVIRONMENT: Production
+  ASPNETCORE_URLS: http://+:8080
+  Database__ApplyMigrationsOnStartup: "false"
+  Database__MigrationsOnly: "false"
+  POSTGRES_HOST: licitaciones-db
+  POSTGRES_PORT: "5432"
+  EXPECTED_MIGRATION: 20260807150000_HU43LicitacionLifecycleColumns
