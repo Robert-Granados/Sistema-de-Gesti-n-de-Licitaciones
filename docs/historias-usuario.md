@@ -5,6 +5,10 @@ Cada historia incluye prioridad (MoSCoW), estimación en puntos ideales (Fibonac
 
 Convención de nombres de historia: `HU-XX`. Convención de rama sugerida: `feature/HU-XX-slug`.
 
+**Control del catálogo:** 54 historias numeradas consecutivamente de HU-01 a
+HU-54. Cada tarjeta conserva rol/objetivo/valor, prioridad, estimación, criterios
+de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
+
 ---
 
 ## Épica 0 — Fundación del proyecto

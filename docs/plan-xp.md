@@ -1,6 +1,8 @@
-# Guía de Inicio — Sistema de Gestión de Licitaciones (XP)
+# Plan de liberación XP — Sistema de Gestión de Licitaciones
 
-Esta guía responde a tres preguntas: **cómo dividir el trabajo en iteraciones XP**, **cómo versionar en Git siguiendo XP** y **cómo dejar listo VS Code con un agente de código**. Está pensada para copiarse (con ajustes) a `/docs/plan-xp.md`, que es uno de los entregables obligatorios.
+Este documento registra el plan de liberación adoptado por el equipo: cómo se
+divide el alcance en iteraciones XP, cómo se integra y versiona el trabajo y qué
+evidencia debe existir al cerrar cada pequeña liberación.
 
 ---
 
@@ -21,7 +23,23 @@ Antes del Planning Game formal necesitas un mínimo esqueleto para que las itera
 
 ## 2. Las cuatro iteraciones XP
 
-El proyecto exige **al menos tres o cuatro iteraciones de duración uniforme** con **pequeñas liberaciones** demostrables al cierre de cada una. Te propongo **4 iteraciones de 2 semanas** (ajustable según tu calendario del curso), agrupando las 54 historias de `historias-usuario.md` por dependencia técnica, no por "sprint" temático — evita ese término, en XP se dice *iteración*.
+El proyecto se organiza en **4 iteraciones de 2 semanas**, con pequeñas
+liberaciones demostrables. Las 54 historias se agrupan por dependencia técnica
+y la Iteración 0 se considera preparación habilitante, no velocidad funcional.
+
+### Resumen del plan de liberación
+
+| Iteración | Alcance | Plan | Observado | Liberación/estado |
+|---|---|---:|---:|---|
+| 0 | HU-01 a HU-03 | 9 | 9 | Base técnica habilitante |
+| 1 | HU-04 a HU-10 | 23 | 23 | Aceptada; tag candidato `v0.1.0-iteracion1` |
+| 2 | HU-11 a HU-25 | 49 | 49 | Aceptada; tag candidato `v0.2.0-iteracion2` |
+| 3 | HU-26 a HU-39 | 40 | 40 | Aceptada con ajustes; tag candidato `v0.3.0-iteracion3` |
+| 4 | HU-40 a HU-54 | 63 | 56 al 09/08/2026 | En curso; candidata `v1.0.0` |
+
+Los valores observados representan puntos con evidencia técnica terminada;
+un tag solo se crea después de demo y aceptación. La Iteración 4 conserva 7
+puntos pendientes (HU-52 a HU-54).
 
 Cada iteración sigue el mismo ciclo interno:
 
@@ -41,8 +59,7 @@ Planning Game (medio día) → Iteración (desarrollo con TDD + pair programming
 ### Iteración 2 — El núcleo del negocio: Licitaciones y Ofertas
 **Historias:** HU-11 a HU-25 (Licitaciones completas + Ofertas completas + mejor oferta/clasificación).
 **Objetivo de negocio:** ejecutar el flujo funcional mínimo descrito en el enunciado: crear licitación, publicarla, registrar ofertas (válidas y rechazadas), calcular mejor oferta y clasificación.
-**Por qué segundo:** es el corazón del sistema y el más rico en reglas de negocio (fechas, vencimiento, transiciones de estado, unicidad compuesta). Requiere que HU-42 (`IClock`) se adelante aquí aunque esté en la Épica 9, porque HU-16 y HU-21 dependen de un reloj inyectable para ser probadas de forma determinista.
-**Ajuste de dependencias:** mueve HU-42 (reloj inyectable) al inicio de esta iteración, antes de HU-16/HU-21.
+**Por qué segundo:** es el corazón del sistema y el más rico en reglas de negocio (fechas, vencimiento, transiciones de estado, unicidad compuesta). Se introdujo una abstracción mínima de reloj como decisión técnica habilitante; la revisión formal y cierre completo de HU-42 permanecieron en la Iteración 4, sin contabilizar dos veces sus puntos.
 **Pequeña liberación:** flujo completo licitación → publicación → ofertas (válidas y rechazadas) → mejor oferta, demostrable desde la UI y desde la API.
 **Evidencia XP mínima:** matriz de transición de estados cubierta por pruebas, evidencia de TDD en los rechazos de negocio (HU-19, HU-20, HU-21), velocidad observada comparada con la Iteración 1 en `bitacora-xp.md`.
 
