@@ -1,5 +1,11 @@
 # Pipeline de CI/CD
 
+La rama `main` está protegida para exigir Pull Request, conversaciones resueltas
+y el check actualizado `8. CI obligatorio`. No permite *force push* ni eliminar
+la rama. La configuración reproducible se conserva en
+`.github/branch-protection.json`; no se exige aprobación de otra persona porque
+el proyecto tiene un único responsable.
+
 El workflow `.github/workflows/ci.yml` se ejecuta en cada pull request y en los
 push a `main`. Sus jobs forman una cadena deliberadamente bloqueante:
 

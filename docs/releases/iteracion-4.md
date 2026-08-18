@@ -82,6 +82,5 @@ por capas, colaboraciones funcionales y secuencias.
 
 ## Publicación
 
-La candidata es `v1.0.0`. El tag debe crearse únicamente después de integrar el
-commit revisado en `main` y confirmar el check remoto `CI obligatorio`. El tag
-no se declara creado en este documento porque aún no aparece en el repositorio.
+La versión final es `v1.0.0`. El tag fue publicado después de integrar el commit
+revisado en `main` y confirmar el check remoto `CI obligatorio`.

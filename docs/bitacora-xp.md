@@ -4,11 +4,16 @@ Este documento registra el resultado observable de cada iteración. Una iteraci�
 solo se considera cerrada cuando el cliente revisa la pequeña liberación y su
 retroalimentación queda registrada.
 
+En este proyecto individual, "cliente" identifica el rol de producto asumido
+por el propio responsable durante la autoevaluación. No existió un cliente
+externo permanente ni programación en pareja humana. Véase
+[xp-individual.md](xp-individual.md).
+
 ## Iteración 1 — Cimientos del dominio y proveedores
 
 **Periodo:** cierre técnico realizado el 23 de julio de 2026
 
-**Estado:** aceptada con ajustes; pendiente de crear el tag de liberación
+**Estado:** aceptada con ajustes; tag de liberación publicado
 
 **Objetivo:** administrar proveedores de extremo a extremo, conservando las
 reglas de negocio, la unicidad normalizada y el historial de ofertas.
@@ -45,14 +50,12 @@ planificado durante la iteración.
   mínima y finalmente la integración con persistencia y MVC.
 - La solución conserva la separación Domain → Application → Infrastructure/Web.
   Domain no depende de EF Core ni de PostgreSQL.
-- El trabajo se realizó en sesiones colaborativas entre la persona responsable
-  del proyecto y el agente de desarrollo. Para cumplir la evidencia académica
-  de *pair programming* entre integrantes del equipo, deben agregarse aquí los
-  nombres, roles de conductor/navegante y duración de la sesión real:
+- El trabajo fue realizado por Robert Granados con asistencia de IA. No hubo una
+  segunda persona y, por tanto, no se reclama *pair programming*.
 
 | Fecha | Conductor | Navegante | Historias | Duración |
 |---|---|---|---|---|
-| 23/07/2026 | Robert Granados | Robert Granados | HU-04 a HU-10 | 24 horas |
+| 23/07/2026 | Robert Granados | No aplica | HU-04 a HU-10 | No registrada |
 
 ### Refactorizaciones relevantes
 
@@ -79,7 +82,7 @@ planificado durante la iteración.
 ### Pequeña liberación
 
 **Candidata:** `v0.1.0-iteracion1`
-**Estado:** aceptada con ajustes y disponible localmente; tag pendiente.
+**Estado:** aceptada y publicada con el tag `v0.1.0-iteracion1`.
 
 La liberación permite:
 
@@ -120,14 +123,14 @@ El procedimiento de demostración y aceptación está en
 
 ### Condición de cierre
 
-La Iteración 1 podrá marcarse como **cerrada** cuando:
+La Iteración 1 se marcó como **cerrada** tras comprobar que:
 
 - se ejecute la demo con el cliente;
 - se complete la sección de retroalimentación;
 - se complete la retrospectiva;
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
-- se cree el tag `v0.1.0-iteracion1` sobre el commit aceptado.
+- se creó el tag `v0.1.0-iteracion1` sobre el commit aceptado.
 
 ---
 
@@ -135,7 +138,7 @@ La Iteración 1 podrá marcarse como **cerrada** cuando:
 
 **Periodo:** cierre técnico realizado el 31 de julio de 2026
 
-**Estado:** Aceptada con ajustes; pendiente de crear el tag de liberación.
+**Estado:** aceptada con ajustes; tag de liberación publicado.
 
 **Objetivo:** ejecutar el flujo funcional mínimo del sistema: crear, publicar y
 cerrar licitaciones; registrar ofertas (válidas y rechazadas); administrarlas; y
@@ -191,14 +194,12 @@ mantuvo el alcance planificado durante la iteración.
   igual al presupuesto y desempate por orden de registro.
 - La solución conserva la separación Domain → Application → Infrastructure/Web.
   Domain no depende de EF Core ni de PostgreSQL.
-- El trabajo se realizó en sesiones colaborativas entre la persona responsable
-  del proyecto y el agente de desarrollo. Para cumplir la evidencia académica
-  de *pair programming* entre integrantes del equipo, deben agregarse aquí los
-  nombres, roles de conductor/navegante y duración de la sesión real:
+- El trabajo fue individual con asistencia de IA; no se contabiliza como
+  *pair programming* entre integrantes de un equipo.
 
 | Fecha | Conductor | Navegante | Historias | Duración |
 |---|---|---|---|---|
-| 31/07/2026 | Robert Granados | Robert Granados | HU-11 a HU-25 | 24 horas |
+| 31/07/2026 | Robert Granados | No aplica | HU-11 a HU-25 | No registrada |
 
 ### Refactorizaciones relevantes
 
@@ -227,7 +228,7 @@ mantuvo el alcance planificado durante la iteración.
 ### Pequeña liberación
 
 **Candidata:** `v0.2.0-iteracion2`
-**Estado:** construida y disponible localmente; tag pendiente de aceptación.
+**Estado:** aceptada y publicada con el tag `v0.2.0-iteracion2`.
 
 La liberación permite:
 
@@ -269,14 +270,14 @@ El procedimiento de demostración y aceptación está en
 
 ### Condición de cierre
 
-La Iteración 2 podrá marcarse como **cerrada** cuando:
+La Iteración 2 se marcó como **cerrada** tras comprobar que:
 
 - se ejecute la demo con el cliente;
 - se complete la sección de retroalimentación;
 - se complete la retrospectiva;
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
-- se cree el tag `v0.2.0-iteracion2` sobre el commit aceptado.
+- se creó el tag `v0.2.0-iteracion2` sobre el commit aceptado.
 
 ---
 
@@ -284,7 +285,7 @@ La Iteración 2 podrá marcarse como **cerrada** cuando:
 
 **Periodo:** cierre técnico realizado el 05 de agosto de 2026
 
-**Estado:** Aceptada con ajustes; pendiente de crear el tag de liberación.
+**Estado:** aceptada con ajustes; tag de liberación publicado.
 
 **Objetivo:** hacer la aplicación usable de principio a fin (landing, menú,
 temas, validaciones, mensajes y confirmaciones), parametrizar la aprobación
@@ -343,14 +344,12 @@ seleccionó HU-26 a HU-39 y mantuvo el alcance planificado durante la iteración
 - La solución conserva la separación Domain → Application → Infrastructure/Web,
   con la API compartiendo los mismos casos de uso de la UI y Domain sin
   depender de EF Core ni de PostgreSQL.
-- El trabajo se realizó en sesiones colaborativas entre la persona responsable
-  del proyecto y el agente de desarrollo. Para cumplir la evidencia académica
-  de *pair programming* entre integrantes del equipo, deben agregarse aquí los
-  nombres, roles de conductor/navegante y duración de la sesión real:
+- El trabajo fue individual con asistencia de IA; no se contabiliza como
+  *pair programming* entre integrantes de un equipo.
 
 | Fecha | Conductor | Navegante | Historias | Duración |
 |---|---|---|---|---|
-| 05/08/2026 | Robert Granados | Robert Granados | HU-26 a HU-39 | 24 horas |
+| 05/08/2026 | Robert Granados | No aplica | HU-26 a HU-39 | No registrada |
 
 ### Refactorizaciones relevantes
 
@@ -427,7 +426,7 @@ seleccionó HU-26 a HU-39 y mantuvo el alcance planificado durante la iteración
 ### Pequeña liberación
 
 **Candidata:** `v0.3.0-iteracion3`
-**Estado:** construida y disponible localmente; tag pendiente de aceptación.
+**Estado:** aceptada y publicada con el tag `v0.3.0-iteracion3`.
 
 La liberación permite:
 
@@ -473,20 +472,20 @@ El procedimiento de demostración y aceptación está en
 
 ### Condición de cierre
 
-La Iteración 3 podrá marcarse como **cerrada** cuando:
+La Iteración 3 se marcó como **cerrada** tras comprobar que:
 
 - se ejecute la demo con el cliente;
 - se complete la sección de retroalimentación;
 - se complete la retrospectiva;
 - se incorporen o planifiquen los ajustes aceptados;
 - el CI permanezca verde; y
-- se cree el tag `v0.3.0-iteracion3` sobre el commit aceptado.
+- se creó el tag `v0.3.0-iteracion3` sobre el commit aceptado.
 
 ## Iteración 4 — Calidad, despliegue y cierre documental
 
 **Periodo:** cierre realizado el 18 de agosto de 2026
 
-**Estado:** cerrada y aceptada documentalmente; publicación del tag pendiente
+**Estado:** cerrada, aceptada y publicada con el tag `v1.0.0`
 
 **Objetivo:** completar trazabilidad y concurrencia, elevar la cobertura,
 automatizar Docker/Kubernetes/CI y cerrar la documentación verificable.
@@ -823,8 +822,7 @@ fue terminado y verificado; no se trasladan historias a otra iteración.
 
 **Candidata:** `v1.0.0`
 
-**Estado:** candidata final aceptada y demostrable; tag pendiente de creación
-sobre el commit que se integre en `main`.
+**Estado:** versión final aceptada y publicada sobre el commit integrado en `main`.
 
 La candidata incluye auditoría, concurrencia optimista, reloj inyectable,
 migraciones reproducibles, cobertura automatizada, imagen no privilegiada,
@@ -854,14 +852,14 @@ documental de HU-51 a HU-54. El guion reproducible se conserva en
   estados provisionales.
 - **Qué debe mejorar:** ejecutar antes el despliegue sobre un clúster Kubernetes
   real y confirmar el pipeline en GitHub, no sólo sus validaciones locales.
-- **Acción concreta posterior:** integrar la rama mediante revisión, comprobar
-  `CI obligatorio` en GitHub y crear `v1.0.0` sobre el commit aceptado. Estas son
-  tareas operativas de publicación, no historias trasladadas.
+- **Acción concreta completada:** la rama se integró mediante PR, el check
+  `CI obligatorio` terminó correctamente y `v1.0.0` se publicó sobre el commit
+  aceptado.
 
 ### Condición de cierre
 
 La Iteración 4 queda cerrada porque las 15 historias satisfacen sus criterios,
 la velocidad final es 63/63, existe evidencia técnica, la pequeña liberación es
-demostrable y la retroalimentación fue incorporada. La publicación en GitHub,
-la creación del tag `v1.0.0` y un despliegue en clúster real permanecen visibles
-como actividades operativas posteriores y no se presentan como ya ejecutadas.
+demostrable y la retroalimentación fue incorporada. La publicación en GitHub y
+el tag `v1.0.0` están completados. El despliegue en un clúster real permanece
+como limitación declarada y no se presenta como ejecutado.

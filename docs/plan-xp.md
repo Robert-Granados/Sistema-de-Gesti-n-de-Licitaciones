@@ -4,6 +4,10 @@ Este documento registra el plan de liberación adoptado por el equipo: cómo se
 divide el alcance en iteraciones XP, cómo se integra y versiona el trabajo y qué
 evidencia debe existir al cerrar cada pequeña liberación.
 
+El proyecto fue ejecutado por una persona. La aplicación de las prácticas que
+requieren varios participantes y el significado de la aceptación están
+declarados en [xp-individual.md](xp-individual.md).
+
 ---
 
 ## 1. Iteración 0 — Preparación (no cuenta como iteración XP, es habilitante)
@@ -32,20 +36,19 @@ y la Iteración 0 se considera preparación habilitante, no velocidad funcional.
 | Iteración | Alcance | Plan | Observado | Liberación/estado |
 |---|---|---:|---:|---|
 | 0 | HU-01 a HU-03 | 9 | 9 | Base técnica habilitante |
-| 1 | HU-04 a HU-10 | 23 | 23 | Aceptada; tag candidato `v0.1.0-iteracion1` |
-| 2 | HU-11 a HU-25 | 49 | 49 | Aceptada; tag candidato `v0.2.0-iteracion2` |
-| 3 | HU-26 a HU-39 | 40 | 40 | Aceptada con ajustes; tag candidato `v0.3.0-iteracion3` |
-| 4 | HU-40 a HU-54 | 63 | 63 | Cerrada; candidata aceptada `v1.0.0`, tag pendiente |
+| 1 | HU-04 a HU-10 | 23 | 23 | Aceptada; tag `v0.1.0-iteracion1` publicado |
+| 2 | HU-11 a HU-25 | 49 | 49 | Aceptada; tag `v0.2.0-iteracion2` publicado |
+| 3 | HU-26 a HU-39 | 40 | 40 | Aceptada; tag `v0.3.0-iteracion3` publicado |
+| 4 | HU-40 a HU-54 | 63 | 63 | Cerrada; tag final `v1.0.0` publicado |
 
 Los valores observados representan puntos con evidencia técnica terminada. La
 Iteración 4 completó HU-52 a HU-54 durante el cierre documental del 18 de agosto
-de 2026. El tag se mantiene como actividad de publicación posterior a integrar
-el commit aceptado en `main`; no se contabiliza como trabajo funcional pendiente.
+de 2026. Los tags de las cuatro liberaciones están publicados en GitHub.
 
 Cada iteración sigue el mismo ciclo interno:
 
 ```
-Planning Game (medio día) → Iteración (desarrollo con TDD + pair programming)
+Planning Game → Iteración (desarrollo individual con TDD)
 → Pequeña liberación (demo funcional) → Retroalimentación del cliente
 → Registro en bitacora-xp.md
 ```
@@ -55,7 +58,9 @@ Planning Game (medio día) → Iteración (desarrollo con TDD + pair programming
 **Objetivo de negocio:** poder registrar y administrar proveedores con las reglas de unicidad y normalización ya funcionando de extremo a extremo (dominio → base de datos → UI).
 **Por qué primero:** Proveedor es la entidad más simple y no depende de ninguna otra; valida que el esqueleto EF Core + PostgreSQL + patrón de validación funcione antes de construir sobre él.
 **Pequeña liberación:** aplicación desplegable con Docker Compose donde se puede crear, listar, editar y eliminar (lógicamente) proveedores, con pruebas unitarias y de integración pasando en CI.
-**Evidencia XP mínima:** historias con estimación y criterios de aceptación (ya documentado), ciclo rojo-verde-refactor visible en el historial de HU-06, al menos una sesión de pair programming documentada.
+**Evidencia XP mínima:** historias con estimación y criterios de aceptación,
+ciclo rojo-verde-refactor visible y verificación automática. La programación
+en pareja no aplica por tratarse de un proyecto individual.
 
 ### Iteración 2 — El núcleo del negocio: Licitaciones y Ofertas
 **Historias:** HU-11 a HU-25 (Licitaciones completas + Ofertas completas + mejor oferta/clasificación).
@@ -75,14 +80,13 @@ Planning Game (medio día) → Iteración (desarrollo con TDD + pair programming
 **Objetivo de negocio:** el sistema es desplegable en Kubernetes, la cobertura mínima se cumple, y toda la documentación de `/docs` queda completa y coherente con lo implementado.
 **Pequeña liberación:** candidata `v1.0.0`/`entrega-final`, demostrable con
 Docker Compose, preparada para `kubectl apply -f k8s/` y protegida por un
-pipeline completo. El tag se crea después de comprobar el CI remoto en verde.
+pipeline completo. El tag se publicó después de comprobar el CI remoto en verde.
 
 **Resultado de cierre:** 15 de 15 historias y 63 de 63 puntos completados. La
 documentación de arquitectura, datos, módulos, integración, API, pruebas y uso
 responsable de IA quedó incorporada al producto. La candidata es demostrable
 con Docker Compose; los manifiestos y el workflow están validados localmente.
-La publicación del tag y la comprobación en infraestructura remota se conservan
-como pasos operativos de liberación, sin alterar la velocidad observada.
+La publicación del tag y la comprobación del pipeline remoto quedaron completadas.
 **Evidencia XP mínima:** reporte de cobertura (≥80% Domain/Application, ≥70% global), evidencia de despliegue en Kubernetes (pods, PVC, logs), `bitacora-xp.md` cerrada con las cuatro iteraciones y su velocidad comparada.
 
 > Nota: si el curso exige explícitamente solo 3 iteraciones, fusiona la Iteración 3 y 4 en una sola de mayor duración, pero documenta la razón en `plan-xp.md` — lo importante es que la duración sea uniforme y quede justificada.
@@ -126,7 +130,13 @@ git commit -m "refactor(HU-06): extrae normalizador de nombre a servicio reutili
 
 Esto es evidencia directa de TDD para el evaluador y para tu propia bitácora.
 
-### 3.3 Programación en parejas: evidencia en el historial
+### 3.3 Programación en parejas en este proyecto individual
+
+La programación en pareja no se aplicó porque hubo un solo desarrollador. La IA
+fue una herramienta de asistencia y no se presenta como una segunda persona.
+Los siguientes lineamientos quedan como referencia para un equipo futuro, no
+como evidencia reclamada por este proyecto.
+
 Si trabajas en pareja, **alterna quién hace el commit** y usa el trailer `Co-authored-by` de GitHub en cada commit, sin importar quién tecleó:
 
 ```
@@ -236,6 +246,6 @@ indent_size = 2
 
 1. Crear repo, `.gitignore`, `.editorconfig`, tablero de historias (Issues + Milestones).
 2. Ejecutar Iteración 0: estructura de solución, Docker Compose base, CI base, entorno VS Code configurado.
-3. Planning Game de la Iteración 1 (estimar/confirmar HU-04 a HU-10) y arrancar con `feature/HU-04-...` en pareja, TDD desde el primer commit.
+3. Planning Game de la Iteración 1 (estimar/confirmar HU-04 a HU-10) y arrancar con `feature/HU-04-...`, aplicando TDD desde el primer commit.
 4. Repetir el ciclo Planning Game → desarrollo → pequeña liberación → retro → bitácora para las Iteraciones 2, 3 y 4 descritas arriba.
 5. Cerrar con etiqueta `v1.0.0`/`entrega-final` solo cuando `/docs` esté completo y el pipeline de CI (incluyendo validación de Kubernetes) esté en verde.
