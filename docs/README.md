@@ -31,6 +31,7 @@
 
 ## Producto y prácticas XP
 
+- [Matriz de trazabilidad: HU, pruebas, commits, PR y documentación](matriz-trazabilidad.md)
 - [Adaptación de XP para una persona](xp-individual.md)
 - [Visión y alcance](vision-alcance.md)
 - [Historias de usuario](historias-usuario.md)
