@@ -40,6 +40,7 @@ El procedimiento completo está en [Pruebas](docs/pruebas.md).
 
 ## Evidencia XP
 
+- [Matriz de trazabilidad completa](docs/matriz-trazabilidad.md)
 - [Adaptación de XP para una persona](docs/xp-individual.md)
 - [Historias de usuario](docs/historias-usuario.md)
 - [Plan de liberación](docs/plan-xp.md)

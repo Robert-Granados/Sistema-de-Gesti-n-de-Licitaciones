@@ -27,6 +27,9 @@ La cobertura se recopila con Coverlet y se valida con `tools/check-coverage.py`.
 
 ## Trazabilidad
 
+La relación verificable por historia —Issue, prueba, commit, PR, documentación y
+release— se encuentra en la [matriz de trazabilidad](matriz-trazabilidad.md).
+
 - Reglas de dominio y aplicación: UnitTests.
 - Restricciones del [modelo de datos](modelo-datos.md): IntegrationTests/Postgres.
 - Contratos de [API](api.md): FunctionalTests.
