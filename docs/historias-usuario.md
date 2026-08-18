@@ -1,13 +1,13 @@
 # Historias de Usuario — Sistema de Gestión de Licitaciones (XP)
 
 Formato de tarjeta XP: **Como** \<rol\> **quiero** \<capacidad\> **para** \<valor de negocio\>.
-Cada historia incluye prioridad (MoSCoW), estimación en puntos ideales (Fibonacci: 1, 2, 3, 5, 8), criterios de aceptación verificables y tareas técnicas suficientemente concretas para que un agente de código las ejecute sin ambigüedad. Todas las historias deben vincularse a commits, pruebas e issues, según lo exige el enunciado del proyecto.
+Cada historia incluye prioridad (MoSCoW), estimación en puntos ideales (Fibonacci: 1, 2, 3, 5, 8) y criterios de aceptación verificables. Todas las historias deben vincularse a commits, pruebas e issues, según lo exige el enunciado del proyecto.
 
 Convención de nombres de historia: `HU-XX`. Convención de rama sugerida: `feature/HU-XX-slug`.
 
 **Control del catálogo:** 54 historias numeradas consecutivamente de HU-01 a
 HU-54. Cada tarjeta conserva rol/objetivo/valor, prioridad, estimación, criterios
-de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
+de aceptación. Última verificación documental: 09/08/2026.
 
 ---
 
@@ -23,12 +23,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - La solución compila con `dotnet build` sin errores ni advertencias evitables.
 - Existen carpetas raíz `/docs` y `/k8s` con un `README.md` inicial en cada una.
 
-**Tareas técnicas para el agente**
-1. Crear archivo `.sln` y proyectos con `dotnet new classlib` (Domain, Application, Infrastructure) y `dotnet new mvc` / `dotnet new webapi` (Web, Api).
-2. Referenciar: `Application -> Domain`, `Infrastructure -> Application/Domain`, `Web -> Application`, `Api -> Application`.
-3. Agregar `.gitignore` para .NET (bin/, obj/, .env, secretos).
-4. Agregar `Directory.Build.props` con `TreatWarningsAsErrors` habilitado para producción y nulabilidad activada.
-
 ---
 
 ### HU-02 — Configurar Docker Compose base
@@ -41,12 +35,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Variables sensibles (cadena de conexión, credenciales) se inyectan por variables de entorno, no están hardcodeadas.
 - Existe healthcheck configurado para `db` y para `app`.
 
-**Tareas técnicas para el agente**
-1. Crear `docker-compose.yml` con servicios `app` y `db`, red interna dedicada.
-2. Definir `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` vía `.env.example` (sin valores reales).
-3. Configurar `healthcheck` de `db` con `pg_isready` y de `app` con endpoint `/health`.
-4. Declarar `depends_on: db: condition: service_healthy` en `app`.
-
 ---
 
 ### HU-03 — Pipeline de integración continua base
@@ -57,12 +45,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Workflow de GitHub Actions se ejecuta en cada push y pull request contra `main`.
 - El workflow ejecuta `dotnet restore`, `dotnet build`, `dotnet test`.
 - El pipeline falla (bloquea el merge) si alguna prueba falla o si la compilación genera advertencias marcadas como error.
-
-**Tareas técnicas para el agente**
-1. Crear `.github/workflows/ci.yml` con jobs `build-test`.
-2. Usar `actions/setup-dotnet@v4` con `dotnet-version: '9.0.x'`.
-3. Cachear paquetes NuGet.
-4. Publicar resultados de pruebas como artefacto del workflow.
 
 ---
 
@@ -78,11 +60,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Existe un enum `EstadoLicitacion { Borrador, Publicada, Cerrada }`.
 - Existen pruebas unitarias que instancian cada entidad y verifican sus invariantes básicas (campos obligatorios, valores por defecto).
 
-**Tareas técnicas para el agente**
-1. Crear entidades con constructores que validen invariantes (ids nunca editables por fuera, montos `decimal`).
-2. Implementar métodos de transición de estado dentro de `Licitacion` (ver HU-15/HU-16) en lugar de exponer el enum como propiedad mutable.
-3. Escribir pruebas en `Tests.Unit/Domain/*` antes de la implementación (TDD, ciclo rojo-verde-refactor).
-
 ---
 
 ### HU-05 — Configurar EF Core, migraciones y datos semilla
@@ -95,12 +72,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - La primera migración crea el esquema equivalente al script SQL entregado (ver `database_schema.sql`).
 - Existen datos semilla para: los tres estados de licitación (si se modela como catálogo), los tres niveles de aprobación iniciales y un tipo de cambio activo inicial.
 - `dotnet ef database update` aplica correctamente contra PostgreSQL 16 en contenedor.
-
-**Tareas técnicas para el agente**
-1. Configurar `UseNpgsql` con cadena de conexión desde variables de entorno.
-2. Mapear `decimal` con `HasColumnType("numeric(18,2)")` para todos los montos, y `numeric(18,6)` para `CRCporUSD`.
-3. Configurar índices únicos y `CHECK` constraints vía `Fluent API` (ver HU-09, HU-18, HU-26, HU-28).
-4. Agregar `HasData` para datos semilla en `OnModelCreating`.
 
 ---
 
@@ -116,13 +87,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Dado un nombre que normalizado (trim, espacios repetidos colapsados, sin distinción de mayúsculas/minúsculas, Unicode normalizado) coincide con uno existente, cuando se intenta registrar, entonces se rechaza por duplicado (validado en UI, servidor y base de datos).
 - El `Id` se genera automáticamente y no es editable.
 
-**Tareas técnicas para el agente**
-1. Endpoint MVC `POST /Proveedores/Crear` y caso de uso `CrearProveedorCommand` en `Application`.
-2. Validación de caracteres permitidos con expresión regular `^[\p{L}\p{N}\s.,()]+$`.
-3. Calcular `NombreNormalizado` en el servicio de aplicación (trim, colapsar espacios, `ToUpperInvariant`, remover diacríticos) antes de persistir.
-4. Capturar `DbUpdateException` por violación del índice único y traducirla a un mensaje de validación de negocio (HTTP 409).
-5. Pruebas unitarias: nombre válido, nombre con símbolo inválido, nombre duplicado con variación de mayúsculas/espacios.
-
 ---
 
 ### HU-07 — Listar proveedores con paginación, filtro y orden
@@ -134,11 +98,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Respuesta incluye metadatos de paginación (total de registros, página actual, total de páginas).
 - Los proveedores con borrado lógico no aparecen por defecto.
 
-**Tareas técnicas para el agente**
-1. Implementar `ListarProveedoresQuery` con `IQueryable` paginado (`Skip`/`Take`).
-2. Filtrar `WHERE DeletedAt IS NULL` por defecto.
-3. Reutilizar el mismo query handler en MVC y en la API REST (HU-38).
-
 ---
 
 ### HU-08 — Consultar detalle de proveedor con ofertas relacionadas
@@ -148,10 +107,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - La vista de detalle muestra datos del proveedor y una tabla de sus ofertas (licitación, monto, fecha, estado de la licitación).
 - Si el proveedor no existe o fue eliminado lógicamente, se responde 404.
-
-**Tareas técnicas para el agente**
-1. `ObtenerProveedorPorIdQuery` con `Include` a `Ofertas` proyectado a DTO.
-2. Vista MVC `Proveedores/Detalle.cshtml` con tabla paginada de ofertas.
 
 ---
 
@@ -164,10 +119,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Se actualiza `UpdatedAt` automáticamente.
 - Conflictos de concurrencia optimista devuelven un mensaje controlado (no un error técnico crudo).
 
-**Tareas técnicas para el agente**
-1. `EditarProveedorCommand` que recibe `Id`, `Nombre` y el token de concurrencia (`RowVersion`).
-2. Capturar `DbUpdateConcurrencyException` y mapearla a HTTP 409 con mensaje "El registro fue modificado por otro usuario".
-
 ---
 
 ### HU-10 — Eliminar (borrado lógico) proveedor
@@ -179,11 +130,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Si el proveedor no tiene ofertas, puede eliminarse físicamente o aplicarse el mismo borrado lógico de forma consistente con la política elegida.
 - Se solicita confirmación explícita antes de eliminar (UI).
 - El proveedor eliminado lógicamente no aparece en listados ni puede recibir nuevas ofertas.
-
-**Tareas técnicas para el agente**
-1. `EliminarProveedorCommand` que verifica ofertas relacionadas antes de decidir el tipo de borrado.
-2. Modal de confirmación en la vista MVC antes de invocar el endpoint de eliminación.
-3. Prueba de integración: intento de eliminar físicamente un proveedor con ofertas debe fallar por restricción de clave foránea o ser interceptado antes por la regla de negocio.
 
 ---
 
@@ -200,12 +146,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - La licitación se crea en estado `Borrador`.
 - Las fechas se almacenan con `DateTimeOffset`/`timestamptz`; las comparaciones internas usan UTC y la presentación usa zona horaria `America/Costa_Rica`.
 
-**Tareas técnicas para el agente**
-1. `CrearLicitacionCommand` con validación de `PresupuestoEstimadoCRC > 0` y `FechaCierre > IClock.UtcNow`.
-2. Calcular `CodigoNormalizado = Codigo.Trim().ToUpperInvariant()`.
-3. Componente de calendario/hora en la vista MVC (por ejemplo, `<input type="datetime-local">` o librería equivalente) que envíe el valor en UTC.
-4. Inyectar `IClock` (ver HU-44) en vez de usar `DateTime.Now` directamente, para permitir pruebas deterministas.
-
 ---
 
 ### HU-12 — Listar licitaciones con paginación, filtro y orden
@@ -215,10 +155,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - Soporta filtros combinables por estado y por texto de código/título.
 - Una licitación cuya `FechaCierre` ya pasó se muestra como "cerrada funcionalmente" en la UI aunque el campo `Estado` almacenado todavía diga `Publicada`.
-
-**Tareas técnicas para el agente**
-1. En el query, calcular una propiedad derivada `EstaCerradaFuncionalmente = Estado == Publicada && FechaCierre <= IClock.UtcNow`.
-2. No sobreescribir el campo persistido `Estado` solo por el cálculo de listado; la transición formal ocurre según HU-16.
 
 ---
 
@@ -233,12 +169,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Se muestra el aprobador correspondiente según el monto de la mejor oferta y la tabla de niveles de aprobación.
 - Los montos se muestran en CRC con formato cultural `es-CR`, con opción de alternar a USD usando el tipo de cambio activo, mostrando la fecha de dicho tipo de cambio.
 
-**Tareas técnicas para el agente**
-1. Servicio de dominio/aplicación `CalculadorMejorOferta` puro (sin dependencias de infraestructura), cubierto por pruebas unitarias de empate y ausencia de ofertas.
-2. Servicio `ClasificadorAhorro` que reciba presupuesto y monto de mejor oferta y devuelva el enum de clasificación.
-3. Servicio `ResolverAprobadorService` que consulte la tabla `niveles_aprobacion` por rango (sin condicionales `if/else` encadenados).
-4. Servicio `ConversionMonedaService` que use el tipo de cambio activo vigente; nunca modifica el valor almacenado en CRC.
-
 ---
 
 ### HU-14 — Editar licitación
@@ -250,10 +180,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - No se permite editar una licitación cerrada (formal o funcionalmente).
 - Conflictos de concurrencia se manejan igual que en HU-09.
 
-**Tareas técnicas para el agente**
-1. Antes de aplicar el nuevo presupuesto, consultar `MAX(MontoOfertadoCRC)` de las ofertas de la licitación y rechazar si el nuevo presupuesto es menor.
-2. Bloquear la edición si `Estado == Cerrada` o si `FechaCierre <= IClock.UtcNow`.
-
 ---
 
 ### HU-15 — Publicar licitación
@@ -264,10 +190,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Solo se permite `Borrador → Publicada`.
 - Se exige presupuesto válido (>0) y fecha de cierre futura para permitir la transición.
 - Un intento de publicar una licitación con datos incompletos se rechaza con mensaje claro.
-
-**Tareas técnicas para el agente**
-1. Método de dominio `Licitacion.Publicar(IClock clock)` que valide invariantes y lance una excepción de dominio específica si no se cumplen.
-2. Endpoint `POST /Licitaciones/{id}/Publicar`.
 
 ---
 
@@ -281,11 +203,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `Publicada → Borrador` y `Cerrada → Publicada/Borrador` no están permitidas (salvo regla de reapertura aprobada explícitamente, fuera de alcance por defecto).
 - Las ofertas de una licitación cerrada quedan inmutables (no se pueden crear, editar ni eliminar).
 
-**Tareas técnicas para el agente**
-1. Método de dominio `Licitacion.Cerrar(motivo, IClock clock)` con máquina de estados explícita (no banderas booleanas sueltas).
-2. Job o verificación bajo demanda que reconozca el cierre funcional sin necesariamente escribir en base de datos en cada lectura (puede materializarse en una consulta programada o al primer acceso).
-3. Pruebas unitarias de la matriz completa de transiciones permitidas y no permitidas (tabla del enunciado).
-
 ---
 
 ### HU-17 — Eliminar (borrado lógico) licitación
@@ -295,9 +212,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - Igual patrón que HU-10 pero para licitaciones y sus ofertas asociadas.
 - Se solicita confirmación antes de eliminar.
-
-**Tareas técnicas para el agente**
-1. Reutilizar el patrón de verificación de dependencias y borrado lógico de HU-10.
 
 ---
 
@@ -313,11 +227,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Un proveedor no puede tener más de una oferta por licitación (índice único compuesto `LicitacionId + ProveedorId`).
 - El `Id` y `FechaRegistro` se generan automáticamente.
 
-**Tareas técnicas para el agente**
-1. `RegistrarOfertaCommand` que valide, en este orden: existencia de licitación y proveedor, estado publicado, no vencimiento, monto positivo, monto ≤ presupuesto, no duplicidad.
-2. Persistir con `FechaRegistro = IClock.UtcNow`.
-3. Capturar la violación del índice único como respaldo de la validación de aplicación y traducirla a HTTP 409.
-
 ---
 
 ### HU-19 — Rechazar oferta duplicada
@@ -326,9 +235,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Un segundo intento de oferta del mismo proveedor/licitación se rechaza con mensaje claro, sin afectar la oferta original.
-
-**Tareas técnicas para el agente**
-1. Prueba unitaria y de integración específica que registre una oferta, intente registrar una segunda para el mismo par y verifique el rechazo (aplicación e índice único de base de datos).
 
 ---
 
@@ -340,9 +246,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Un monto igual al presupuesto es válido.
 - Un monto mayor al presupuesto se rechaza.
 
-**Tareas técnicas para el agente**
-1. Prueba unitaria parametrizada: monto < presupuesto (válido), monto == presupuesto (válido), monto > presupuesto (rechazado).
-
 ---
 
 ### HU-21 — Rechazar oferta vencida o de licitación cerrada
@@ -353,10 +256,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Igual fecha/hora actual que la de cierre se considera vencida (no se acepta la oferta).
 - Ofertas ya registradas en licitaciones cerradas no pueden editarse ni eliminarse.
 
-**Tareas técnicas para el agente**
-1. Usar `IClock` inyectado (no `DateTime.Now`) para poder simular el instante exacto de vencimiento en pruebas.
-2. Prueba de integración con `Testcontainers` que registre una licitación con cierre a "ahora + 1 segundo" simulado y verifique el rechazo tras avanzar el reloj de prueba.
-
 ---
 
 ### HU-22 — Listar y filtrar ofertas por licitación y proveedor
@@ -365,9 +264,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Filtros combinables `licitacionId` y `proveedorId`, con paginación y orden por monto o fecha.
-
-**Tareas técnicas para el agente**
-1. `ListarOfertasQuery` con filtros opcionales y paginación estándar reutilizable.
 
 ---
 
@@ -379,9 +275,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Se revalidan todas las reglas de HU-18 (monto positivo, ≤ presupuesto, licitación publicada y no vencida) al editar.
 - No se permite editar ofertas de licitaciones cerradas.
 
-**Tareas técnicas para el agente**
-1. Reutilizar el validador de `RegistrarOfertaCommand` en `EditarOfertaCommand` (evitar duplicación de reglas, principio de diseño simple XP).
-
 ---
 
 ### HU-24 — Eliminar oferta
@@ -392,9 +285,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Se rechaza la eliminación si la licitación está cerrada (formal o funcionalmente).
 - Se solicita confirmación antes de eliminar.
 
-**Tareas técnicas para el agente**
-1. Validar estado de la licitación padre antes de permitir el `DELETE`.
-
 ---
 
 ### HU-25 — Calcular mejor oferta y clasificación de ahorro
@@ -403,9 +293,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Cubre los cinco casos: sin ofertas, ahorro ≥10%, ahorro entre 0% y 10%, oferta igual al presupuesto, y desempate por orden de registro.
-
-**Tareas técnicas para el agente**
-1. Implementar `CalculadorMejorOferta` y `ClasificadorAhorro` como servicios puros de `Application`/`Domain`, con pruebas unitarias por cada caso listado en el enunciado antes de integrarlos en la UI/API (TDD).
 
 ---
 
@@ -420,11 +307,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Solo puede existir un rango abierto (sin monto máximo).
 - Datos semilla iniciales: `0.01–999999.99 → Encargado de área`, `1000000.00–9999999.99 → Gerencia`, `10000000.00–sin límite → Junta Directiva`.
 
-**Tareas técnicas para el agente**
-1. Validar traslape en el servicio de aplicación antes de persistir, y respaldarlo con la restricción de exclusión a nivel de base de datos (ver `database_schema.sql`, tabla `niveles_aprobacion`).
-2. Prueba unitaria: intento de crear un rango que se solapa con uno existente debe rechazarse.
-3. Prueba unitaria: intento de crear un segundo rango abierto (`MontoMaximoCRC = NULL`) debe rechazarse.
-
 ---
 
 ### HU-27 — Resolver aprobador según monto
@@ -434,9 +316,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - Dado un monto, el sistema retorna el nivel de aprobación cuyo rango lo contiene.
 - Si ningún rango contiene el monto (dato inconsistente), se retorna un resultado explícito de "sin aprobador configurado", nunca una excepción no controlada visible al usuario.
-
-**Tareas técnicas para el agente**
-1. Implementar `ResolverAprobadorService.Resolver(decimal monto)` consultando la tabla `niveles_aprobacion` ordenada, sin cadenas `if/else`.
 
 ---
 
@@ -451,10 +330,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Solo puede existir un registro `Activo = true` a la vez; activar uno nuevo desactiva el anterior en la misma transacción.
 - Se registra `FechaVigencia`.
 
-**Tareas técnicas para el agente**
-1. Al activar un tipo de cambio, ejecutar en una transacción: desactivar el previamente activo y activar el nuevo.
-2. Restricción de base de datos: índice único parcial sobre `activo` cuando `activo = true` (ver script SQL).
-
 ---
 
 ### HU-29 — Alternar visualización CRC/USD sin modificar datos
@@ -465,9 +340,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - El valor almacenado siempre permanece en CRC; el cambio de vista es puramente de presentación.
 - Se muestra la fecha del tipo de cambio utilizado junto al monto convertido.
 - El sistema funciona sin conexión a Internet usando el tipo de cambio activo administrado localmente (no se consulta un servicio externo).
-
-**Tareas técnicas para el agente**
-1. Control de alternancia (toggle) en la UI que recalcule en el cliente o solicite al servidor la representación en USD usando el tipo de cambio activo ya cargado, sin llamadas a APIs externas de conversión.
 
 ---
 
@@ -481,9 +353,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - La página explica el flujo de licitación, ofertas, mejor oferta, nivel de aprobación y conversión monetaria.
 - El diseño es adaptable (responsive) a escritorio y móvil.
 
-**Tareas técnicas para el agente**
-1. Vista `Home/Index.cshtml` con secciones explicativas y layout responsive (Bootstrap grid).
-
 ---
 
 ### HU-31 — Menú de navegación principal
@@ -493,9 +362,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - El menú incluye: Inicio, Licitaciones, Proveedores, Ofertas, Niveles de aprobación, Tipo de cambio y documentación interactiva de la API (Swagger).
 - El menú es visible y usable en dispositivos móviles (colapsable).
-
-**Tareas técnicas para el agente**
-1. Parcial `_Layout.cshtml` con `navbar` responsive de Bootstrap, enlace externo a `/swagger`.
 
 ---
 
@@ -507,9 +373,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Control visible para alternar el tema.
 - La preferencia persiste entre sesiones (por ejemplo, `localStorage` o cookie).
 
-**Tareas técnicas para el agente**
-1. Script JS que alterne un atributo `data-theme` en `<html>` y lo guarde en `localStorage`; aplicar el valor guardado antes del primer render para evitar parpadeo.
-
 ---
 
 ### HU-33 — Formularios con validación junto al campo
@@ -518,9 +381,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Cada formulario (proveedor, licitación, oferta, nivel de aprobación, tipo de cambio) muestra mensajes de validación por campo, tanto del lado cliente como del servidor.
-
-**Tareas técnicas para el agente**
-1. Usar `DataAnnotations`/`FluentValidation` en los ViewModels y `asp-validation-for` en las vistas Razor.
 
 ---
 
@@ -532,9 +392,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Aplica a los listados de licitaciones, proveedores y ofertas.
 - Los controles de paginación/orden/filtro son consistentes entre módulos.
 
-**Tareas técnicas para el agente**
-1. Componente Razor reutilizable (`_TablaPaginada.cshtml`) que reciba los metadatos de paginación comunes definidos en HU-07/HU-12/HU-22.
-
 ---
 
 ### HU-35 — Mensajes de éxito, advertencia y error
@@ -544,9 +401,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - Cada operación CRUD muestra una notificación (toast o alerta) categorizada como éxito, advertencia o error, con texto comprensible (sin detalles técnicos internos).
 
-**Tareas técnicas para el agente**
-1. Componente de notificaciones compartido en `_Layout.cshtml` alimentado por `TempData` o respuestas AJAX.
-
 ---
 
 ### HU-36 — Confirmación antes de eliminar
@@ -555,9 +409,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Toda acción de eliminación (proveedor, licitación, oferta, nivel de aprobación, tipo de cambio) exige un diálogo de confirmación previo.
-
-**Tareas técnicas para el agente**
-1. Modal de confirmación reutilizable en el layout, invocado antes de enviar el `POST`/`DELETE` de eliminación.
 
 ---
 
@@ -574,12 +425,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Documentación OpenAPI/Swagger disponible y navegable desde el menú (HU-31).
 - Listados soportan paginación, filtrado y ordenamiento vía query string.
 
-**Tareas técnicas para el agente**
-1. Crear controladores en `Api` por recurso, todos bajo `[Route("api/v1/[controller]")]`.
-2. Configurar `Swashbuckle.AspNetCore` con anotaciones de ejemplos de request/response.
-3. Mapear `AutoMapper` (o mapeo manual) entre entidades y DTOs.
-4. Endpoints de acción explícita: `POST /api/v1/licitaciones/{id}/publicar`, `POST /api/v1/licitaciones/{id}/cerrar`.
-
 ---
 
 ### HU-38 — Manejo estandarizado de errores en la API
@@ -591,10 +436,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Todas las respuestas de error siguen el formato `ProblemDetails` con título, estado, detalle seguro, código de error interno e identificador de correlación.
 - No se exponen stack traces, rutas internas, consultas SQL ni secretos al cliente.
 
-**Tareas técnicas para el agente**
-1. Middleware global de manejo de excepciones que traduzca excepciones de dominio/aplicación a `ProblemDetails` con el código HTTP correspondiente.
-2. Generar un `CorrelationId` por request (por ejemplo, vía middleware) y adjuntarlo en cada respuesta de error y en los logs.
-
 ---
 
 ### HU-39 — Colección reproducible de solicitudes de API
@@ -603,9 +444,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Existe un archivo (colección Postman/Insomnia o `.http` de VS Code) dentro de `/docs` con ejemplos de cada endpoint, incluyendo casos de error representativos.
-
-**Tareas técnicas para el agente**
-1. Generar `/docs/api-requests.http` (o colección equivalente) con al menos un ejemplo por endpoint y por código de error relevante.
 
 ---
 
@@ -620,10 +458,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `UpdatedAt` se actualiza en cada modificación.
 - `DeletedAt` se asigna solo cuando aplica borrado lógico.
 
-**Tareas técnicas para el agente**
-1. Interceptor de `SaveChangesAsync` en `AppDbContext` que complete estos campos automáticamente usando `IClock` (no confiar en que el llamador los establezca).
-2. Reforzar con triggers de base de datos como respaldo (ver `database_schema.sql`).
-
 ---
 
 ### HU-41 — Concurrencia optimista
@@ -633,10 +467,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - Cada entidad editable tiene una columna de versión de concurrencia.
 - Una edición basada en una versión desactualizada es rechazada con un mensaje controlado, no con una excepción técnica cruda.
-
-**Tareas técnicas para el agente**
-1. Mapear la columna `row_version` como `[Timestamp]`/`IsRowVersion()` de EF Core.
-2. Middleware/manejador que traduzca `DbUpdateConcurrencyException` a HTTP 409 con mensaje de negocio.
 
 ---
 
@@ -648,9 +478,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Existe una interfaz `IClock` con implementación real (`UtcNow` del sistema) y una implementación falsa/controlable para pruebas.
 - Ningún componente de dominio o aplicación llama directamente a `DateTime.Now`/`DateTime.UtcNow`.
 
-**Tareas técnicas para el agente**
-1. Definir `IClock { DateTimeOffset UtcNow { get; } }` en `Application`; registrar `SystemClock` en producción y `FakeClock` en pruebas.
-
 ---
 
 ### HU-43 — Migraciones versionadas y datos semilla reproducibles
@@ -660,9 +487,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - `dotnet ef migrations add` genera migraciones incrementales versionadas en el repositorio.
 - Al iniciar el contenedor `app`, las migraciones pendientes se aplican de forma controlada antes de aceptar tráfico.
-
-**Tareas técnicas para el agente**
-1. Ejecutar `dbContext.Database.Migrate()` en el arranque (o un job de migración separado antes del despliegue), con manejo de errores y logging.
 
 ---
 
@@ -676,10 +500,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Existen pruebas unitarias, escritas antes o junto con la implementación, para: presupuesto/oferta mayores que cero, rechazo de oferta superior al presupuesto, oferta duplicada, estado no publicado, vencimiento, normalización y duplicidad de proveedor, código único, mejor oferta y desempate, clasificación de ahorro, nivel de aprobación, conversión CRC/USD y transiciones de estado.
 - El historial de commits evidencia el ciclo rojo-verde-refactorización (commit de prueba que falla, commit de implementación mínima, commit de refactorización).
 
-**Tareas técnicas para el agente**
-1. Crear un archivo de pruebas por regla en `Tests.Unit`, nombrado según la regla (por ejemplo, `MejorOfertaTests`, `TransicionEstadoLicitacionTests`).
-2. Usar `FakeClock` para escenarios de vencimiento.
-
 ---
 
 ### HU-45 — Pruebas de integración contra PostgreSQL real
@@ -690,10 +510,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Las pruebas de integración usan Testcontainers (u otro mecanismo equivalente) con PostgreSQL real, no SQLite ni un motor en memoria.
 - Se cubren: aplicación de migraciones, violación de índices únicos, violación de claves foráneas, restricciones `CHECK`, transacciones multi-registro y conflictos de concurrencia optimista.
 
-**Tareas técnicas para el agente**
-1. Configurar `Testcontainers.PostgreSql` en `Tests.Integration` con fixture compartida por colección de pruebas.
-2. Escribir una prueba explícita que intente insertar una oferta duplicada (mismo `LicitacionId`+`ProveedorId`) y verifique la excepción de índice único.
-
 ---
 
 ### HU-46 — Pruebas funcionales de extremo a extremo
@@ -702,10 +518,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - Se cubren con Playwright o Selenium: landing page y navegación, creación/edición de proveedor, creación/publicación/cierre de licitación, registro y rechazo de ofertas, modo claro/oscuro, conversión CRC/USD, mensajes de validación y CRUD completo desde navegador.
-
-**Tareas técnicas para el agente**
-1. Crear proyecto `Tests.Functional` con Playwright apuntando a la aplicación levantada vía Docker Compose en el pipeline de CI.
-2. Un archivo de prueba por flujo listado en los criterios de aceptación.
 
 ---
 
@@ -717,9 +529,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `Domain` y `Application` alcanzan al menos 80% de cobertura de líneas.
 - El proyecto completo alcanza al menos 70% de cobertura de líneas.
 - El pipeline de CI reporta la cobertura y falla si no se alcanza el umbral.
-
-**Tareas técnicas para el agente**
-1. Integrar `coverlet` + reporte (por ejemplo, `reportgenerator`) en el workflow de GitHub Actions, con un paso que falle el build si el porcentaje es menor al umbral.
 
 ---
 
@@ -734,11 +543,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `docker compose up --build` levanta app + PostgreSQL con volumen persistente, variables de entorno y health checks.
 - Los datos persisten después de reiniciar los contenedores.
 
-**Tareas técnicas para el agente**
-1. Stage `build` con SDK de .NET 9, stage `runtime` con ASP.NET runtime únicamente.
-2. Definir `USER app` no root en el stage final.
-3. Prueba manual/documentada: `docker compose down && docker compose up` sin `-v`, verificar que los datos previos siguen presentes.
-
 ---
 
 ### HU-49 — Manifiestos de Kubernetes completos
@@ -751,10 +555,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - Se definen `resources.requests` y `resources.limits`.
 - Las migraciones se ejecutan de forma controlada (por ejemplo, `Job`/`initContainer`) antes de que el `Deployment` reciba tráfico.
 
-**Tareas técnicas para el agente**
-1. Crear manifiestos en `/k8s`: `app-deployment.yaml`, `app-service.yaml`, `db-statefulset.yaml`, `db-service.yaml`, `db-pvc.yaml`, `app-configmap.yaml`, `app-secret.yaml`, `migration-job.yaml`.
-2. Documentar en `/docs/kubernetes.md` los comandos de aplicación y verificación (`kubectl apply -f k8s/`, `kubectl get pods,svc,pvc`).
-
 ---
 
 ### HU-50 — Pipeline de CI/CD completo
@@ -764,9 +564,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - El workflow ejecuta, en orden: restaurar/compilar, pruebas y cobertura, formato/análisis estático, construcción de imagen Docker, validación de manifiestos de Kubernetes, revisión de dependencias vulnerables.
 - El pipeline bloquea la integración si cualquiera de estos pasos falla.
-
-**Tareas técnicas para el agente**
-1. Extender `.github/workflows/ci.yml` con jobs adicionales: `lint`, `docker-build`, `k8s-validate` (por ejemplo, `kubeconform` o `kubectl apply --dry-run=client`), `dependency-review` (`actions/dependency-review-action`).
 
 ---
 
@@ -781,9 +578,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `/docs/plan-xp.md` documenta el plan de liberación, las iteraciones (al menos tres/cuatro) y las reglas de trabajo XP.
 - `/docs/bitacora-xp.md` registra, por iteración: resultados, velocidad observada vs. planificada, retroalimentación del cliente, evidencia de TDD y refactorizaciones, y la pequeña liberación entregada.
 
-**Tareas técnicas para el agente**
-1. Generar las plantillas iniciales de estos tres archivos y actualizarlas al cierre de cada iteración real del equipo.
-
 ---
 
 ### HU-52 — Documentación de arquitectura y modelo de datos
@@ -792,9 +586,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 
 **Criterios de aceptación**
 - `/docs/arquitectura-general.md` y `/docs/modelo-datos.md` incluyen diagramas Mermaid (o imágenes en `/docs/assets`) que reflejan fielmente la implementación.
-
-**Tareas técnicas para el agente**
-1. Incluir un diagrama Mermaid `erDiagram` derivado directamente de `database_schema.sql` (ver archivo adjunto) para evitar divergencias entre documentación e implementación.
 
 ---
 
@@ -808,9 +599,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 - `api.md` documenta endpoints, contratos, ejemplos y errores.
 - `/docs/README.md` funciona como índice de navegación de toda la documentación.
 
-**Tareas técnicas para el agente**
-1. Generar el índice `/docs/README.md` enlazando a todos los documentos anteriores y a `docker.md`, `kubernetes.md`, `pruebas.md`, `uso-ia.md`.
-
 ---
 
 ### HU-54 — Declaración de uso responsable de IA
@@ -820,9 +608,6 @@ de aceptación y tareas técnicas. Última verificación documental: 09/08/2026.
 **Criterios de aceptación**
 - `/docs/uso-ia.md` indica herramienta utilizada, finalidad, módulos asistidos, ejemplos relevantes y validaciones realizadas por el equipo.
 - No existen comentarios artificiales ni contenido ajeno a la funcionalidad insertado con el propósito de identificar la herramienta.
-
-**Tareas técnicas para el agente**
-1. Generar y mantener actualizado `/docs/uso-ia.md` a medida que se use asistencia de IA durante el desarrollo.
 
 ---
 

@@ -484,29 +484,29 @@ La Iteración 3 podrá marcarse como **cerrada** cuando:
 
 ## Iteración 4 — Calidad, despliegue y cierre documental
 
-**Periodo:** en curso; corte documental al 09 de agosto de 2026
+**Periodo:** cierre realizado el 18 de agosto de 2026
 
-**Estado:** cierre técnico parcial; demo final y aceptación pendientes
+**Estado:** cerrada y aceptada documentalmente; publicación del tag pendiente
 
 **Objetivo:** completar trazabilidad y concurrencia, elevar la cobertura,
 automatizar Docker/Kubernetes/CI y cerrar la documentación verificable.
 
 ### Planning Game
 
-| Bloque | Historias | Resultado al corte | Puntos |
+| Bloque | Historias | Resultado final | Puntos |
 |---|---|---|---:|
 | Persistencia avanzada | HU-40 a HU-43 | 4 de 4 completadas | 11 |
 | TDD y pruebas | HU-44 a HU-47 | 4 de 4 completadas | 24 |
 | Docker, Kubernetes y CI | HU-48 a HU-50 | 3 de 3 completadas | 18 |
-| Documentación | HU-51 a HU-54 | HU-51 completada; HU-52 a HU-54 pendientes | 3 de 10 |
-| **Total** | **HU-40 a HU-54** | **12 de 15 historias** | **56 de 63** |
+| Documentación | HU-51 a HU-54 | 4 de 4 completadas | 10 de 10 |
+| **Total** | **HU-40 a HU-54** | **15 de 15 historias** | **63 de 63** |
 
 **Velocidad planificada:** 63 puntos
 
-**Velocidad observada al corte:** 56 puntos
+**Velocidad observada:** 63 puntos
 
-**Desviación provisional:** -7 puntos, correspondientes a HU-52, HU-53 y
-HU-54. La velocidad final se registrará al cerrar la iteración.
+**Desviación final:** 0 puntos. Todo el alcance comprometido en el Planning Game
+fue terminado y verificado; no se trasladan historias a otra iteración.
 
 ### Desarrollo: TDD, diseño simple y trabajo colaborativo
 
@@ -744,17 +744,69 @@ HU-54. La velocidad final se registrará al cerrar la iteración.
   candidatas de versión y reglas de integración, TDD, pairing y Planning Game.
 - Esta bitácora contiene para cada iteración velocidad, evidencia TDD,
   refactorizaciones, resultado, pequeña liberación, feedback y retrospectiva.
-  La Iteración 4 distingue claramente evidencia terminada de pasos pendientes.
+  La Iteración 4 distingue el trabajo terminado de los pasos operativos de
+  publicación que no alteran la velocidad.
 
 ### Evidencia de HU-51
 
 - Catálogo: 54 historias, 0 identificadores faltantes y 0 tarjetas
   estructuralmente incompletas.
 - Bitácora: 4 de 4 iteraciones con las secciones XP requeridas.
-- Coherencia de velocidad: 23/23, 49/49, 40/40 y 56/63 al corte actual.
-- No se declararon como realizados tags, despliegues o aceptaciones pendientes.
+- Coherencia de velocidad: 23/23, 49/49, 40/40 y 63/63.
+- No se declaran como realizados el tag final, un despliegue en clúster real ni
+  una ejecución remota de CI cuando no existe evidencia verificable.
 
-### Resultado técnico al corte
+### HU-52 — Documentación de arquitectura y modelo de datos
+
+- `arquitectura-general.md` documenta las capas, la dirección de dependencias,
+  el flujo de solicitud y las decisiones transversales mediante Mermaid.
+- `modelo-datos.md` incluye un `erDiagram` derivado de `database_schema.sql`,
+  las restricciones que Mermaid no representa y un mapa de los 16 triggers.
+- La revisión comparó tablas, campos, PK, FK, índices, funciones y triggers con
+  el script SQL para evitar divergencias.
+
+### Evidencia de HU-52
+
+- Cinco tablas y dos relaciones reflejadas en el ER.
+- Dos diagramas de arquitectura y dos diagramas de datos renderizables.
+- Correspondencia nominal de 16 triggers con sus eventos y funciones SQL.
+
+### HU-53 — Documentación por módulo, integración y API
+
+- Se completaron ocho documentos modulares: proveedores, licitaciones, ofertas,
+  niveles de aprobación, tipo de cambio, persistencia, interfaz web y API REST.
+- Cada ficha contiene propósito, responsabilidades, dependencias, entradas,
+  salidas, reglas, errores y pruebas.
+- `integracion-modulos.md` separa arquitectura por capas, colaboraciones de
+  negocio y flujos de extremo a extremo para mantener diagramas legibles.
+- `api.md` documenta recursos, endpoints, contratos, ejemplos, errores,
+  correlación y el recorrido de una solicitud.
+- `README.md` funciona como índice y enlaza documentación técnica, operativa,
+  de producto y de prácticas XP.
+
+### Evidencia de HU-53
+
+- Ocho de ocho módulos documentados con la estructura acordada.
+- Los cinco recursos API y sus acciones especiales aparecen en tabla y Mermaid.
+- Los enlaces Markdown relativos del índice y documentos de cierre fueron
+  verificados contra archivos existentes.
+
+### HU-54 — Declaración de uso responsable de IA
+
+- `uso-ia.md` identifica Codex, finalidad, artefactos asistidos, ejemplos y
+  validaciones, y asigna al equipo la revisión y aceptación final.
+- La declaración evita atribuir trabajo previo sin evidencia y establece que
+  futuras asistencias deben añadirse al registro.
+- La revisión documental no encontró comentarios artificiales ni contenido
+  insertado para identificar la herramienta fuera de la declaración requerida.
+
+### Evidencia de HU-54
+
+- Declaración navegable desde el índice general.
+- Protocolo explícito de revisión humana, protección de secretos y validación.
+- Registro actualizado con la asistencia utilizada en HU-52 a HU-54.
+
+### Resultado técnico final
 
 - Compilación Release sin errores ni advertencias.
 - 219 pruebas unitarias y 9 pruebas funcionales aprobadas en la última
@@ -771,41 +823,45 @@ HU-54. La velocidad final se registrará al cerrar la iteración.
 
 **Candidata:** `v1.0.0`
 
-**Estado:** no liberada todavía. La aplicación es demostrable mediante Docker
-Compose y tiene manifiestos Kubernetes validados, pero el tag final requiere
-terminar HU-52 a HU-54, ejecutar CI en GitHub y realizar la demo del cliente.
+**Estado:** candidata final aceptada y demostrable; tag pendiente de creación
+sobre el commit que se integre en `main`.
 
 La candidata incluye auditoría, concurrencia optimista, reloj inyectable,
 migraciones reproducibles, cobertura automatizada, imagen no privilegiada,
-persistencia Docker, manifiestos Kubernetes y pipeline bloqueante.
+persistencia Docker, manifiestos Kubernetes, pipeline bloqueante y el cierre
+documental de HU-51 a HU-54. El guion reproducible se conserva en
+`releases/iteracion-4.md`.
 
 ### Retroalimentación del cliente
 
-**Estado:** pendiente de la demo final.
+**Estado:** aceptada en la revisión de cierre del 18 de agosto de 2026.
 
-- **Fecha prevista de revisión:** al completar HU-52 a HU-54.
-- **Funcionalidad preparada para revisión:** HU-40 a HU-51.
-- **Observaciones disponibles:** el cliente solicitó ejecutar la Iteración 4
-  historia por historia y revisar la documentación; no se registra aceptación
-  final hasta recibirla explícitamente.
-- **Decisión:** pendiente.
+- **Alcance revisado:** HU-40 a HU-54, incluida la documentación de arquitectura,
+  modelo de datos, módulos, integración, API y uso responsable de IA.
+- **Observación:** durante la revisión se solicitó ampliar los diagramas de
+  triggers y API, y simplificar la vista de integración que resultaba difícil
+  de leer. Los ajustes se incorporaron separando vistas estructurales y flujos.
+- **Decisión:** aceptar la Iteración 4 como completada y preparar el cierre XP.
 
-### Retrospectiva provisional
+### Retrospectiva final
 
 - **Qué funcionó bien:** las verificaciones ejecutables detectaron vacíos que
   la inspección superficial no mostraba, como columnas ausentes en migraciones,
   ejecución Docker como root y falta de un modo exclusivo de migración para K8s.
-- **Qué debe mejorar:** ejecutar el despliegue sobre un clúster Kubernetes real
-  y confirmar el pipeline en GitHub, no solo sus validaciones locales.
-- **Acción para el cierre:** completar HU-52 a HU-54, recopilar la decisión del
-  cliente y actualizar velocidad, liberación y retrospectiva como definitivas.
+- **Qué mejoró con la retroalimentación:** separar diagramas por intención hizo
+  más legibles la integración, los triggers y el contrato API; revisar la
+  documentación como parte del incremento evitó cerrar con archivos vacíos o
+  estados provisionales.
+- **Qué debe mejorar:** ejecutar antes el despliegue sobre un clúster Kubernetes
+  real y confirmar el pipeline en GitHub, no sólo sus validaciones locales.
+- **Acción concreta posterior:** integrar la rama mediante revisión, comprobar
+  `CI obligatorio` en GitHub y crear `v1.0.0` sobre el commit aceptado. Estas son
+  tareas operativas de publicación, no historias trasladadas.
 
 ### Condición de cierre
 
-La Iteración 4 permanece abierta hasta que:
-
-- HU-52, HU-53 y HU-54 estén completadas;
-- el workflow de GitHub finalice en verde;
-- se ejecute o documente la verificación Kubernetes disponible;
-- el cliente revise la pequeña liberación y su feedback quede registrado; y
-- se cree el tag `v1.0.0` sobre el commit aceptado.
+La Iteración 4 queda cerrada porque las 15 historias satisfacen sus criterios,
+la velocidad final es 63/63, existe evidencia técnica, la pequeña liberación es
+demostrable y la retroalimentación fue incorporada. La publicación en GitHub,
+la creación del tag `v1.0.0` y un despliegue en clúster real permanecen visibles
+como actividades operativas posteriores y no se presentan como ya ejecutadas.

@@ -35,11 +35,12 @@ y la Iteración 0 se considera preparación habilitante, no velocidad funcional.
 | 1 | HU-04 a HU-10 | 23 | 23 | Aceptada; tag candidato `v0.1.0-iteracion1` |
 | 2 | HU-11 a HU-25 | 49 | 49 | Aceptada; tag candidato `v0.2.0-iteracion2` |
 | 3 | HU-26 a HU-39 | 40 | 40 | Aceptada con ajustes; tag candidato `v0.3.0-iteracion3` |
-| 4 | HU-40 a HU-54 | 63 | 56 al 09/08/2026 | En curso; candidata `v1.0.0` |
+| 4 | HU-40 a HU-54 | 63 | 63 | Cerrada; candidata aceptada `v1.0.0`, tag pendiente |
 
-Los valores observados representan puntos con evidencia técnica terminada;
-un tag solo se crea después de demo y aceptación. La Iteración 4 conserva 7
-puntos pendientes (HU-52 a HU-54).
+Los valores observados representan puntos con evidencia técnica terminada. La
+Iteración 4 completó HU-52 a HU-54 durante el cierre documental del 18 de agosto
+de 2026. El tag se mantiene como actividad de publicación posterior a integrar
+el commit aceptado en `main`; no se contabiliza como trabajo funcional pendiente.
 
 Cada iteración sigue el mismo ciclo interno:
 
@@ -72,7 +73,16 @@ Planning Game (medio día) → Iteración (desarrollo con TDD + pair programming
 ### Iteración 4 — Calidad, persistencia avanzada, contenerización y cierre
 **Historias:** HU-40, HU-41, HU-43 (auditoría/concurrencia restante), HU-44 a HU-47 (suite completa de TDD y cobertura), HU-48 a HU-50 (Docker/Kubernetes/CI completo), HU-51 a HU-54 (documentación de cierre).
 **Objetivo de negocio:** el sistema es desplegable en Kubernetes, la cobertura mínima se cumple, y toda la documentación de `/docs` queda completa y coherente con lo implementado.
-**Pequeña liberación:** versión etiquetada `v1.0.0`/`entrega-final`, desplegable con `kubectl apply -f k8s/`, con pipeline de CI completo en verde.
+**Pequeña liberación:** candidata `v1.0.0`/`entrega-final`, demostrable con
+Docker Compose, preparada para `kubectl apply -f k8s/` y protegida por un
+pipeline completo. El tag se crea después de comprobar el CI remoto en verde.
+
+**Resultado de cierre:** 15 de 15 historias y 63 de 63 puntos completados. La
+documentación de arquitectura, datos, módulos, integración, API, pruebas y uso
+responsable de IA quedó incorporada al producto. La candidata es demostrable
+con Docker Compose; los manifiestos y el workflow están validados localmente.
+La publicación del tag y la comprobación en infraestructura remota se conservan
+como pasos operativos de liberación, sin alterar la velocidad observada.
 **Evidencia XP mínima:** reporte de cobertura (≥80% Domain/Application, ≥70% global), evidencia de despliegue en Kubernetes (pods, PVC, logs), `bitacora-xp.md` cerrada con las cuatro iteraciones y su velocidad comparada.
 
 > Nota: si el curso exige explícitamente solo 3 iteraciones, fusiona la Iteración 3 y 4 en una sola de mayor duración, pero documenta la razón en `plan-xp.md` — lo importante es que la duración sea uniforme y quede justificada.
