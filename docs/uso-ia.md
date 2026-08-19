@@ -2,7 +2,10 @@
 
 ## Herramienta y finalidad
 
-Se utilizó Codex, asistente de programación de OpenAI, como apoyo para analizar el repositorio, contrastar documentación con la implementación y redactar documentación técnica de la Iteración 4. La herramienta actuó como asistencia; las decisiones del proyecto, la aceptación y la autoría responsable permanecen en el equipo.
+Utilicé Codex, asistente de programación de OpenAI, como apoyo para analizar
+el repositorio, contrastar documentación con la implementación y redactar parte
+de la documentación técnica. Revisé y acepté personalmente el contenido final;
+las decisiones y la autoría responsable del proyecto me corresponden.
 
 ## Módulos y artefactos asistidos
 
@@ -11,7 +14,9 @@ Se utilizó Codex, asistente de programación de OpenAI, como apoyo para analiza
 - Integración y API: contraste con controladores, contratos, middleware, ejemplos HTTP y pruebas funcionales.
 - Índice, estrategia de pruebas y esta declaración de uso.
 
-No se atribuye a IA la implementación previa de módulos cuando no existe evidencia de ello. Esta declaración se debe actualizar si se usa otra herramienta o si la asistencia se extiende a nuevos artefactos.
+No atribuyo a la IA la implementación de módulos cuando el historial no lo
+demuestra. Esta declaración corresponde al alcance de asistencia registrado al
+cierre del proyecto.
 
 ## Ejemplos relevantes de asistencia
 
@@ -28,6 +33,10 @@ No se atribuye a IA la implementación previa de módulos cuando no existe evide
 - Revisión de que cada módulo incluya propósito, responsabilidades, dependencias, entradas, salidas, reglas, errores y pruebas.
 - Verificación automatizada de compilación/pruebas y de enlaces Markdown relativos al completar esta iteración; cualquier limitación del entorno debe registrarse en la entrega o bitácora.
 
-## Protocolo de revisión del equipo
+## Revisión realizada
 
-Antes de aceptar la historia, una persona del equipo debe revisar los cambios, ejecutar las pruebas pertinentes y confirmar que diagramas, ejemplos y reglas coinciden con el sistema observable. No se deben incorporar secretos, datos personales, código no comprendido ni afirmaciones no verificadas. Los cambios sugeridos por IA se mantienen bajo el mismo proceso de revisión, versionamiento y pruebas que cualquier contribución humana.
+Revisé los cambios asistidos, ejecuté las pruebas pertinentes y contrasté los
+diagramas, ejemplos y reglas con el sistema observable. No incorporé secretos,
+datos personales, código no comprendido ni afirmaciones sin verificación. Las
+sugerencias de IA siguieron el mismo proceso de revisión, versionamiento y
+pruebas aplicado al resto del proyecto.

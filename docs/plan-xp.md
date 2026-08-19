@@ -1,6 +1,6 @@
 # Plan de liberación XP — Sistema de Gestión de Licitaciones
 
-Este documento registra el plan de liberación adoptado por el equipo: cómo se
+Este documento registra el plan de liberación que adopté: cómo se
 divide el alcance en iteraciones XP, cómo se integra y versiona el trabajo y qué
 evidencia debe existir al cerrar cada pequeña liberación.
 
@@ -12,16 +12,20 @@ declarados en [xp-individual.md](xp-individual.md).
 
 ## 1. Iteración 0 — Preparación (no cuenta como iteración XP, es habilitante)
 
-Antes del Planning Game formal necesitas un mínimo esqueleto para que las iteraciones produzcan software demostrable desde la primera. Esto corresponde a **HU-01, HU-02, HU-03** (fundación) y a dejar el repositorio listo.
+Antes del Planning Game formal se preparó un esqueleto mínimo para producir
+software demostrable desde la primera iteración. Esta preparación correspondió a
+**HU-01, HU-02 y HU-03**.
 
-**Qué se hace:**
-1. Crear el repositorio en GitHub (único repo del proyecto).
-2. Ejecutar HU-01 (estructura de solución), HU-02 (Docker Compose base) y HU-03 (CI base).
-3. Aplicar el script `database_schema.sql` como primera migración manual de referencia (luego EF Core generará las migraciones formales en HU-05).
-4. Configurar el entorno local (sección 3 de esta guía).
-5. Redactar `/docs/plan-xp.md` (este documento) y `/docs/historias-usuario.md` (ya generado).
+**Trabajo realizado:**
+1. Creación del repositorio único en GitHub.
+2. Estructura de la solución, Docker Compose base y CI base.
+3. Incorporación de `database_schema.sql` como referencia inicial del esquema.
+4. Configuración del entorno local.
+5. Elaboración del plan XP y del catálogo de historias de usuario.
 
-**Salida esperada:** repo con `dotnet build` verde, `docker compose up --build` funcionando, CI ejecutando en cada push. Aún no hay funcionalidad de negocio — eso empieza en la Iteración 1.
+**Resultado:** repositorio compilable, entorno reproducible con Docker Compose y
+CI ejecutable en cada cambio. La funcionalidad de negocio comenzó en la
+Iteración 1.
 
 ---
 
@@ -89,8 +93,6 @@ con Docker Compose; los manifiestos y el workflow están validados localmente.
 La publicación del tag y la comprobación del pipeline remoto quedaron completadas.
 **Evidencia XP mínima:** reporte de cobertura (≥80% Domain/Application, ≥70% global), evidencia de despliegue en Kubernetes (pods, PVC, logs), `bitacora-xp.md` cerrada con las cuatro iteraciones y su velocidad comparada.
 
-> Nota: si el curso exige explícitamente solo 3 iteraciones, fusiona la Iteración 3 y 4 en una sola de mayor duración, pero documenta la razón en `plan-xp.md` — lo importante es que la duración sea uniforme y quede justificada.
-
 ---
 
 ## 3. Versionamiento en Git bajo XP
@@ -109,9 +111,11 @@ git checkout -b feature/HU-06-registrar-proveedor
 ```
 
 ### 3.2 Commits: Conventional Commits + ciclo TDD visible
-Usa **Conventional Commits**, con el `HU-XX` como referencia explícita en el cuerpo o en un scope, para que cada commit se pueda vincular a la historia (requisito explícito del proyecto).
+Se adoptó **Conventional Commits**, con `HU-XX` como referencia en el mensaje
+cuando la historia contó con un commit individual. Los commits agrupados se
+identifican como tales en la [matriz de trazabilidad](matriz-trazabilidad.md).
 
-Formato sugerido:
+Formato adoptado:
 ```
 <tipo>(HU-XX): <descripción corta en imperativo>
 
@@ -120,132 +124,70 @@ Formato sugerido:
 
 Tipos: `feat`, `fix`, `test`, `refactor`, `docs`, `chore`, `ci`, `build`.
 
-**El historial de cada historia debe mostrar el ciclo rojo-verde-refactor como commits separados**, no como un único commit gigante:
+Los ciclos TDD con evidencia directa se registraron mediante commits separados:
 
 ```bash
-git commit -m "test(HU-06): agrega prueba de rechazo por nombre duplicado (rojo)"
-git commit -m "feat(HU-06): implementa CrearProveedorCommand con validacion de unicidad (verde)"
-git commit -m "refactor(HU-06): extrae normalizador de nombre a servicio reutilizable"
+git commit -m "test(HU-44): agrega pruebas unitarias de reglas de negocio (rojo)"
+git commit -m "feat(HU-44): cubre conversión CRC/USD y normalización de proveedor (verde)"
+git commit -m "refactor(HU-44): simplifica validación de nombre y guardia de conversión"
 ```
 
-Esto es evidencia directa de TDD para el evaluador y para tu propia bitácora.
+Esta secuencia constituye evidencia directa de TDD y se complementa con la
+bitácora y la matriz de trazabilidad.
 
 ### 3.3 Programación en parejas en este proyecto individual
 
 La programación en pareja no se aplicó porque hubo un solo desarrollador. La IA
 fue una herramienta de asistencia y no se presenta como una segunda persona.
-Los siguientes lineamientos quedan como referencia para un equipo futuro, no
-como evidencia reclamada por este proyecto.
-
-Si trabajas en pareja, **alterna quién hace el commit** y usa el trailer `Co-authored-by` de GitHub en cada commit, sin importar quién tecleó:
-
-```
-feat(HU-11): implementa creacion de licitacion con validacion de fecha
-
-Co-authored-by: Nombre Compañero <correo@ejemplo.com>
-```
-
-Esto evita que el historial se concentre en una sola cuenta (requisito explícito) y deja evidencia de propiedad colectiva.
+No se utilizaron trailers `Co-authored-by`, porque no existió una segunda
+persona participante. El historial identifica a Robert Granados como único
+autor humano del proyecto.
 
 ### 3.4 Pull Requests como Planning Game en miniatura
-Cada PR de una historia debe:
-1. Referenciar el issue de la historia (`Closes #HU-06` o el número de issue asociado).
-2. Incluir en la descripción los criterios de aceptación copiados de `historias-usuario.md`, marcados como cumplidos.
-3. Mostrar CI en verde (build, pruebas, cobertura, análisis estático) antes de poder mergear.
-4. Ser revisado (aunque sea por el propio compañero de pareja) antes del merge — esto sustituye la revisión de código formal cuando el equipo es de dos personas.
+Los PR conservaron la integración de ramas de historia y el resultado del CI.
+La plantilla incorporada durante el cierre estandariza la referencia al Issue,
+los criterios de aceptación, las pruebas y la evidencia XP para cambios
+posteriores. La protección de `main` exige el check `8. CI obligatorio`.
 
 ### 3.5 Issues y Milestones (permitidos, con vocabulario XP)
-- Un **Issue** por historia de usuario, título `HU-XX: <nombre>`, con la descripción completa de `historias-usuario.md` pegada (rol/quiero/para + criterios de aceptación).
-- Etiquetas por épica (`epica:proveedores`, `epica:ofertas`, etc.) y por tipo (`tipo:defecto` para bugs encontrados durante el desarrollo).
-- Un **Milestone por iteración** (`Iteración 1`, `Iteración 2`, ...), nunca "Sprint N". Cada Milestone agrupa las historias planificadas en el Planning Game de esa iteración.
-- Nada de "Product Backlog" ni tablero Scrum: si usas GitHub Projects, nómbralo "Historias" o "Tablero XP" y organiza columnas como `Por hacer / En pareja / En revisión / Liberado`, evitando terminología de Scrum/Kanban formal (WIP limits, etc.).
+- Cada historia dispone de un Issue con rol, valor, estimación y criterios.
+- Los cinco Milestones corresponden a la preparación y las cuatro iteraciones.
+- Los Issues y Milestones se incorporaron retrospectivamente durante la
+  auditoría final; organizan la evidencia, pero no se presentan como prueba de
+  uso durante los Planning Games originales.
 
 ### 3.6 Etiquetas (tags) de liberación
-- Al cierre de cada iteración, crea un tag ligero de referencia interna: `v0.1.0-iteracion1`, `v0.2.0-iteracion2`, etc. — esto materializa la "pequeña liberación" exigida.
-- Al final del proyecto, la entrega evaluable se marca con `v1.0.0` **o** `entrega-final` (ambos aceptados según el enunciado, elige uno y sé consistente):
+- Cada iteración cerró con un tag y una Release. La entrega funcional quedó
+  identificada mediante `v1.0.0`:
 
 ```bash
 git tag -a v1.0.0 -m "Entrega final - Sistema de Gestion de Licitaciones"
 git push origin v1.0.0
 ```
 
-### 3.7 Qué nunca debe llegar al repositorio
-- Archivos `.env`, `appsettings.Development.json` con credenciales reales, carpetas `bin/`, `obj/`, `node_modules/`.
-- Confirma tu `.gitignore` desde el primer commit de la Iteración 0, no después.
+### 3.7 Higiene del repositorio
+
+El `.gitignore` excluye archivos `.env`, configuraciones de desarrollo con
+credenciales y directorios generados como `bin/`, `obj/` y `node_modules/`.
 
 ---
 
-## 4. Configuración del entorno: VS Code + agente de código
+## 4. Entorno utilizado
 
-### 4.1 Instalación base (una sola vez por máquina)
-1. **.NET 9 SDK** — verifica con `dotnet --version`.
-2. **Docker Desktop** (o Docker Engine + Compose plugin en Linux) — necesario desde la Iteración 0 y obligatorio para Testcontainers en HU-45.
-3. **Git** configurado con tu nombre/correo y, si trabajas en pareja, decide si vas a alternar cuentas locales o usar `Co-authored-by` (recomendado: una sola cuenta activa por sesión + trailer).
-4. **cliente de PostgreSQL** (opcional pero útil): `psql` o una extensión de VS Code para inspeccionar la base de datos durante el desarrollo.
-5. **VS Code** actualizado.
+El desarrollo se realizó con .NET 9, Git, Docker Compose, PostgreSQL 16 y un
+editor compatible con C#. El repositorio conserva `.editorconfig` como fuente
+de convenciones y el pipeline verifica formato, compilación y pruebas. Las
+pruebas de integración utilizan PostgreSQL real mediante Testcontainers y las
+pruebas de interfaz utilizan Playwright.
 
-### 4.2 Extensiones de VS Code recomendadas
-- **C# Dev Kit** (incluye C#, IntelliCode, soporte de pruebas de .NET) — esencial para Domain/Application/Infrastructure/Web/Api.
-- **Docker** (extensión oficial de Microsoft) — para construir/inspeccionar imágenes y ver logs de contenedores desde el editor.
-- **PostgreSQL** (por ejemplo, la extensión de Microsoft o `ckolkman.vscode-postgres`) — consultar tablas y validar los índices/constraints de `database_schema.sql` sin salir del editor.
-- **EditorConfig for VS Code** — respeta el `.editorconfig` de HU-01.
-- **GitLens** — muy útil para verificar que el historial de commits realmente evidencia el ciclo TDD y la alternancia de pareja (te lo van a evaluar).
-- **YAML** (Red Hat) — para editar los manifiestos de `/k8s` y los workflows de GitHub Actions con autocompletado.
-- **REST Client** o el uso del archivo `.http` nativo de VS Code — para ejecutar la colección de `/docs/api-requests.http` (HU-39) directamente desde el editor.
-- Extensión del **agente de código** que vayas a usar (ver 4.4).
+Los procedimientos reproducibles de ejecución se encuentran en
+[pruebas](pruebas.md), [Docker](docker.md), [Kubernetes](kubernetes.md) y
+[CI/CD](ci-cd.md).
 
-### 4.3 Configuración de workspace
-Crea en la raíz del repo:
+## 5. Secuencia ejecutada
 
-**`.editorconfig`** (mínimo):
-```ini
-root = true
-
-[*.cs]
-indent_style = space
-indent_size = 4
-insert_final_newline = true
-charset = utf-8-bom
-
-[*.{yml,yaml,json,md}]
-indent_style = space
-indent_size = 2
-```
-
-**`.vscode/tasks.json`** (tareas rápidas para el ciclo TDD):
-```json
-{
-  "version": "2.0.0",
-  "tasks": [
-    { "label": "build", "type": "shell", "command": "dotnet build" },
-    { "label": "test-unit", "type": "shell", "command": "dotnet test Tests.Unit" },
-    { "label": "test-watch", "type": "shell", "command": "dotnet watch test --project Tests.Unit" },
-    { "label": "compose-up", "type": "shell", "command": "docker compose up --build" },
-    { "label": "ef-migrate", "type": "shell", "command": "dotnet ef database update --project Infrastructure" }
-  ]
-}
-```
-`test-watch` es la tarea que más vas a usar en TDD: deja las pruebas corriendo en rojo/verde mientras escribes.
-
-**`.vscode/settings.json`** (mínimo):
-```json
-{
-  "dotnet.defaultSolution": "SistemaLicitaciones.sln",
-  "editor.formatOnSave": true,
-  "files.exclude": { "**/bin": true, "**/obj": true }
-}
-```
-
-
-
-
-
----
-
-## 5. Orden de arranque (resumen accionable)
-
-1. Crear repo, `.gitignore`, `.editorconfig`, tablero de historias (Issues + Milestones).
-2. Ejecutar Iteración 0: estructura de solución, Docker Compose base, CI base, entorno VS Code configurado.
-3. Planning Game de la Iteración 1 (estimar/confirmar HU-04 a HU-10) y arrancar con `feature/HU-04-...`, aplicando TDD desde el primer commit.
-4. Repetir el ciclo Planning Game → desarrollo → pequeña liberación → retro → bitácora para las Iteraciones 2, 3 y 4 descritas arriba.
-5. Cerrar con etiqueta `v1.0.0`/`entrega-final` solo cuando `/docs` esté completo y el pipeline de CI (incluyendo validación de Kubernetes) esté en verde.
+1. Preparación del repositorio, estructura, Compose y CI.
+2. Planificación y ejecución de cuatro iteraciones funcionales.
+3. Desarrollo incremental con pruebas y refactorización verificables.
+4. Demostración, retroalimentación y retrospectiva por iteración.
+5. Publicación de pequeñas liberaciones y cierre documental.

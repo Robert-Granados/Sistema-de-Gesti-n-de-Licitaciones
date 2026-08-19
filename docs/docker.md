@@ -9,7 +9,7 @@
 
 ```powershell
 Copy-Item .env.example .env
-# Edite .env antes de continuar.
+# El archivo .env contiene la configuración local.
 docker compose up -d --build
 docker compose ps
 ```
@@ -39,8 +39,8 @@ Puede confirmar que el volumen continúa presente con:
 docker volume inspect proyecto_xp_postgres-data
 ```
 
-No agregue `-v` a `docker compose down` si desea conservar los datos; esa
-opción elimina el volumen nombrado.
+La opción `-v` de `docker compose down` elimina el volumen nombrado y, por
+tanto, no forma parte del procedimiento de reinicio con persistencia.
 
 ## Evidencia de la prueba HU-48
 

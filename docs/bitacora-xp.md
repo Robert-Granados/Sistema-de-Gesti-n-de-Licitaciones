@@ -21,8 +21,8 @@ reglas de negocio, la unicidad normalizada y el historial de ofertas.
 ### Planning Game
 
 El cliente priorizó como imprescindibles el modelo de dominio, la persistencia
-en PostgreSQL y el flujo completo de proveedores. El equipo seleccionó las
-historias HU-04 a HU-10 por su dependencia funcional y mantuvo el alcance
+en PostgreSQL y el flujo completo de proveedores. Seleccioné las
+historias HU-04 a HU-10 por su dependencia funcional y mantuve el alcance
 planificado durante la iteración.
 
 | Historia | Resultado | Puntos |
@@ -110,7 +110,7 @@ El procedimiento de demostración y aceptación está en
 - **Prioridad de los cambios: Media**
 - **Decisión:** Aceptada con ajustes
 
-### Retrospectiva del equipo
+### Retrospectiva individual
 
 - **Qué funcionó bien:** Funcionalidad implementada correctamente, pruebas unitarias y de integración exitosas. 
 - **Qué debe mejorar:** Mejorar la experiencia del usuario (UX/UI) y permitir pruebas con más datos en los diferentes apartados.
@@ -149,8 +149,8 @@ calcular automáticamente la mejor oferta con su clasificación de ahorro.
 El cliente priorizó el núcleo del negocio (licitaciones y ofertas) sobre el
 resto de las épicas. Se adelantó HU-42 (`IClock`, reloj inyectable) al inicio de
 la iteración para que HU-16 y HU-21 fueran probables de forma determinista,
-según el ajuste previsto en `plan-xp.md`. El equipo seleccionó HU-11 a HU-25 y
-mantuvo el alcance planificado durante la iteración.
+según el ajuste previsto en `plan-xp.md`. Seleccioné HU-11 a HU-25 y
+mantuve el alcance planificado durante la iteración.
 
 | Historia | Resultado | Puntos |
 |---|---:|---:|
@@ -195,7 +195,7 @@ mantuvo el alcance planificado durante la iteración.
 - La solución conserva la separación Domain → Application → Infrastructure/Web.
   Domain no depende de EF Core ni de PostgreSQL.
 - El trabajo fue individual con asistencia de IA; no se contabiliza como
-  *pair programming* entre integrantes de un equipo.
+  *pair programming* entre dos personas.
 
 | Fecha | Conductor | Navegante | Historias | Duración |
 |---|---|---|---|---|
@@ -257,7 +257,7 @@ El procedimiento de demostración y aceptación está en
 - **Prioridad de los cambios:** Media
 - **Decisión:** Aceptada con ajustes
 
-### Retrospectiva del equipo
+### Retrospectiva individual
 
 - **Qué funcionó bien:** La matriz de transición de estados y el flujo licitación → publicación → ofertas → mejor oferta quedaron cubiertos por pruebas unitarias y de integración; se reutilizó `OfertaValidador` para registrar, editar y eliminar ofertas, evitando duplicación de reglas.
 - **Qué debe mejorar:** La interfaz de usuario sigue siendo básica y falta la API REST documentada y sus pruebas para cerrar el alcance de la Iteración 3.
@@ -296,8 +296,8 @@ documentada en Swagger que refleje el aprobador y la conversión CRC/USD.
 
 El cliente priorizó las reglas paramétricas (niveles de aprobación y tipo de
 cambio), la experiencia de usuario completa y la exposición de la API REST,
-según el alcance previsto para la Iteración 3 en `plan-xp.md`. El equipo
-seleccionó HU-26 a HU-39 y mantuvo el alcance planificado durante la iteración.
+según el alcance previsto para la Iteración 3 en `plan-xp.md`. Seleccioné
+HU-26 a HU-39 y mantuve el alcance planificado durante la iteración.
 
 | Historia | Resultado | Puntos |
 |---|---|---:|
@@ -345,7 +345,7 @@ seleccionó HU-26 a HU-39 y mantuvo el alcance planificado durante la iteración
   con la API compartiendo los mismos casos de uso de la UI y Domain sin
   depender de EF Core ni de PostgreSQL.
 - El trabajo fue individual con asistencia de IA; no se contabiliza como
-  *pair programming* entre integrantes de un equipo.
+  *pair programming* entre dos personas.
 
 | Fecha | Conductor | Navegante | Historias | Duración |
 |---|---|---|---|---|
@@ -458,7 +458,7 @@ El procedimiento de demostración y aceptación está en
 - **Prioridad de los cambios:** Media
 - **Decisión:** Aceptada con ajustes
 
-### Retrospectiva del equipo
+### Retrospectiva individual
 
 - **Qué funcionó bien:** Se completó la experiencia de usuario solicitada desde la Iteración 1; la API quedó versionada, con DTOs y errores estandarizados, y las pruebas de contrato (`ApiContractTests`) y del middleware (`ApiExceptionMiddlewareTests`) validan el contrato HTTP sin depender de una instancia en ejecución.
 - **Qué debe mejorar:** Ampliar las pruebas funcionales de extremo a extremo desde el navegador y preparar el despliegue en Kubernetes.
@@ -793,9 +793,9 @@ fue terminado y verificado; no se trasladan historias a otra iteración.
 ### HU-54 — Declaración de uso responsable de IA
 
 - `uso-ia.md` identifica Codex, finalidad, artefactos asistidos, ejemplos y
-  validaciones, y asigna al equipo la revisión y aceptación final.
-- La declaración evita atribuir trabajo previo sin evidencia y establece que
-  futuras asistencias deben añadirse al registro.
+  validaciones, y deja a mi cargo la revisión y aceptación final.
+- La declaración evita atribuir trabajo previo sin evidencia y delimita la
+  asistencia registrada durante el proyecto.
 - La revisión documental no encontró comentarios artificiales ni contenido
   insertado para identificar la herramienta fuera de la declaración requerida.
 

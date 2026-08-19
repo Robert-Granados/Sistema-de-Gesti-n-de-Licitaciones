@@ -102,4 +102,5 @@ Cada caso de escritura persiste mediante `SaveChangesAsync`; PostgreSQL aplica F
 
 - Docker Compose inicia PostgreSQL, espera su salud, aplica migraciones y expone la aplicación en el puerto configurado.
 - Kubernetes usa ConfigMap/Secret, StatefulSet y PVC para la base, un Job de migración y Deployment/Service para la aplicación.
-- CI restaura, compila, ejecuta suites y valida cobertura; consulte [pruebas](pruebas.md) y [CI/CD](ci-cd.md).
+- CI restaura, compila, ejecuta suites y valida cobertura. Los detalles se
+  encuentran en [pruebas](pruebas.md) y [CI/CD](ci-cd.md).
