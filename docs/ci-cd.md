@@ -14,7 +14,7 @@ push a `main`. Sus jobs forman una cadena deliberadamente bloqueante:
    y verificar los umbrales del proyecto.
 3. Verificar `dotnet format`, analizadores y advertencias como errores.
 4. Construir la imagen Docker y confirmar que utiliza el usuario `app`.
-5. validar los nueve manifiestos Kubernetes con Kubeconform estricto.
+5. Validar los nueve manifiestos Kubernetes con Kubeconform estricto.
 6. Auditar dependencias NuGet directas/transitivas y, en pull requests, ejecutar
    `actions/dependency-review-action` con severidad mínima `moderate`.
 7. Levantar Compose y ejecutar las pruebas Playwright contra la aplicación real.
@@ -27,9 +27,9 @@ incluso cuando una prueba falla. Los contenedores de navegador se detienen con
 
 ## Protección de la rama
 
-Para impedir la integración de cambios defectuosos, configure en GitHub la regla
-de protección de `main` y marque `CI obligatorio` como status check requerido.
-No permita omitir la regla a quienes integran pull requests.
+La regla de protección de `main` exige `CI obligatorio` como *status check* y
+resolución de conversaciones. La configuración no permite *force push* ni la
+eliminación de la rama.
 
 ## Comprobaciones locales equivalentes
 

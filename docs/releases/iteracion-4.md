@@ -48,7 +48,8 @@ La aplicación debe responder en <http://localhost:8080>, Swagger en
 
 ## Comprobación automatizada
 
-Use el SDK local incluido cuando `dotnet` no esté disponible globalmente:
+El SDK local incluido permite ejecutar la comprobación cuando `dotnet` no está
+disponible globalmente:
 
 ```powershell
 .\.dotnet\dotnet.exe build SistemaLicitaciones.sln --no-restore

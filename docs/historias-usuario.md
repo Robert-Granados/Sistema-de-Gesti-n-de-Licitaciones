@@ -14,7 +14,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ## Épica 0 — Fundación del proyecto
 
 ### HU-01 — Inicializar estructura de solución modular
-**Como** equipo de desarrollo **quiero** una solución .NET 9 organizada en proyectos separados **para** aplicar separación de responsabilidades desde el inicio.
+**Como** desarrollador **quiero** una solución .NET 9 organizada en proyectos separados **para** aplicar separación de responsabilidades desde el inicio.
 - Prioridad: Alta (Debe) · Estimación: 3
 
 **Criterios de aceptación**
@@ -38,7 +38,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-03 — Pipeline de integración continua base
-**Como** equipo **quiero** que cada cambio se compile y pruebe automáticamente **para** detectar errores temprano (XP: integración continua).
+**Como** desarrollador **quiero** que cada cambio se compile y pruebe automáticamente **para** detectar errores temprano (XP: integración continua).
 - Prioridad: Alta · Estimación: 3
 
 **Criterios de aceptación**
@@ -493,7 +493,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ## Épica 10 — TDD y pruebas automatizadas
 
 ### HU-44 — Suite de pruebas unitarias de reglas de negocio
-**Como** equipo **quiero** cubrir con pruebas unitarias todas las reglas críticas de negocio **para** prevenir regresiones (XP: TDD).
+**Como** desarrollador **quiero** cubrir con pruebas unitarias todas las reglas críticas de negocio **para** prevenir regresiones (XP: TDD).
 - Prioridad: Alta · Estimación: 8
 
 **Criterios de aceptación**
@@ -503,7 +503,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-45 — Pruebas de integración contra PostgreSQL real
-**Como** equipo **quiero** validar migraciones, índices, restricciones, transacciones y concurrencia contra una instancia real de PostgreSQL **para** garantizar que las reglas también se cumplen en la base de datos.
+**Como** desarrollador **quiero** validar migraciones, índices, restricciones, transacciones y concurrencia contra una instancia real de PostgreSQL **para** garantizar que las reglas también se cumplen en la base de datos.
 - Prioridad: Alta · Estimación: 5
 
 **Criterios de aceptación**
@@ -513,7 +513,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-46 — Pruebas funcionales de extremo a extremo
-**Como** equipo **quiero** automatizar los flujos completos desde el navegador **para** validar la experiencia real del usuario.
+**Como** desarrollador **quiero** automatizar los flujos completos desde el navegador **para** validar la experiencia real del usuario.
 - Prioridad: Alta · Estimación: 8
 
 **Criterios de aceptación**
@@ -522,7 +522,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-47 — Cobertura mínima de pruebas
-**Como** equipo **quiero** medir y exigir un umbral mínimo de cobertura **para** asegurar un nivel base de verificación automatizada.
+**Como** desarrollador **quiero** medir y exigir un umbral mínimo de cobertura **para** asegurar un nivel base de verificación automatizada.
 - Prioridad: Media · Estimación: 3
 
 **Criterios de aceptación**
@@ -535,7 +535,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ## Épica 11 — Docker, Kubernetes e integración continua
 
 ### HU-48 — Dockerfile multi-stage y Compose completo
-**Como** equipo **quiero** una imagen Docker optimizada y un Compose completo con persistencia **para** ejecutar la solución de forma reproducible.
+**Como** desarrollador **quiero** una imagen Docker optimizada y un Compose completo con persistencia **para** ejecutar la solución de forma reproducible.
 - Prioridad: Alta · Estimación: 5
 
 **Criterios de aceptación**
@@ -546,7 +546,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-49 — Manifiestos de Kubernetes completos
-**Como** equipo **quiero** desplegar la solución en Kubernetes con persistencia y configuración segura **para** demostrar un despliegue productivo.
+**Como** desarrollador **quiero** desplegar la solución en Kubernetes con persistencia y configuración segura **para** demostrar un despliegue productivo.
 - Prioridad: Alta · Estimación: 8
 
 **Criterios de aceptación**
@@ -558,7 +558,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-50 — Pipeline de CI/CD completo
-**Como** equipo **quiero** un pipeline que compile, pruebe, analice, construya la imagen y valide los manifiestos **para** bloquear cambios defectuosos antes de integrarlos.
+**Como** desarrollador **quiero** un pipeline que compile, pruebe, analice, construya la imagen y valide los manifiestos **para** bloquear cambios defectuosos antes de integrarlos.
 - Prioridad: Alta · Estimación: 5
 
 **Criterios de aceptación**
@@ -570,7 +570,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ## Épica 12 — Documentación y prácticas XP
 
 ### HU-51 — Documentar historias, plan de liberación y bitácora XP
-**Como** equipo **quiero** documentar las historias, el plan de iteraciones y los resultados de cada iteración **para** dejar evidencia verificable del proceso XP.
+**Como** responsable del proyecto **quiero** documentar las historias, el plan de iteraciones y los resultados de cada iteración **para** dejar evidencia verificable del proceso XP.
 - Prioridad: Alta · Estimación: 3
 
 **Criterios de aceptación**
@@ -581,7 +581,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-52 — Documentación de arquitectura y modelo de datos
-**Como** equipo **quiero** documentar la arquitectura general y el modelo de datos con diagramas **para** facilitar el entendimiento del sistema.
+**Como** responsable del proyecto **quiero** documentar la arquitectura general y el modelo de datos con diagramas **para** facilitar el entendimiento del sistema.
 - Prioridad: Media · Estimación: 3
 
 **Criterios de aceptación**
@@ -590,7 +590,7 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-53 — Documentación por módulo, integración y API
-**Como** equipo **quiero** un archivo Markdown por módulo, uno de integración y uno de API **para** que cualquier persona entienda propósito, dependencias y contratos.
+**Como** responsable del proyecto **quiero** un archivo Markdown por módulo, uno de integración y uno de API **para** que cualquier persona entienda propósito, dependencias y contratos.
 - Prioridad: Media · Estimación: 3
 
 **Criterios de aceptación**
@@ -602,11 +602,11 @@ de aceptación. Última verificación documental: 09/08/2026.
 ---
 
 ### HU-54 — Declaración de uso responsable de IA
-**Como** equipo **quiero** declarar el uso de herramientas de IA como asistencia **para** cumplir la política de uso responsable del curso.
+**Como** responsable del proyecto **quiero** declarar el uso de herramientas de IA como asistencia **para** cumplir la política de uso responsable del curso.
 - Prioridad: Media · Estimación: 1
 
 **Criterios de aceptación**
-- `/docs/uso-ia.md` indica herramienta utilizada, finalidad, módulos asistidos, ejemplos relevantes y validaciones realizadas por el equipo.
+- `/docs/uso-ia.md` indica herramienta utilizada, finalidad, módulos asistidos, ejemplos relevantes y validaciones que realicé.
 - No existen comentarios artificiales ni contenido ajeno a la funcionalidad insertado con el propósito de identificar la herramienta.
 
 ---

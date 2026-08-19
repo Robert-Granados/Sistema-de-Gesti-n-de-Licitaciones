@@ -19,7 +19,9 @@ dotnet build SistemaLicitaciones.sln --no-restore
 dotnet test SistemaLicitaciones.sln --no-build
 ```
 
-Para navegador, instale primero los binarios requeridos por Playwright según el artefacto generado al compilar y asegure que la aplicación/base estén disponibles según `TestSettings`. Para la integración PostgreSQL, Docker debe estar operativo.
+Las pruebas de navegador requieren los binarios de Playwright generados durante
+la compilación y la disponibilidad de la aplicación y la base indicada en
+`TestSettings`. Las pruebas de integración con PostgreSQL requieren Docker.
 
 ## Cobertura
 
