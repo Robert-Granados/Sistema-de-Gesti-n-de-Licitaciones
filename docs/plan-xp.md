@@ -137,11 +137,7 @@ bitácora y la matriz de trazabilidad.
 
 ### 3.3 Programación en parejas en este proyecto individual
 
-La programación en pareja no se aplicó porque hubo un solo desarrollador. La IA
-fue una herramienta de asistencia y no se presenta como una segunda persona.
-No se utilizaron trailers `Co-authored-by`, porque no existió una segunda
-persona participante. El historial identifica a Robert Granados como único
-autor humano del proyecto.
+La programación en pareja no se aplicó porque hubo un solo desarrollador.
 
 ### 3.4 Pull Requests como Planning Game en miniatura
 Los PR conservaron la integración de ramas de historia y el resultado del CI.
